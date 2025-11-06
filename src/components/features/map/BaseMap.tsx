@@ -30,7 +30,7 @@ const BaseMap = ({
     queryKey: ["currentLocation"],
     queryFn: fetchCurrentLocation,
     enabled: useCurrentLocation, // useCurrentLocation이 true일 때만 실행
-    refetchInterval: 5000, // 5초마다 업데이트
+    refetchInterval: 3000, // 3초마다 업데이트
   });
 
   // 현재 위치 모드 + 위치 데이터가 있으면 -> 현재 위치, 그 외에는 props로 받은 기본 center 사용

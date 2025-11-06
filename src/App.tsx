@@ -17,7 +17,12 @@ function App() {
           level={4}
         />
 
-        <BaseMap useCurrentLocation={true} width="100%" height="80vh" />
+        <BaseMap
+          useCurrentLocation={true}
+          width="100%"
+          height="80vh"
+          markerLabel="내 위치"
+        />
       </div>
     </>
   );
