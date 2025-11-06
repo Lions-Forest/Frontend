@@ -1,14 +1,14 @@
 import "./App.css";
-import KakaoMap from "./components/features/map";
+import BaseMap from "./components/features/map/BaseMap";
 
 function App() {
   return (
     <>
       <div>
         <h2>카카오맵 테스트</h2>
-        <KakaoMap />
+        <BaseMap />
 
-        <KakaoMap
+        <BaseMap
           width="80vw"
           height="50vh"
           center={{ lat: 35.1796, lng: 129.0756 }}
@@ -16,6 +16,8 @@ function App() {
           markerLabel="부산"
           level={4}
         />
+
+        <BaseMap useCurrentLocation={true} width="100%" height="80vh" />
       </div>
     </>
   );
