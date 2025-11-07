@@ -1,24 +1,27 @@
 import styled, { keyframes } from "styled-components";
 import Background from "@/assets/images/LoadingBackground.svg";
 import SpinnerIcon from "@/assets/images/LoadingLion.svg";
+import Header from "@/components/layout/Header";
 
 export default function LoadingPage() {
   return (
     <PageWrap>
+      <Header />
+
       <Container>
         <Spinner>
-          <img src={SpinnerIcon} width={102} height={90} />
+          <img src={SpinnerIcon} width={150} height={130} />
         </Spinner>
         <TextContainer>
           <TextShadow>
             <span>위치</span>
-            <span style={{ display: "inline-block", width: "5px" }} />
+            <span style={{ display: "inline-block", width: "10px" }} />
             <span>로딩중</span>
           </TextShadow>
 
           <Text>
             <ColoredText color="#FBBC04">위치</ColoredText>
-            <span style={{ width: "5px" }} />
+            <span style={{ width: "10px" }} />
             <ColoredText color="#FF2370">로</ColoredText>
             <ColoredText color="#0095FF">딩</ColoredText>
             <ColoredText color="#43D687">중</ColoredText>
@@ -47,10 +50,6 @@ const dotsAnimation = keyframes`
 `;
 
 const PageWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   max-width: 402px;
   max-height: 874px;
   width: 100%;
@@ -61,7 +60,13 @@ const PageWrap = styled.div`
 `;
 
 const Container = styled.div`
-  gap: 27px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 75%;
+  gap: 10px;
 `;
 
 const Spinner = styled.div`
@@ -70,7 +75,7 @@ const Spinner = styled.div`
   align-items: center;
 
   img {
-    animation: ${rotate} 3.5s linear infinite;
+    animation: ${rotate} 5s linear infinite;
   }
 `;
 
