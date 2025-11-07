@@ -1,11 +1,12 @@
 import "./App.css";
 import BaseMap from "./components/features/map/BaseMap";
+import LoadingPage from "./pages/LoadingPage";
 
 function App() {
   return (
     <>
       <div>
-        <h2>카카오맵 테스트</h2>
+        {/* <h2>카카오맵 테스트</h2>
         <BaseMap />
 
         <BaseMap
@@ -22,7 +23,8 @@ function App() {
           width="100%"
           height="80vh"
           markerLabel="내 위치"
-        />
+        /> */}
+        <LoadingPage />
       </div>
     </>
   );

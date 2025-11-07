@@ -1,59 +1,49 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchCurrentLocation } from "@/api/services/locationApi";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
+import { useAllLocations } from "@/hooks/useAllLocations";
+import { useMyLocation } from "@/hooks/useMyLocation";
+import { useEffect, useState } from "react";
+import LoadingPage from "@/pages/LoadingPage";
 
-export type BaseMapProps = {
-  width?: string; // 지도 너비
-  height?: string; // 지도 높이
-  center?: { lat: number; lng: number }; // 지도 중심 위치
-  markerPosition?: { lat: number; lng: number }; // 마커 위치
-  markerLabel?: string; // 마커 텍스트
-  level?: number; // 지도 확대 레벨
-  useCurrentLocation?: boolean; // 현재 위치 사용 여부
-};
+export default function BaseMap({ userId }: { userId: string }) {
+  // useMyLocation(userId); // 내 위치 Firebase에 업로드
+  // const locations = useAllLocations(); // 모든 사용자 위치 구독
+  // const myLocation = locations?.[userId]; // 모든 사용자 위치 중 내 위치 찾아내기 (중심 좌표를 찾기 위해)
+  // const [center, setCenter] = useState<{ lat: Number; lng: number } | null>(
+  //   null
+  // );
 
-const BaseMap = ({
-  width = "80vw", // 지도 기본 너비
-  height = "80vh", // 지도 기본 높이
-  center = { lat: 37.5665, lng: 126.978 },
-  markerPosition,
-  markerLabel = "서울시청",
-  level = 3, // 지도 기본 확대 레벨
-  useCurrentLocation = false,
-}: BaseMapProps) => {
-  // React Query로 현재 위치 가져오기
-  const {
-    data: currentPos,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["currentLocation"],
-    queryFn: fetchCurrentLocation,
-    enabled: useCurrentLocation, // useCurrentLocation이 true일 때만 실행
-    refetchInterval: 3000, // 3초마다 업데이트
-  });
+  // useEffect(() => {
+  //   if (myLocation) {
+  //     setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
+  //   }
+  // }, [myLocation]);
 
-  // 현재 위치 모드 + 위치 데이터가 있으면 -> 현재 위치, 그 외에는 props로 받은 기본 center 사용
-  const finalCenter = useCurrentLocation && currentPos ? currentPos : center;
-  // markerPosition prop이 있으면 사용, 없으면 finalCenter 사용
-  const finalMarker = markerPosition || finalCenter;
+  // // 아직 위치 데이터가 들어오지 않았다면 로딩 화면 표시
+  // const isLoading = !locations || !myLocation;
+  // if (isLoading) return <LoadingPage />;
 
-  if (useCurrentLocation && isLoading) return <div>위치 가져오는 중...</div>;
-  if (useCurrentLocation && error) return <div>위치를 가져올 수 없습니다.</div>;
+  const myLocation = { latitude: 37.5665, longitude: 126.978 };
 
   return (
-    <div style={{ width, height }}>
-      <Map
-        center={finalCenter}
-        style={{ width: "100%", height: "100%" }}
-        level={level}
-      >
-        <MapMarker position={finalMarker}>
-          <div>{markerLabel}</div>
-        </MapMarker>
-      </Map>
-    </div>
+    <Map
+      center={{ lat: myLocation.latitude, lng: myLocation.longitude }}
+      style={{ width: "100%", height: "100%" }}
+      level={4}
+    >
+      {/* 모든 사용자 위치에 마커 표시 -> locatioins의 각 키(userId)와 값(loc)을 순회
+      {Object.entries(locations).map(([id, loc]) =>
+        loc?.latitude && loc?.longitude ? (
+          <MapMarker
+            key={id} // React 리스트용 키
+            position={{ lat: loc.latitude, lng: loc.longitude }}
+            title={id === userId ? "내 위치" : `사용자 ${id}`} // 마커에 마우스 올렸을 때 보일 텍스트
+          />
+        ) : null
+      )} */}
+      <MapMarker
+        position={{ lat: myLocation.latitude, lng: myLocation.longitude }}
+        title="내 위치"
+      />
+    </Map>
   );
-};
-
-export default BaseMap;
+}

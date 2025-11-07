@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../firebaseConfig";
+import { db } from "@/firebase/firebase";
 
 export const useAllLocations = () => {
   const [locations, setLocations] = useState<{

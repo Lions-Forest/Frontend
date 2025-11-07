@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { ref, set } from "firebase/database";
-import { db } from "../firebaseConfig";
+import { db } from "@/firebase/firebase";
 
 export const useMyLocation = (userId: string) => {
   useEffect(() => {
