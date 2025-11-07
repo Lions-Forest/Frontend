@@ -1,12 +1,17 @@
 import "./App.css";
 import BaseMap from "./components/features/map/BaseMap";
 import LoadingPage from "./pages/LoadingPage";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/Landing";
+import HomePage from "./pages/Home";
+import { GlobalStyle } from "./styles/global";
+import "./App.css";
 
 function App() {
   return (
     <>
-      <div>
-        {/* <h2>카카오맵 테스트</h2>
+      {/* <h2>카카오맵 테스트</h2>
         <BaseMap />
 
         <BaseMap
@@ -24,7 +29,16 @@ function App() {
           height="80vh"
           markerLabel="내 위치"
         /> */}
-        <LoadingPage />
+
+      <GlobalStyle />
+      <LoadingPage />
+      <div className="container">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/home" element={<HomePage />} />
+          </Routes>
+        </BrowserRouter>
       </div>
     </>
   );
