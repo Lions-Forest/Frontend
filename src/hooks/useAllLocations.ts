@@ -1,19 +1,21 @@
-import { useEffect, useState } from "react";
-import { ref, onValue } from "firebase/database";
+import type { UserLocation } from "@/api/UserLocation";
 import { db } from "@/firebase/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
-export const useAllLocations = () => {
-  const [locations, setLocations] = useState<{
-    [key: string]: { latitude: number; longitude: number };
-  }>({});
+export function useAllLocations() {
+  const [locations, setLocations] = useState<Record<string, UserLocation>>({});
 
   useEffect(() => {
-    const usersRef = ref(db, "users");
-    const unsubscribe = onValue(usersRef, (snapshot) => {
-      if (snapshot.exists()) setLocations(snapshot.val());
+    const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
+      const newLocations: Record<string, UserLocation> = {};
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data() as UserLocation;
+        if (data.shareLocation) newLocations[data.userId] = data;
+      });
+      setLocations(newLocations);
     });
     return () => unsubscribe();
   }, []);
-
   return locations;
-};
+}

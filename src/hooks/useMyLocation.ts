@@ -1,20 +1,29 @@
 import { useEffect } from "react";
-import { ref, set } from "firebase/database";
-import { db } from "@/firebase/firebase";
+import { db } from "@/firebase/firebase"; // firestore 초기화
+import { doc, setDoc } from "firebase/firestore"; // firestore에서 문서를 생성하거나 업데이트하는 함수
 
-export const useMyLocation = (userId: string) => {
+export const useMyLocation = (user: {
+  userId: string;
+  name: string;
+  shareLocation: boolean;
+}) => {
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!user.shareLocation) return;
 
     const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        set(ref(db, `users/${userId}/location`), { latitude, longitude });
+      async (pos) => {
+        await setDoc(doc(db, "locations", user.userId), {
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          status: "study", // 나중에 사용자가 바꿀 수 있음
+          shareLocation: user.shareLocation,
+          name: user.name,
+        });
       },
       (err) => console.error(err),
-      { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+      { enableHighAccuracy: true }
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [userId]);
+  }, [user]);
 };
