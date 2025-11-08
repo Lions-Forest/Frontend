@@ -2,7 +2,7 @@ import { Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
 import { useEffect, useState } from "react";
-import LoadingPage from "@/pages/LoadingPage";
+import LoadingPage from "@/pages/Map/LoadingPage";
 import MarkerImage from "@/assets/images/LoadingLion.svg"; // 임시로 다른 사진 지정
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
