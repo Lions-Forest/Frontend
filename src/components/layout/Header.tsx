@@ -1,34 +1,77 @@
 import React from 'react'
 import styled from 'styled-components';
-import alarmOne from '../../assets/icons/alarmOne.png'
+import none from '../../assets/icons/alarmNone.png'
+import one from '../../assets/icons/alarmOne.png'
+import two from '../../assets/icons/alarmTwo.png'
+import three from '../../assets/icons/alarmThree.png'
+import more from '../../assets/icons/alarmMore.png'
+import type { Meeting, Member } from '@/types';
+import MyMeeting from '../features/myMeeting';
 
-function Header() {
+// TODO: subtitle이 소모임 일 때, 오른쪽에 시간 display 보이기 (어떻게 가져올 지 생각해보자)
+
+function Header(member : Member, page : string = 'home') {
+    
+    let text : string = '';
+
+    // 알림 아이콘 설정
+    const alarmValue = member.alarm ?? 0;
+    let alarmImgSrc = none;
+
+    if ( alarmValue === 1 ) alarmImgSrc = one;
+    else if ( alarmValue === 2 ) alarmImgSrc = two;
+    else if ( alarmValue === 3 ) alarmImgSrc = three;
+    else if ( alarmValue >= 4 ) alarmImgSrc = more;
+    else alarmImgSrc = none;
+
+    // subheader 타이틀 설정
+    if (page === 'meeting-detail') {
+        text = '소모임';
+    } else if (page === 'home') {
+        text = '내가 신청한 모임';
+    } else {
+        text = '모임 개설하기';
+    }
+
+    
     return(
-        <HeaderLayout>
-            <Title>
-                <TitleLetter color='#FFF200'>모여봐요</TitleLetter>
-                <TitleLetter color='#FF2370'>사</TitleLetter>
-                <TitleLetter color='#0095FF'>자</TitleLetter>
-                <TitleLetter color='#FBBC04'>의</TitleLetter>
-                <TitleLetter color='#43D687'>숲</TitleLetter>
-            </Title>
-            <AlarmImg src={alarmOne} />
-        </HeaderLayout>
+        <Layout>
+            <HeaderLayout>
+                <Title>
+                    <TitleLetter color='#FFF200'>모여봐요</TitleLetter>
+                    <TitleLetter color='#FF2370'>사</TitleLetter>
+                    <TitleLetter color='#0095FF'>자</TitleLetter>
+                    <TitleLetter color='#FBBC04'>의</TitleLetter>
+                    <TitleLetter color='#43D687'>숲</TitleLetter>
+                </Title>
+                <AlarmImg src={alarmImgSrc} />
+            </HeaderLayout>
+            <HeaderLayout>
+                <SubTitle>{text}</SubTitle>
+            </HeaderLayout>
+        </Layout>
     )
 }
 
 export default Header;
 
-const HeaderLayout = styled.div`
+const Layout = styled.div`
     width: 100%;
-    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding-bottom: 12px;
+`;
+
+const HeaderLayout = styled.div`
     display: flex;
     justify-content: space-between;
+    align-items: center;
 `;
 
 const Title = styled.div`
     font-family: dongleBold;
-    font-size: 36px;
+    font-size: 54px;
     leading-trim: NONE;
     line-height: 100%;
     letter-spacing: 0%;
@@ -41,6 +84,13 @@ const TitleLetter = styled.div`
 `;
 
 const AlarmImg = styled.img`
-    width: 28px;
-    height: 31px;
+    width: 34px;
+`;
+
+const SubTitle = styled.div`
+    color: #000;
+    font-family: dongleRegular;
+    font-weight: 700;
+    font-size: 45px;
+    align-self: stretch;
 `;
