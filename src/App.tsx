@@ -8,6 +8,7 @@ import HomePage from "./pages/Home";
 import { GlobalStyle } from "./styles/global";
 import "./App.css";
 import { useAllLocations } from "./hooks/useAllLocations";
+import PlaceSearchTest from "./pages/Map/PlaceSearchTest";
 
 const myUserId = "testUser1";
 const myName = "내 이름";
@@ -44,6 +45,7 @@ function App() {
         shareLocation={true}
         userLocations={userLocations}
       />
+      <PlaceSearchTest />
       <div className="container">
         <BrowserRouter>
           <Routes>
