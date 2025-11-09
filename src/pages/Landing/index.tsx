@@ -51,8 +51,9 @@ function index() {
 
 export default index;
 
+// TODO: 랜딩페이지 이미지 확대시키기 (위아래 크롭)
 const Background = styled.img`
-  // width: 100%;
+  width: 100%;
   height: 100%;
   // background-position: center;
   // position: relative;
@@ -106,8 +107,8 @@ const LoginBtn = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0px 20px;
   gap: 20px;
+  border-radius: 8px;
 `;
 
 const LoginImg = styled.img`
@@ -117,5 +118,7 @@ const LoginImg = styled.img`
 
 const LoginText = styled.div`
   color: rgba(31, 31, 31, 1);
-  // 더 채워질 예정 (피그마에 질문 남겨놓음)
+  font-size: 18.5px;
+  font-family: Pretendard;
+  font-weight: 600;
 `;

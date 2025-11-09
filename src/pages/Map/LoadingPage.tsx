@@ -6,7 +6,7 @@ import Header from "@/components/layout/Header";
 export default function LoadingPage() {
   return (
     <PageWrap>
-      <Header />
+      {/* <Header /> */}
 
       <Container>
         <Spinner>

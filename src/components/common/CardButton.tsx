@@ -1,36 +1,91 @@
 import React from 'react'
 import styled from 'styled-components'
 
-// state: 
 interface ButtonProps { 
-    state: string;
-    text?: string;
+  onJoin?: boolean;
+  onJoinCancel?: boolean;
+  onMakeCancel?: boolean;
+  onClose?: boolean;
+  onInfo?: boolean;
+  color?: string;
 }
 
-const CardButton = (state: ButtonProps) => {
+const CardButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMakeCancel = false, onClose = false, color = `#D9D9D9`  }: ButtonProps) => {
 
-  if (state === 'save') text = '저장하기'    
+  let text = '';
+  let onClick = () => {};
+  let bgColor = '#D9D9D9';
+  let textColor = '#000';
+  let disabled = false;
+  let border = 'none';
+
+  // TODO: onClick 기능 임의 설정, 경로 수정 필요
+  if (onJoin) {
+    text = '참여하기';
+    onClick = () => {location.href = '/join' };
+    bgColor = color;
+    textColor = '#fff';
+  } else if (onMakeCancel) {
+    text = '모임 개설 취소';
+    onClick = () => {location.href = '/make-cancel'};
+    bgColor = '#fff';
+    textColor = '#000';
+    border = `2px solid ${color}`    
+  } else if (onJoinCancel) {
+    text = '참여 신청 취소';
+    onClick = () => {location.href = '/join-cancel'};
+    bgColor = '#fff';
+    textColor = '#000';
+    border = `2px solid ${color}` 
+  } else if (onClose) {
+    text = '신청 마감';
+    disabled = true;
+    bgColor = '#848484';
+    textColor = '#000';
+  } else {
+    text = '모임 정보 확인';
+    onClick = () => {location.href = '/info'};
+    bgColor = '#D9D9D9';
+    textColor = '#000';
+  }
+
   return (
-    <BtnLayout>{text}</BtnLayout>
+    <BtnLayout 
+    bgColor={bgColor}
+    textColor={textColor}
+    border={border}
+    disabled={disabled}
+    onClick={disabled ? undefined : onClick}
+    >{text}</BtnLayout>
   )
 }
 
 export default CardButton
 
-const BtnLayout = styled.div`
-    width: 360;
-    height: 42;
-    top: 20px;
-    left: 20px;
-    angle: 0 deg;
-    opacity: 1;
+interface BtnLayoutProps {
+  bgColor: string;
+  textColor: string;
+  border: string;
+  disabled: boolean;
+}
 
-    font-family: Pretendard;
-    font-weight: 600;
-    font-style: SemiBold;
-    font-size: 16px;
-    leading-trim: NONE;
-    line-height: 100%;
-    letter-spacing: 0%;
+const BtnLayout = styled.div<BtnLayoutProps>`
+  display: flex;
+  width: 243px;
+  padding: 12px 15px;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: #000;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  border-radius: 10px;
+  background: ${({ bgColor }) => bgColor};
+  color: ${({ textColor }) => textColor};
+  border: ${({ border }) => border};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 

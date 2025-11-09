@@ -14,7 +14,8 @@
   .container {
     width: 100vw;
     height: 100vh;
-    max-width: 402px;  /* 아이폰16 가로 크기 */
+    max-width: 600px;
+    /* max-width: 402px;  아이폰16 가로 크기 */
     margin: 0 auto;    /* 가로 중앙 정렬 */
     box-sizing: border-box;
     position: relative;
@@ -23,7 +24,7 @@
     align-item: center;
   }
 
-  /* 2. 데스크탑, 태블릿 대응 - 화면 넓을 때 */
+  /* 2. 데스크탑, 태블릿 대응 - 화면 넓을 때
   @media only screen and (min-width: 600px) {
     .container {
       max-width: 600px;
@@ -35,7 +36,7 @@
     }
   }
 
-  /* 3. 더 큰 화면용 추가 미디어 쿼리 */
+  3. 더 큰 화면용 추가 미디어 쿼리
   @media only screen and (min-width: 900px) {
     .container {
       max-width: 900px;
@@ -43,7 +44,7 @@
     .text-overlay {
       font-size: 3rem;
     }
-  }
+  } */
 
   #root {
     height: 100vh;
