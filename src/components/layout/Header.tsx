@@ -1,21 +1,24 @@
-import React from 'react'
 import styled from 'styled-components';
 import none from '../../assets/icons/alarmNone.png'
 import one from '../../assets/icons/alarmOne.png'
 import two from '../../assets/icons/alarmTwo.png'
 import three from '../../assets/icons/alarmThree.png'
 import more from '../../assets/icons/alarmMore.png'
-import type { Meeting, Member } from '@/types';
-import MyMeeting from '../features/myMeeting';
+import type { Member } from '@/types';
 
 // TODO: subtitle이 소모임 일 때, 오른쪽에 시간 display 보이기 (어떻게 가져올 지 생각해보자)
 
-function Header(member : Member, page : string = 'home') {
+interface HeaderProps {
+    member?: Member;
+    page?: string;
+}
+
+function Header({ member, page = 'home' }: HeaderProps = {}) {
     
     let text : string = '';
 
     // 알림 아이콘 설정
-    const alarmValue = member.alarm ?? 0;
+    const alarmValue = member?.alarm ?? 0;
     let alarmImgSrc = none;
 
     if ( alarmValue === 1 ) alarmImgSrc = one;
@@ -27,8 +30,8 @@ function Header(member : Member, page : string = 'home') {
     // subheader 타이틀 설정
     if (page === 'meeting-detail') {
         text = '소모임';
-    } else if (page === 'home') {
-        text = '내가 신청한 모임';
+    // } else if (page === 'home') {
+    //     text = '내가 신청한 모임';
     } else {
         text = '모임 개설하기';
     }
@@ -46,9 +49,11 @@ function Header(member : Member, page : string = 'home') {
                 </Title>
                 <AlarmImg src={alarmImgSrc} />
             </HeaderLayout>
-            <HeaderLayout>
+            {page !== 'home' &&
+            <HeaderLayout> 
                 <SubTitle>{text}</SubTitle>
             </HeaderLayout>
+            }
         </Layout>
     )
 }
@@ -61,6 +66,8 @@ const Layout = styled.div`
     flex-direction: column;
     gap: 25px;
     padding-bottom: 12px;
+    background: #E4F2EA;
+    padding: 15px 16px;
 `;
 
 const HeaderLayout = styled.div`
@@ -71,7 +78,7 @@ const HeaderLayout = styled.div`
 
 const Title = styled.div`
     font-family: dongleBold;
-    font-size: 54px;
+    font-size: 36px;
     leading-trim: NONE;
     line-height: 100%;
     letter-spacing: 0%;
@@ -84,13 +91,13 @@ const TitleLetter = styled.div`
 `;
 
 const AlarmImg = styled.img`
-    width: 34px;
+    width: 23px;
 `;
 
 const SubTitle = styled.div`
     color: #000;
     font-family: dongleRegular;
     font-weight: 700;
-    font-size: 45px;
+    font-size: 30px;
     align-self: stretch;
 `;

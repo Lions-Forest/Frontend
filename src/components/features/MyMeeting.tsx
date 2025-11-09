@@ -31,7 +31,7 @@ function MyMeeting({ meetings = [] }: MyMeetingProps) {
 
     return (
         <Layout>
-            {/* <SubTitle>내가 신청한 모임</SubTitle> */}
+            <Title>내가 신청한 모임</Title>
             <MeetingInfo>
                 <Background src={background} />
                 <Info>
@@ -40,11 +40,9 @@ function MyMeeting({ meetings = [] }: MyMeetingProps) {
                         ? formatMeetingDate(meeting.date)
                         : ""}
                     </DateInfo>
-                    <Title>
-                        {meetings.length
-                        ? meeting.title
-                        : "신청한 모임이 없습니다."}
-                    </Title>
+                    {meetings.length
+                        ? <SubTitle>{meeting.title}</SubTitle>
+                        : <NoneTitle>신청한 모임이 없어요</NoneTitle>}
                 </Info>
                 <LionImage src={lionWatching} />
                 {showArrows && (
@@ -80,7 +78,7 @@ export default MyMeeting;
 
 const Layout = styled.div`
     width: 100%;
-    padding: 16px;
+    padding: 0px 16px 16px 16px 16px;
     display: flex;
     flex-direction: column;
     align-items: start;
@@ -89,61 +87,76 @@ const Layout = styled.div`
     position: relative;
 `;
 
-const MeetingInfo = styled.div`
-
-`;
-
-const Info = styled.div`
-    position: relative;
-    bottom: 50%;
-    left: 25%;
-
-    z-index: 2;
-`;
-
 const Title = styled.div`
     color: #000;
     font-family: dongleRegular;
-    font-size: 33px;
+    font-weight: 700;
+    font-size: 45px;
+    align-self: stretch;
+    margin-bottom: 8px;
+`;
+
+const SubTitle = styled.div`
+    color: #000;
+    font-family: dongleRegular;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 400;
     line-height: normal;
+`;
+
+const NoneTitle = styled.div`
+    color: #5F5F5F;
+    font-family: dongleRegular;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+`;
+
+const MeetingInfo = styled.div`
+    position: relative;
+    width: 100%;
+`;
+
+const Info = styled.div`
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    transform: translateY(-50%);
+    z-index: 2;
 `;
 
 const DateInfo = styled.div`
     color: #848484;
     font-family: dongleRegular;
-    font-size: 33px;
+    font-size: 22px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
 `;
 
 const ArrowLeft = styled.img`
-    width: 25px;
+    width: 17px;
 `;
 
 const ArrowRight = styled.img`
-    width: 25px;
+    width: 17px;
     transform: rotate(180deg);
 `;
 
 const Background = styled.img`
-    width: 450px;
+    width: 332px;
     position: relative;
-    display: flex;
-    overflow: visible;
-
+    display: block;
     z-index: 1;
 `;
 
 const LionImage = styled.img`
-    // width: 194px;
-    // position: absolute;
-    // right: 0%;
-    // top: 10%;
     position: absolute;
-    right: 15px;  // 박스 바깥으로
-    bottom: 67px;
-    width: 170px;
+    right: 0%;  // 박스 바깥으로
+    top: -60%;
+    width: 130px;
     z-index: 2;
     pointer-events: none;
     user-select: none;

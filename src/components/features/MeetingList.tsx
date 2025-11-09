@@ -128,12 +128,14 @@ const Layout = styled.div`
     width: 100%;
     align-items: center;
     justify-content: center;
+    // margin: 16px 0px;
 `;
 
 const ListHeader = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: center;
     gap: 8px;
     margin-bottom: 20px;
 `;
@@ -147,7 +149,7 @@ const OptionInfo = styled.div`
 const OptionTitle = styled.div`
     color: #000;
     font-family: dongleRegular;
-    font-size: 45px;
+    font-size: 30px;
     font-weight: 700;
     line-height: normal;
 `;
@@ -162,7 +164,7 @@ const TypeList = styled.div`
 
 const TypeBtn = styled.div<{ selected?: boolean }>`
     display: flex;
-    padding: 10px 15px;
+    padding: 5px 10px;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -171,7 +173,7 @@ const TypeBtn = styled.div<{ selected?: boolean }>`
     color: ${({ selected }) => (selected ? "#fff" : "#848484")};
 
     font-family: Pretendard;
-    font-size: 21px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -180,9 +182,9 @@ const TypeBtn = styled.div<{ selected?: boolean }>`
 
 const MoreBtn = styled.div`
     display: flex;
-    width: 117px;
-    height: 45px;
-    //padding: 7px 15px 3px 18px;
+    width: 78px;
+    height: 30px;
+    //padding: 5px 10px 2px 15px;
     align-items: center;
     justify-content: center;
     gap: 10px;
@@ -194,7 +196,7 @@ const MoreBtn = styled.div`
 
     color: #000;
     font-family: dongleRegular;
-    font-size: 30px;
+    font-size: 20px;
     font-weight: 700;
     line-height: normal;
 `;

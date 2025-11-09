@@ -100,7 +100,7 @@ function PreviewCard({ meeting }: { meeting: Meeting }
         <Progress>
             <ProgressOuter>
                 <ProgressBarInner width={progress * 100} color={theme.loading}/>
-                <ProgressBarLion src={lionHead} left={180 * progress * 1.5}/>
+                <ProgressBarLion src={lionHead} left={180 * progress}/>
             </ProgressOuter>
             <Time>{`${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`}</Time>
         </Progress>
@@ -137,44 +137,44 @@ export default PreviewCard;
 
 
 const PreviewCardLayout = styled.div<{ backgroundColor: string }>`
-    width: 541px;
-    height: 324px;
-    border-radius: 10px;
+    width: 361px;
+    height: 216px;
+    border-radius: 7px;
     background: ${({ backgroundColor }) => backgroundColor};
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.10);
 `;
 
 const TitleLayout = styled.div`
-    width: 541px;
-    height: 64.5px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    width: 361px;
+    height: 43px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
     background: #FFFFFF;
 
     display: flex;
     align-items: center;
     justify-content: start;
-    margin-bottom: 18px;
+    margin-bottom: 15px;
 `;
 
 const Title = styled.div`
     font-family: dongleBold;
-    font-size: 33px;
+    font-size: 22px;
     color: #000000;
     padding: 0px 18px;
 `;
 
 const Progress = styled.div`
     display: flex;
-    margin-left: 24px;
-    gap: 24px;
+    margin-left: 16px;
+    gap: 16px;
     align-items: center;
 `;
 
 const ProgressOuter = styled.div`
-    width: 280px;
-    height: 10px;
-    border-radius: 75px;
+    width: 187px;
+    height: 7px;
+    border-radius: 50px;
 
     position: relative;
     background: #D9D9D9;
@@ -187,47 +187,47 @@ interface ProgressBarInnerProps {
 
 const ProgressBarInner = styled.div<ProgressBarInnerProps>`
     width: ${props => `${props.width}%` || '0%'};
-    height: 10px;
-    border-radius: 75px;
+    height: 7px;
+    border-radius: 50px;
     background:${props => `${props.color}` || '#fff'};
 `;
 
 const ProgressBarLion = styled.img<{ left?: number }>`
-    width: 54px;
-    height: 46px;
+    width: 36px;
+    height: 31px;
     margin-left: 3%;
     position: absolute;
     left: ${props => `${props.left}px` || '0px'};
-    top: -20px;
+    top: -15px;
     transform: translateX(-50%);
 `;
 
 const Time = styled.div`
     font-family: Pretendard;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 15px;
     color: #FFFFFF;
 `;
 
 const Body = styled.div`
-    width: 510px;
-    height: 127px;
-    border-radius: 10.5px;
+    width: 340px;
+    height: 85px;
+    border-radius: 7px;
     background: #FFF;
     display: flex;
-    margin: 22px 15px 12px 15px;
+    margin: 10px 10px;
 `;
 
 const ImagePlaceholder = styled.img`
-    width: 243px;
-    height: 127px;
+    width: 161.845px;
+    height: 85px;
     background: #C4C4C4;
-    border-radius: 10px;
+    border-radius: 7px;
 `;
 
 const Info = styled.div`
     display: flex;
-    gap: 24px;
+    gap: 14.87px;
 `;
 
 const InfoTitle = styled.div`
@@ -235,12 +235,12 @@ const InfoTitle = styled.div`
     flex-direction: column;
     align-item: start;
     justify-content: center;
-    margin-left: 24px;
-    gap: 9px;
+    margin-left: 16px;
+    gap: 6px;
 
     color: #000;
     font-family: Pretendard;
-    font-size: 15px;
+    font-size: 10px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -251,11 +251,11 @@ const InfoDetail = styled.div`
     flex-direction: column;
     align-item: start;
     justify-content: center;
-    gap: 9px;
+    gap: 6px;
     
     color: #000;
     font-family: Pretendard;
-    font-size: 15px;
+    font-size: 10px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
@@ -263,6 +263,6 @@ const InfoDetail = styled.div`
 
 const Buttons = styled.div`
     display: flex;
-    gap: 24px;
-    margin: 0px 16px 16px 16px;
+    gap: 16px;
+    margin: 8px 11px 11px 11px;
 `;
