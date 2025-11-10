@@ -1,7 +1,7 @@
-import { Map, MapMarker } from "react-kakao-maps-sdk";
+import { Circle, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import LoadingPage from "@/pages/Map/LoadingPage";
 import MarkerImage from "@/assets/images/LoadingLion.svg"; // 임시로 다른 사진 지정
 import type { UserLocation } from "@/api/UserLocation";
@@ -64,6 +64,48 @@ export default function BaseMap({
             size: { width: 50, height: 50 },
             options: { offset: { x: 25, y: 50 } },
           };
+
+          if (user.userId === userId) {
+            return (
+              <React.Fragment key={user.userId}>
+                <MapMarker
+                  key={user.userId}
+                  position={{ lat: user.latitude, lng: user.longitude }}
+                  image={markerImage}
+                  title={`${user.name} (나)`}
+                />
+
+                {/* 작은 빨간 점 */}
+                {/* <MapMarker
+                  position={{ lat: user.latitude, lng: user.longitude }}
+                  key={`${user.userId}-dot`}
+                >
+                  <div
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      background: "#FF2370",
+                      border: "2px solid white",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  />
+                </MapMarker> */}
+
+                {/* 레이더 같은 반투명한 원 */}
+                <Circle
+                  key={`${user.userId}-circle`}
+                  center={{ lat: user.latitude, lng: user.longitude }} // 원의 중심 좌표
+                  radius={150} // 반경(m)
+                  strokeWeight={2} // 테두리 굵기
+                  strokeColor={"#FF2370"} // 테두리 색
+                  strokeOpacity={0.8} // 테두리 불투명도
+                  fillColor={"#FF2370"} // 내부 채움 색
+                  fillOpacity={0.2} // 내부 채움 색 불투명도
+                />
+              </React.Fragment>
+            );
+          }
 
           return (
             <MapMarker

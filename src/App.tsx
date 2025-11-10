@@ -18,7 +18,6 @@ function App() {
   const userLocations = Object.values(locations); // 객체 → 배열
   return (
     <>
-      <h2>카카오맵 테스트</h2>
       {/* <BaseMap />
 
       <BaseMap
