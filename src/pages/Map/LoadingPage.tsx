@@ -2,38 +2,39 @@ import styled, { keyframes } from "styled-components";
 import Background from "@/assets/images/LoadingBackground.svg";
 import SpinnerIcon from "@/assets/images/LoadingLion.svg";
 import Header from "@/components/layout/Header";
+import Layout from "@/components/layout/Layout";
 
 export default function LoadingPage() {
   return (
-    <PageWrap>
-      {/* <Header /> */}
+    <Layout>
+      <PageWrap>
+        <Container>
+          <Spinner>
+            <img src={SpinnerIcon} width={150} height={120} />
+          </Spinner>
+          <TextContainer>
+            <TextShadow>
+              <span>위치</span>
+              <span style={{ display: "inline-block", width: "10px" }} />
+              <span>로딩중</span>
+            </TextShadow>
 
-      <Container>
-        <Spinner>
-          <img src={SpinnerIcon} width={150} height={130} />
-        </Spinner>
-        <TextContainer>
-          <TextShadow>
-            <span>위치</span>
-            <span style={{ display: "inline-block", width: "10px" }} />
-            <span>로딩중</span>
-          </TextShadow>
+            <Text>
+              <ColoredText color="#FBBC04">위치</ColoredText>
+              <span style={{ width: "10px" }} />
+              <ColoredText color="#FF2370">로</ColoredText>
+              <ColoredText color="#0095FF">딩</ColoredText>
+              <ColoredText color="#43D687">중</ColoredText>
 
-          <Text>
-            <ColoredText color="#FBBC04">위치</ColoredText>
-            <span style={{ width: "10px" }} />
-            <ColoredText color="#FF2370">로</ColoredText>
-            <ColoredText color="#0095FF">딩</ColoredText>
-            <ColoredText color="#43D687">중</ColoredText>
-
-            <Dots>
-              <DotShadow />
-              <DotText />
-            </Dots>
-          </Text>
-        </TextContainer>
-      </Container>
-    </PageWrap>
+              <Dots>
+                <DotShadow />
+                <DotText />
+              </Dots>
+            </Text>
+          </TextContainer>
+        </Container>
+      </PageWrap>
+    </Layout>
   );
 }
 
@@ -50,8 +51,6 @@ const dotsAnimation = keyframes`
 `;
 
 const PageWrap = styled.div`
-  max-width: 402px;
-  max-height: 874px;
   width: 100%;
   height: 100%;
   background-image: url(${Background});
@@ -65,7 +64,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 75%;
+  height: 85%;
   gap: 10px;
 `;
 
