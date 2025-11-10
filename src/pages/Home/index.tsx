@@ -1,7 +1,11 @@
+import DueList from '@/components/common/DueList';
 import PreviewCard from '@/components/common/PreviewCard';
+import WriteButton from '@/components/common/WriteButton';
 import MeetingList from '@/components/features/MeetingList';
-import MyMeeting from '@/components/features/myMeeting';
+import MyMeeting from '@/components/features/MyMeeting';
+import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
+import Layout from '@/components/layout/Layout';
 import type { Meeting, Member } from '@/types';
 import React from 'react'
 import styled from 'styled-components';
@@ -23,7 +27,7 @@ const exampleMeetings: Meeting[] = [
       type: "식사",
       complete: false,
       owner: exampleOwner,
-      memberNumber: 3,
+      memberNumber: 4,
       memberLimit: 5,
       location: "양셰프 중앙대점"
     },
@@ -96,13 +100,29 @@ const exampleMeetings: Meeting[] = [
   
 
 function index() {
+
+  const dueMeetings = exampleMeetings.filter(m => {
+    // 잔여 인원 1명일 경우
+    const isNearlyFull = (m.memberLimit - m.memberNumber) === 1;
+  
+    // 마감 1시간 이하 남은 경우
+    const diffMs = (new Date(m.date)).getTime() - new Date().getTime();
+    const isOneHourLeft = diffMs > 0 && diffMs <= 60 * 60 * 1000; // 0 < diff <= 1시간
+  
+    return isNearlyFull || isOneHourLeft;
+  });  
+
     return (
+      <Layout>
         <HomeLayout>
-            <Header />
             <MyMeeting />
             <Line />
             <MeetingList meetings={exampleMeetings} />
+            <Line />
+            <DueList meetings={dueMeetings}/>
+            <WriteButton />
         </HomeLayout>
+      </Layout>
     )
 }
 
@@ -116,11 +136,12 @@ const HomeLayout = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 23px 25px;
+    padding: 16px;
+    gap: 16px;
 `;
 
 const Line = styled.div`
-    width: 557px;
+    width: 361px;
     height: 2px;
     background: #E2E2E2;
 `;

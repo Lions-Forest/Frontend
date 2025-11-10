@@ -71,18 +71,18 @@ interface BtnLayoutProps {
 
 const BtnLayout = styled.div<BtnLayoutProps>`
   display: flex;
-  width: 243px;
-  padding: 12px 15px;
+  width: 162px;
+  padding: 8px 10px;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   color: #000;
   font-family: Pretendard;
-  font-size: 15px;
+  font-size: 10px;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 700;
   line-height: normal;
-  border-radius: 10px;
+  border-radius: 7px;
   background: ${({ bgColor }) => bgColor};
   color: ${({ textColor }) => textColor};
   border: ${({ border }) => border};
