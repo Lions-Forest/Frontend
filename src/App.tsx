@@ -5,6 +5,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
+import MyPage from "./pages/Mypage";
 import { GlobalStyle } from "./styles/global";
 import "./App.css";
 import { useAllLocations } from "./hooks/useAllLocations";
@@ -51,6 +52,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<HomePage />} />
             {/* <Route path="/map" element={<TestMap />} /> */}
+            <Route path="/mypage" element={<MyPage />} />
           </Routes>
         </BrowserRouter>
       </div>
