@@ -1,4 +1,5 @@
 import DueList from '@/components/common/DueList';
+import Line from '@/components/common/Line';
 import PreviewCard from '@/components/common/PreviewCard';
 import WriteButton from '@/components/common/WriteButton';
 import MeetingList from '@/components/features/MeetingList';
@@ -138,10 +139,4 @@ const HomeLayout = styled.div`
     align-items: center;
     padding: 16px;
     gap: 16px;
-`;
-
-const Line = styled.div`
-    width: 361px;
-    height: 2px;
-    background: #E2E2E2;
 `;

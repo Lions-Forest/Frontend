@@ -64,8 +64,8 @@ const Layout = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    padding-bottom: 12px;
+    gap: 16px;
+    // padding-bottom: 12px;
     background: #E4F2EA;
     padding: 15px 16px;
 `;

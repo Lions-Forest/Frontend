@@ -4,14 +4,15 @@ import styled from "styled-components";
 import Footer from "./Footer";
 
 interface LayoutProps {
+    page?: string;
     children: React.ReactNode;
 }
 
-function Layout({ children }: LayoutProps) {
+function Layout({ page, children }: LayoutProps) {
     return(
         <Root>
             <HeaderWrapper>
-                <Header page="home" />
+                <Header page={page} />
             </HeaderWrapper>
             <Content>
                 {children}

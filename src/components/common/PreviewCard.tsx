@@ -1,29 +1,8 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
 import CardButton from "./CardButton";
-import type { Meeting, Member } from "@/types";
-
-// const exampleOwner: Member = {
-//     id: 0,
-//     name: '김종앙',
-//     nickname: '멋쟁이 사자처럼',
-//     photoUrl: 'blank.com',
-// }
-
-// const exampleMemberOne: Member = {
-//     id: 1,
-//     name: '김종앙',
-//     nickname: '멋쟁이 사자처럼',
-//     photoUrl: 'blank.com',
-// }
-
-// const exampleMemberTwo: Member = {
-//     id: 2,
-//     name: '김종앙',
-//     nickname: '멋쟁이 사자처럼',
-//     photoUrl: 'blank.com',
-// }
+import type { Meeting } from "@/types";
 
 interface ColorTheme {
     body: string;
@@ -71,17 +50,8 @@ function calculateRemaining(meetingDate: Date) {
     return remaining;
 }
 
-function PreviewCard({ meeting }: { meeting: Meeting }
-    // id, title, date, type, owner, memberLimit, memberNumber, location,
-    // id = 0,
-    // title = "세션 전 함께 저녁 먹어요~",
-    // date =  new Date('2025-12-08T18:30:00'),
-    // type = "식사",
-    // owner = exampleOwner,
-    // memberNumber = 2,
-    // memberLimit = 5,
-    // location = "양셰프 중앙대점",
-) {
+function PreviewCard({ meeting }: { meeting: Meeting }) {
+  const navigate = useNavigate();
   
   const remaining = calculateRemaining(meeting.date);
   const progress = meeting.memberNumber / meeting.memberLimit;
@@ -91,6 +61,10 @@ function PreviewCard({ meeting }: { meeting: Meeting }
   else if (meeting.id % 4 === 1) theme = blueTheme;
   else if (meeting.id % 4 === 2) theme = yellowTheme;
   else theme = pinkTheme;  
+
+  const handleCardClick = () => {
+    navigate('/home/meeting-detail', { state: { meeting } });
+  };
 
   return (
     <PreviewCardLayout backgroundColor={theme.body}>
@@ -119,14 +93,10 @@ function PreviewCard({ meeting }: { meeting: Meeting }
                         <div>{meeting.memberNumber}/{meeting.memberLimit}</div>
                         <div>{meeting.location}</div>
                     </InfoDetail>
-                    {/* <div>모임 종류 <span>{type}</span></div>
-                    <div>모임장 <span>{owner.name}</span></div>
-                    <div>인원 <span>{memberNumber}/{memberLimit}</span></div>
-                    <div>장소 <span>{location}</span></div> */}
                 </Info>
             </Body>
-            <Buttons>
-                <CardButton onInfo={true} />
+            <Buttons onClick={(e) => e.stopPropagation()}>
+                <CardButton onInfo={true} onClick={handleCardClick} />
                 <CardButton onJoin={true} color={theme.button}/>
             </Buttons>
     </PreviewCardLayout>
