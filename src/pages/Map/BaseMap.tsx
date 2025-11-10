@@ -1,4 +1,4 @@
-import { Circle, Map, MapMarker } from "react-kakao-maps-sdk";
+import { Circle, CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
 import React, { useEffect, useState } from "react";
@@ -93,7 +93,7 @@ export default function BaseMap({
                 </MapMarker> */}
 
                 {/* 레이더 같은 반투명한 원 */}
-                <Circle
+                {/* <Circle
                   key={`${user.userId}-circle`}
                   center={{ lat: user.latitude, lng: user.longitude }} // 원의 중심 좌표
                   radius={150} // 반경(m)
@@ -102,7 +102,40 @@ export default function BaseMap({
                   strokeOpacity={0.8} // 테두리 불투명도
                   fillColor={"#FF2370"} // 내부 채움 색
                   fillOpacity={0.2} // 내부 채움 색 불투명도
-                />
+                /> */}
+
+                {/* 그라데이션 원 */}
+                <CustomOverlayMap
+                  position={{ lat: user.latitude, lng: user.longitude }}
+                >
+                  <div
+                    style={{
+                      width: "250px",
+                      height: "250px",
+                      borderRadius: "50%",
+                      background:
+                        "radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, rgba(0, 128, 0, 0,7) 90%",
+                      transform: "translate(-50%, -50%)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                </CustomOverlayMap>
+
+                {/* 내 위치 (빨간 점) */}
+                <CustomOverlayMap
+                  position={{ lat: user.latitude, lng: user.longitude }}
+                >
+                  <div
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      background: "#00cc00",
+                      border: "none",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  />
+                </CustomOverlayMap>
               </React.Fragment>
             );
           }
