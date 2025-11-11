@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import styled from "styled-components";
 import Footer from "./Footer";
+import InfoButton from "../common/InfoButton";
 
 interface LayoutProps {
     page?: string;
@@ -17,9 +18,17 @@ function Layout({ page, children }: LayoutProps) {
             <Content>
                 {children}
             </Content>
-            <FooterWrapper>
-                <Footer />
-            </FooterWrapper>
+            {page === 'create-meeting' ? (
+                <></>
+                // <ButtonWrapper>
+                //     <InfoButton onNext={true} />
+                // </ButtonWrapper>
+            ) : (
+                <FooterWrapper>
+                    <Footer />
+                </FooterWrapper>
+            )}
+            
         </Root>
     )
 }
@@ -52,3 +61,7 @@ const FooterWrapper = styled.div`
     width: 100%;
 `;
 
+const ButtonWrapper = styled.div`
+    width: 100%;
+    margin: 0px 16px 54px 16px;
+`;
