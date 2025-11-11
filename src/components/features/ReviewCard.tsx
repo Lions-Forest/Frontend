@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import { HiOutlineStar as FullStar} from "react-icons/hi";
 import { HiStar as EmptyStar} from "react-icons/hi";
+import ScoreNav from "../common/ScoreNav";
 
 const MAX_STARS = 5;
 
@@ -14,7 +15,8 @@ function ReviewCard({ review }: { review: Review }){
                 <ProfileName>{review.writer.nickname || review.writer.name}</ProfileName>
             </Header>
             <CardPhoto src={review.photoUrl}/>
-            <StarSection>
+            <ScoreNav review={review} />
+            {/* <StarSection>
             {[...Array(MAX_STARS)].map((_, i) =>
                 i < review.starNumber ? (
                     <StyledStar as={FullStar} key={i} filled />
@@ -22,7 +24,7 @@ function ReviewCard({ review }: { review: Review }){
                     <StyledStar as={EmptyStar} key={i} />
                 )
             )}
-            </StarSection>
+            </StarSection> */}
             <CardDetail>{review.detail}</CardDetail>
         </CardLayout>
     )

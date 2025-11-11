@@ -41,4 +41,5 @@ export interface Review {
     photoUrl: string,
     starNumber: number,
     detail: string,
+    date: Date,
 }

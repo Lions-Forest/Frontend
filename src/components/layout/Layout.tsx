@@ -44,7 +44,7 @@ const Root = styled.div`
 `;
 
 const HeaderWrapper = styled.div`
-    flex-shrink: 0;
+    // flex-shrink: 0;
     width: 100%;
 `;
 
@@ -57,7 +57,7 @@ const Content = styled.div`
 `;
 
 const FooterWrapper = styled.div`
-    flex-shrink: 0;
+    // flex-shrink: 0;
     width: 100%;
 `;
 

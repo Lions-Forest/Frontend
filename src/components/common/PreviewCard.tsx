@@ -1,3 +1,5 @@
+// TODO: width px -> %로 바꾸기
+
 import { useNavigate } from "react-router-dom";
 import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
@@ -107,7 +109,8 @@ export default PreviewCard;
 
 
 const PreviewCardLayout = styled.div<{ backgroundColor: string }>`
-    width: 361px;
+    // width: 361px;
+    width: 100%;
     height: 216px;
     border-radius: 7px;
     background: ${({ backgroundColor }) => backgroundColor};
@@ -115,7 +118,8 @@ const PreviewCardLayout = styled.div<{ backgroundColor: string }>`
 `;
 
 const TitleLayout = styled.div`
-    width: 361px;
+    // width: 361px;
+    width: 100%;
     height: 43px;
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;

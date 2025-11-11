@@ -188,7 +188,7 @@ const MoreBtn = styled.div`
     align-items: center;
     justify-content: center;
     gap: 10px;
-    flex-shrink: 0;
+    // flex-shrink: 0;
     border-radius: 50px;
     background: #FFF;
     box-shadow: 0px 0px 10px  #00000040;
