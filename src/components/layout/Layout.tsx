@@ -2,19 +2,22 @@ import React from "react";
 import Header from "./Header";
 import styled from "styled-components";
 import Footer from "./Footer";
-import InfoButton from "../common/InfoButton";
+import BackToNavBar from '../common/BackToNavBar'; // Import BackToNavBar
 
 interface LayoutProps {
     page?: string;
     children: React.ReactNode;
+    showBackNavBar?: boolean; // New prop for conditional rendering
+    backNavBarText?: string; // New prop for BackToNavBar text
 }
 
-function Layout({ page, children }: LayoutProps) {
+function Layout({ page, children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
     return(
         <Root>
             <HeaderWrapper>
                 <Header page={page} />
             </HeaderWrapper>
+            {showBackNavBar && <BackToNavBar text={backNavBarText} />} {/* 뒤로가기 NavBar 필요할 때만 사용 */}
             <Content>
                 {children}
             </Content>
