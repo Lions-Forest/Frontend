@@ -2,9 +2,9 @@
 // 1. BtnSection 디자인 수정하기
 // 2. background 반응형 적용 방안 구상하기 (위아래 적절히 잘리도록?)
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import landingImage from '../../assets/images/landingImage.png';
+import landingImage from "../../assets/images/landingImage.png";
 
 type ColorSpanProps = {
   color: string;
@@ -15,7 +15,7 @@ type BtnSectionProps = {
   opacity: number;
 };
 
-function index() {
+function Index() {
   const [colorStep, setColorStep] = useState(false);
   const [show, setShow] = useState(false);
 
@@ -25,31 +25,52 @@ function index() {
   }, []);
 
   useEffect(() => {
-  const showTimer = setTimeout(() => setShow(true), 3500);
-  return () => clearTimeout(showTimer);
-}, []);
+    const showTimer = setTimeout(() => setShow(true), 3500);
+    return () => clearTimeout(showTimer);
+  }, []);
 
   return (
     <div>
-        <Background src={landingImage} />
-            <OverlayText> 
-              <ColorSpan color={colorStep ? "rgba(255, 234, 0, 1)" : "rgba(255, 255, 255, 1)"}>모여봐요</ColorSpan><br/>
-              <ColorSpan color={colorStep ? "rgba(255, 35, 112, 1)" : "rgba(255, 255, 255, 1)"}>사</ColorSpan>
-              <ColorSpan color={colorStep ? "rgba(0, 149, 255, 1)" : "rgba(255, 255, 255, 1)"}>자</ColorSpan>
-              <ColorSpan color={colorStep ? "rgba(251, 188, 4, 1)" : "rgba(255, 255, 255, 1)"}>의</ColorSpan>
-              <ColorSpan color={colorStep ? "rgba(67, 214, 135, 1)" : "rgba(255, 255, 255, 1)"}>숲</ColorSpan>
-            </OverlayText>
-            <BtnSection opacity={show ? 1 : 0}>
-              <LoginBtn>
-                <LoginImg src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" />
-                <LoginText>Sign in with Google</LoginText>
-              </LoginBtn>
-            </BtnSection>
+      <Background src={landingImage} />
+      <OverlayText>
+        <ColorSpan
+          color={colorStep ? "rgba(255, 234, 0, 1)" : "rgba(255, 255, 255, 1)"}
+        >
+          모여봐요
+        </ColorSpan>
+        <br />
+        <ColorSpan
+          color={colorStep ? "rgba(255, 35, 112, 1)" : "rgba(255, 255, 255, 1)"}
+        >
+          사
+        </ColorSpan>
+        <ColorSpan
+          color={colorStep ? "rgba(0, 149, 255, 1)" : "rgba(255, 255, 255, 1)"}
+        >
+          자
+        </ColorSpan>
+        <ColorSpan
+          color={colorStep ? "rgba(251, 188, 4, 1)" : "rgba(255, 255, 255, 1)"}
+        >
+          의
+        </ColorSpan>
+        <ColorSpan
+          color={colorStep ? "rgba(67, 214, 135, 1)" : "rgba(255, 255, 255, 1)"}
+        >
+          숲
+        </ColorSpan>
+      </OverlayText>
+      <BtnSection opacity={show ? 1 : 0}>
+        <LoginBtn>
+          <LoginImg src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" />
+          <LoginText>Sign in with Google</LoginText>
+        </LoginBtn>
+      </BtnSection>
     </div>
-  )
+  );
 }
 
-export default index;
+export default Index;
 
 // TODO: 랜딩페이지 이미지 확대시키기 (위아래 크롭)
 const Background = styled.img`
@@ -81,7 +102,8 @@ const OverlayText = styled.div`
 
 const ColorSpan = styled.span<ColorSpanProps>`
   color: ${({ color }) => color};
-  text-shadow: ${({ textShadow }) => textShadow || '0px 4px 7px rgba(0, 0, 0, 0.5)'};
+  text-shadow: ${({ textShadow }) =>
+    textShadow || "0px 4px 7px rgba(0, 0, 0, 0.5)"};
   transition: color 1s, text-shadow 1s;
 `;
 
@@ -93,7 +115,7 @@ const BtnSection = styled.div<BtnSectionProps>`
   display: flex;
   justify-content: center;
   // opacity: 0%;
-  opacity: ${({ opacity }) => opacity};  // 0 또는 1
+  opacity: ${({ opacity }) => opacity}; // 0 또는 1
   transition: opacity 2s;
 `;
 
