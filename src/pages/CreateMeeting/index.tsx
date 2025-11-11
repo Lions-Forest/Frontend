@@ -12,7 +12,7 @@ import InfoButton from "@/components/common/InfoButton";
 function index() {
     const [step, setStep] = useState(1);
     return(
-        <Layout page="create-meeting">
+        <Layout page="create-meeting" showBackNavBar={true} backNavBarText="모임 개설하기">
             <StepLayout>
                 {step === 1 && <StepOneInfo onNextStep={() => setStep(2)} />}
                 {step === 2 && <StepTwoName onNextStep={() => setStep(3)} onPrevStep={() => setStep(1)} />}

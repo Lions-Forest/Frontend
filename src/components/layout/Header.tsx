@@ -52,7 +52,7 @@ function Header({ member, page = 'home' }: HeaderProps = {}) {
             </HeaderLayout>
             {page !== 'home' &&
             <HeaderLayout> 
-                <SubTitle>{text}</SubTitle>
+                {/*<SubTitle>{text}</SubTitle>*/}
             </HeaderLayout>
             }
         </Layout>

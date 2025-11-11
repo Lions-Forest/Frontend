@@ -5,24 +5,32 @@ import Footer from "./Footer";
 import BackToNavBar from '../common/BackToNavBar'; // Import BackToNavBar
 
 interface LayoutProps {
+    page?: string;
     children: React.ReactNode;
     showBackNavBar?: boolean; // New prop for conditional rendering
     backNavBarText?: string; // New prop for BackToNavBar text
 }
 
-function Layout({ children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
+function Layout({  page, children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
     return(
         <Root>
             <HeaderWrapper>
-                <Header page="home" />
+                <Header page={page} />
             </HeaderWrapper>
             {showBackNavBar && <BackToNavBar text={backNavBarText} />} {/* 뒤로가기 NavBar 필요할 때만 사용 */}
             <Content>
                 {children}
             </Content>
-            <FooterWrapper>
-                <Footer />
-            </FooterWrapper>
+            {page === 'create-meeting' ? (
+                <></>
+                // <ButtonWrapper>
+                //     <InfoButton onNext={true} />
+                // </ButtonWrapper>
+            ) : (
+                <FooterWrapper>
+                    <Footer />
+                </FooterWrapper>
+            )}
         </Root>
     )
 }
@@ -53,5 +61,10 @@ const Content = styled.div`
 const FooterWrapper = styled.div`
     flex-shrink: 0;
     width: 100%;
+`;
+
+const ButtonWrapper = styled.div`
+    width: 100%;
+    margin: 0px 16px 54px 16px;
 `;
 
