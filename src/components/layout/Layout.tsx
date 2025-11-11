@@ -2,33 +2,27 @@ import React from "react";
 import Header from "./Header";
 import styled from "styled-components";
 import Footer from "./Footer";
-import InfoButton from "../common/InfoButton";
+import BackToNavBar from '../common/BackToNavBar'; // Import BackToNavBar
 
 interface LayoutProps {
-    page?: string;
     children: React.ReactNode;
+    showBackNavBar?: boolean; // New prop for conditional rendering
+    backNavBarText?: string; // New prop for BackToNavBar text
 }
 
-function Layout({ page, children }: LayoutProps) {
+function Layout({ children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
     return(
         <Root>
             <HeaderWrapper>
-                <Header page={page} />
+                <Header page="home" />
             </HeaderWrapper>
+            {showBackNavBar && <BackToNavBar text={backNavBarText} />} {/* 뒤로가기 NavBar 필요할 때만 사용 */}
             <Content>
                 {children}
             </Content>
-            {page === 'create-meeting' ? (
-                <></>
-                // <ButtonWrapper>
-                //     <InfoButton onNext={true} />
-                // </ButtonWrapper>
-            ) : (
-                <FooterWrapper>
-                    <Footer />
-                </FooterWrapper>
-            )}
-            
+            <FooterWrapper>
+                <Footer />
+            </FooterWrapper>
         </Root>
     )
 }
@@ -61,7 +55,3 @@ const FooterWrapper = styled.div`
     width: 100%;
 `;
 
-const ButtonWrapper = styled.div`
-    width: 100%;
-    margin: 0px 16px 54px 16px;
-`;
