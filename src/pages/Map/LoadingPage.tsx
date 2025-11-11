@@ -1,7 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import Background from "@/assets/images/LoadingBackground.svg";
 import SpinnerIcon from "@/assets/images/LoadingLion.svg";
-import Header from "@/components/layout/Header";
 import Layout from "@/components/layout/Layout";
 
 export default function LoadingPage() {

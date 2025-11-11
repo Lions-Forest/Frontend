@@ -1,4 +1,4 @@
-import { Circle, CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
+import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
 import React, { useEffect, useState } from "react";

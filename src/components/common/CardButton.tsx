@@ -1,7 +1,6 @@
-import React from 'react'
-import styled from 'styled-components'
+import styled from "styled-components";
 
-interface ButtonProps { 
+interface ButtonProps {
   onJoin?: boolean;
   onJoinCancel?: boolean;
   onMakeCancel?: boolean;
@@ -10,57 +9,73 @@ interface ButtonProps {
   color?: string;
 }
 
-const CardButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMakeCancel = false, onClose = false, color = `#D9D9D9`  }: ButtonProps) => {
-
-  let text = '';
+const CardButton = ({
+  onJoin = false,
+  // onInfo = false,
+  onJoinCancel = false,
+  onMakeCancel = false,
+  onClose = false,
+  color = `#D9D9D9`,
+}: ButtonProps) => {
+  let text = "";
   let onClick = () => {};
-  let bgColor = '#D9D9D9';
-  let textColor = '#000';
+  let bgColor = "#D9D9D9";
+  let textColor = "#000";
   let disabled = false;
-  let border = 'none';
+  let border = "none";
 
   // TODO: onClick 기능 임의 설정, 경로 수정 필요
   if (onJoin) {
-    text = '참여하기';
-    onClick = () => {location.href = '/join' };
+    text = "참여하기";
+    onClick = () => {
+      location.href = "/join";
+    };
     bgColor = color;
-    textColor = '#fff';
+    textColor = "#fff";
   } else if (onMakeCancel) {
-    text = '모임 개설 취소';
-    onClick = () => {location.href = '/make-cancel'};
-    bgColor = '#fff';
-    textColor = '#000';
-    border = `2px solid ${color}`    
+    text = "모임 개설 취소";
+    onClick = () => {
+      location.href = "/make-cancel";
+    };
+    bgColor = "#fff";
+    textColor = "#000";
+    border = `2px solid ${color}`;
   } else if (onJoinCancel) {
-    text = '참여 신청 취소';
-    onClick = () => {location.href = '/join-cancel'};
-    bgColor = '#fff';
-    textColor = '#000';
-    border = `2px solid ${color}` 
+    text = "참여 신청 취소";
+    onClick = () => {
+      location.href = "/join-cancel";
+    };
+    bgColor = "#fff";
+    textColor = "#000";
+    border = `2px solid ${color}`;
   } else if (onClose) {
-    text = '신청 마감';
+    text = "신청 마감";
     disabled = true;
-    bgColor = '#848484';
-    textColor = '#000';
+    bgColor = "#848484";
+    textColor = "#000";
   } else {
-    text = '모임 정보 확인';
-    onClick = () => {location.href = '/info'};
-    bgColor = '#D9D9D9';
-    textColor = '#000';
+    text = "모임 정보 확인";
+    onClick = () => {
+      location.href = "/info";
+    };
+    bgColor = "#D9D9D9";
+    textColor = "#000";
   }
 
   return (
-    <BtnLayout 
-    bgColor={bgColor}
-    textColor={textColor}
-    border={border}
-    disabled={disabled}
-    onClick={disabled ? undefined : onClick}
-    >{text}</BtnLayout>
-  )
-}
+    <BtnLayout
+      bgColor={bgColor}
+      textColor={textColor}
+      border={border}
+      disabled={disabled}
+      onClick={disabled ? undefined : onClick}
+    >
+      {text}
+    </BtnLayout>
+  );
+};
 
-export default CardButton
+export default CardButton;
 
 interface BtnLayoutProps {
   bgColor: string;
@@ -86,6 +101,5 @@ const BtnLayout = styled.div<BtnLayoutProps>`
   background: ${({ bgColor }) => bgColor};
   color: ${({ textColor }) => textColor};
   border: ${({ border }) => border};
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
 `;
-

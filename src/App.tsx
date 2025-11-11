@@ -1,7 +1,5 @@
 import "./App.css";
 import BaseMap from "./pages/Map/BaseMap";
-import LoadingPage from "./pages/Map/LoadingPage";
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
