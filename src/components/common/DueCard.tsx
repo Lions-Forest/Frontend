@@ -1,5 +1,5 @@
 import type { Meeting } from "@/types";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import styled from "styled-components";
 
 interface DueCardProps {
@@ -46,96 +46,95 @@ function formatTime(diffMs: number) {
   
 
 function DueCard({ meeting }: DueCardProps) {
+  const diffMs = useMemo(() => getTimeDiffMs(meeting.date), [meeting.date]);
+  const timeText = formatTime(diffMs);
 
-    const diffMs = useMemo(() => getTimeDiffMs(meeting.date), [meeting.date]);
-    const timeText = formatTime(diffMs);
-  
-    // Calculate member progress
-    const progress = meeting.memberNumber / meeting.memberLimit;
+  // Calculate member progress
+  const progress = meeting.memberNumber / meeting.memberLimit;
 
-    return(
-        <CardLayout>
-            <Header>
-                <Time>{timeText}</Time>
-            </Header>
-            <Body>
-                <CircleOutline>
-                <svg viewBox="0 0 65 65">
-                    <circle
-                        cx="30"
-                        cy="30"
-                        r="25"
-                        stroke="#C4C4C4"
-                        strokeWidth="5"
-                        fill="#DBDBDB"
-                    />
-                    <circle
-                        cx="30"
-                        cy="30"
-                        r="25"
-                        stroke="#FF4081"
-                        strokeWidth="5"
-                        fill="transparent"
-                        strokeDasharray={2 * Math.PI * 25}
-                        strokeDashoffset={2 * Math.PI * 25 * (1 - progress)}
-                        strokeLinecap="round"
-                        transform="rotate(-90 30 30)"
-                    />
-                </svg>
-                </CircleOutline>
-                <MemberNumber>
-                    <ColoredCount>{meeting.memberNumber}</ColoredCount>
-                    /{meeting.memberLimit}
-                </MemberNumber>
-                <Title>{meeting.title}</Title>
-            </Body>
-        </CardLayout>
-    )
+  return (
+    <CardLayout>
+      <Header>
+        <Time>{timeText}</Time>
+      </Header>
+      <Body>
+        <CircleOutline>
+          <svg viewBox="0 0 65 65">
+            <circle
+              cx="30"
+              cy="30"
+              r="25"
+              stroke="#C4C4C4"
+              strokeWidth="5"
+              fill="#DBDBDB"
+            />
+            <circle
+              cx="30"
+              cy="30"
+              r="25"
+              stroke="#FF4081"
+              strokeWidth="5"
+              fill="transparent"
+              strokeDasharray={2 * Math.PI * 25}
+              strokeDashoffset={2 * Math.PI * 25 * (1 - progress)}
+              strokeLinecap="round"
+              transform="rotate(-90 30 30)"
+            />
+          </svg>
+        </CircleOutline>
+        <MemberNumber>
+          <ColoredCount>{meeting.memberNumber}</ColoredCount>/
+          {meeting.memberLimit}
+        </MemberNumber>
+        <Title>{meeting.title}</Title>
+      </Body>
+    </CardLayout>
+  );
 }
 
-export default DueCard
+export default DueCard;
 
 const CardLayout = styled.div`
-    width: 114px;
-    height: 139px;
-    flex-shrink: 0;
-    border-radius: 7px;
-    background: #FFF;
+  width: 114px;
+  height: 139px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: #fff;
 `;
 
 const Header = styled.div`
-    width: 114px;
-    height: 26px;
-    flex-shrink: 0;
-    border-radius: 7px 7px 0 0;
-    background: #FF2370;
+  width: 114px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 7px 7px 0 0;
+  background: #ff2370;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
 `;
 
 const Time = styled.div`
-    color: #FFF;
-    font-family: Pretendard;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
+  color: #fff;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 `;
 
 const Body = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
 `;
 
 const CircleOutline = styled.div`
-    width: 63px;
-    height: 63px;
+  width: 63px;
+  height: 63px;
 `;
 
 // const CircleInline = styled.div`
@@ -146,35 +145,35 @@ const CircleOutline = styled.div`
 // `;
 
 const MemberNumber = styled.div`
-    color: #000;
-    font-family: Pretendard;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
+  color: #000;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 
-    display: flex;
+  display: flex;
 `;
 
 const ColoredCount = styled.div`
-    color: #FF2370;
-    font-family: Pretendard;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
+  color: #ff2370;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 `;
 
 const Title = styled.div`
-    // width: 103px;
-    // height: 12px;
-    flex-shrink: 0;
-    aspect-ratio: 103/12;
-    color: #000;
-    text-align: center;
-    font-family: Pretendard;
-    font-size: 10px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
+  // width: 103px;
+  // height: 12px;
+  flex-shrink: 0;
+  aspect-ratio: 103/12;
+  color: #000;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 `;
