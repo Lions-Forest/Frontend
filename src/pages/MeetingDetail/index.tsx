@@ -1,3 +1,5 @@
+// TODO: 멤버 클릭할 때 <MemberModal> 띄우기, 프롭스로 익명/실명 전달 로직 구현
+
 import Layout from "@/components/layout/Layout";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
