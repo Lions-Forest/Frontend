@@ -8,11 +8,13 @@ export function useAllLocations() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
+      console.log("snapshot docs:", snapshot.docs);
       const newLocations: Record<string, UserLocation> = {};
       snapshot.docs.forEach((doc) => {
         const data = doc.data() as UserLocation;
         if (data.shareLocation) newLocations[data.userId] = data;
       });
+      console.log("newLocations:", newLocations);
       setLocations(newLocations);
     });
     return () => unsubscribe();

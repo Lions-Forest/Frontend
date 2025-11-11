@@ -23,6 +23,8 @@ export default function BaseMap({
   useMyLocation({ userId, name, shareLocation }); // 내 위치 Firebase에 업로드
   const locations = useAllLocations(); // 모든 사용자 위치 구독
   const myLocation = locations?.[userId]; // 모든 사용자 위치 중 내 위치 찾아내기 (중심 좌표를 찾기 위해)
+  console.log("locations state:", locations);
+  console.log("myLocation:", myLocation);
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(
     myLocation ? { lat: myLocation.latitude, lng: myLocation.longitude } : null
   );

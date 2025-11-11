@@ -12,6 +12,7 @@ export const useMyLocation = (user: {
 
     const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
+        console.log("내 위치 좌표:", pos.coords);
         await setDoc(doc(db, "locations", user.userId), {
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
@@ -19,6 +20,7 @@ export const useMyLocation = (user: {
           shareLocation: user.shareLocation,
           name: user.name,
         });
+        console.log("Firestore에 위치 업데이트 완료");
       },
       (err) => console.error(err),
       { enableHighAccuracy: true }
