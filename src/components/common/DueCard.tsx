@@ -12,12 +12,38 @@ function getTimeDiffMs(date: Date | string) {
   return Math.max(d.getTime() - now.getTime(), 0);
 }
 
+// function formatTime(diffMs: number) {
+//   const totalSeconds = Math.floor(diffMs / 1000);
+//   const minutes = Math.floor(totalSeconds / 60);
+//   const seconds = totalSeconds % 60;
+//   return `${minutes}M:${String(seconds).padStart(2, '0')}S`;
+// }
+
 function formatTime(diffMs: number) {
-  const totalSeconds = Math.floor(diffMs / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}M:${String(seconds).padStart(2, "0")}S`;
+    let totalSeconds = Math.max(Math.floor(diffMs / 1000), 0);
+  
+    const days = Math.floor(totalSeconds / (60 * 60 * 24));
+    totalSeconds %= (60 * 60 * 24);
+    const hours = Math.floor(totalSeconds / (60 * 60));
+    totalSeconds %= (60 * 60);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+  
+    let result = "";
+  
+    // 최소 M:SS는 항상 보여줌
+    if (days > 0) {
+      result += `${days}D:`;
+    }
+    if (hours > 0 || days > 0) {
+      result += `${String(hours).padStart(2, "0")}H:`;
+    }
+    // minutes, seconds는 무조건 표기
+    result += `${String(minutes).padStart(2, "0")}M:${String(seconds).padStart(2, "0")}S`;
+  
+    return result;
 }
+  
 
 function DueCard({ meeting }: DueCardProps) {
   const diffMs = useMemo(() => getTimeDiffMs(meeting.date), [meeting.date]);

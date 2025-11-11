@@ -1,28 +1,8 @@
-import lionHead from "../../assets/icons/lionHead.png";
+import { useNavigate } from "react-router-dom";
+import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
 import CardButton from "./CardButton";
 import type { Meeting } from "@/types";
-
-// const exampleOwner: Member = {
-//     id: 0,
-//     name: '김종앙',
-//     nickname: '멋쟁이 사자처럼',
-//     photoUrl: 'blank.com',
-// }
-
-// const exampleMemberOne: Member = {
-//     id: 1,
-//     name: '김종앙',
-//     nickname: '멋쟁이 사자처럼',
-//     photoUrl: 'blank.com',
-// }
-
-// const exampleMemberTwo: Member = {
-//     id: 2,
-//     name: '김종앙',
-//     nickname: '멋쟁이 사자처럼',
-//     photoUrl: 'blank.com',
-// }
 
 interface ColorTheme {
   body: string;
@@ -69,20 +49,8 @@ function calculateRemaining(meetingDate: Date) {
   return remaining;
 }
 
-function PreviewCard({
-  meeting,
-}: {
-  meeting: Meeting;
-}) // id, title, date, type, owner, memberLimit, memberNumber, location,
-// id = 0,
-// title = "세션 전 함께 저녁 먹어요~",
-// date =  new Date('2025-12-08T18:30:00'),
-// type = "식사",
-// owner = exampleOwner,
-// memberNumber = 2,
-// memberLimit = 5,
-// location = "양셰프 중앙대점",
-{
+function PreviewCard({ meeting }: { meeting: Meeting }) {
+  const navigate = useNavigate();
   const remaining = calculateRemaining(meeting.date);
   const progress = meeting.memberNumber / meeting.memberLimit;
   let theme: ColorTheme;
@@ -92,48 +60,43 @@ function PreviewCard({
   else if (meeting.id % 4 === 2) theme = yellowTheme;
   else theme = pinkTheme;
 
+  const handleCardClick = () => {
+    navigate('/home/meeting-detail', { state: { meeting } });
+  };
+
   return (
     <PreviewCardLayout backgroundColor={theme.body}>
-      <TitleLayout>
-        <Title>{meeting.title}</Title>
-      </TitleLayout>
-      <Progress>
-        <ProgressOuter>
-          <ProgressBarInner width={progress * 100} color={theme.loading} />
-          <ProgressBarLion src={lionHead} left={180 * progress} />
-        </ProgressOuter>
-        <Time>{`${remaining.day}D : ${String(remaining.hour).padStart(
-          2,
-          "0"
-        )}H : ${String(remaining.min).padStart(2, "0")}M`}</Time>
-      </Progress>
-      <Body>
-        <ImagePlaceholder src="https://via.placeholder.com/" />
-        <Info>
-          <InfoTitle>
-            <div>모임 종류</div>
-            <div>모임장</div>
-            <div>인원</div>
-            <div>장소</div>
-          </InfoTitle>
-          <InfoDetail>
-            <div>{meeting.type}</div>
-            <div>{meeting.owner.name}</div>
-            <div>
-              {meeting.memberNumber}/{meeting.memberLimit}
-            </div>
-            <div>{meeting.location}</div>
-          </InfoDetail>
-          {/* <div>모임 종류 <span>{type}</span></div>
-                    <div>모임장 <span>{owner.name}</span></div>
-                    <div>인원 <span>{memberNumber}/{memberLimit}</span></div>
-                    <div>장소 <span>{location}</span></div> */}
-        </Info>
-      </Body>
-      <Buttons>
-        <CardButton onInfo={true} />
-        <CardButton onJoin={true} color={theme.button} />
-      </Buttons>
+        <TitleLayout>
+            <Title>{meeting.title}</Title>
+        </TitleLayout>
+        <Progress>
+            <ProgressOuter>
+                <ProgressBarInner width={progress * 100} color={theme.loading}/>
+                <ProgressBarLion src={lionHead} left={180 * progress}/>
+            </ProgressOuter>
+            <Time>{`${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`}</Time>
+        </Progress>
+            <Body>
+                <ImagePlaceholder src="https://via.placeholder.com/"/>
+                <Info>
+                    <InfoTitle>
+                        <div>모임 종류</div>
+                        <div>모임장</div>
+                        <div>인원</div>
+                        <div>장소</div>
+                    </InfoTitle>
+                    <InfoDetail>
+                        <div>{meeting.type}</div>
+                        <div>{meeting.owner.name}</div>
+                        <div>{meeting.memberNumber}/{meeting.memberLimit}</div>
+                        <div>{meeting.location}</div>
+                    </InfoDetail>
+                </Info>
+            </Body>
+            <Buttons onClick={(e) => e.stopPropagation()}>
+                <CardButton onInfo={true} onClick={handleCardClick} />
+                <CardButton onJoin={true} color={theme.button}/>
+            </Buttons>
     </PreviewCardLayout>
   );
 }

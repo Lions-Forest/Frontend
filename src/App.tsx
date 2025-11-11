@@ -3,6 +3,7 @@ import BaseMap from "./pages/Map/BaseMap";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
+import MeetingDetailPage from "./pages/MeetingDetail";
 import { GlobalStyle } from "./styles/global";
 import "./App.css";
 import { useAllLocations } from "./hooks/useAllLocations";
@@ -48,7 +49,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<HomePage />} />
-            {/* <Route path="/map" element={<TestMap />} /> */}
+            <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
           </Routes>
         </BrowserRouter>
       </div>
