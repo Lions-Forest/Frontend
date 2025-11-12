@@ -12,8 +12,8 @@ import { MdDiversity3 as MemberIcon} from "react-icons/md";
 import background from "../../assets/images/background.png";
 import Line from "@/components/common/Line";
 import InfoButton from "@/components/common/InfoButton";
-import ReviewList from "@/components/features/ReviewList";
-import ReplyList from "@/components/features/ReplyList";
+//import ReviewList from "@/components/features/ReviewList";
+//import ReplyList from "@/components/features/ReplyList";
 
 function formatMeetingDate(date: Date | string) {
     const d: Date = date instanceof Date ? date : new Date(date as string);
