@@ -2,7 +2,8 @@ import styled from "styled-components";
 
 function MyInfoCard() {
     return(
-        <Layout>
+        
+        <Layout> {/* Layout 컴포넌트 아님 */}
             <HeaderWrapper>
                 <HeaderTitle>내 정보</HeaderTitle>
                 <HeaderButton>수정하기</HeaderButton>
@@ -14,7 +15,7 @@ function MyInfoCard() {
                 </UserImage>
                 <UserDetails>
                     <UserName>이름</UserName>
-                    <UserNickName>닉네임 <p style={{height: '46px'}}>tem</p></UserNickName>
+                    <UserNickName>닉네임</UserNickName>
                     <UserIntro>한 줄 소개</UserIntro>
                 </UserDetails>
             </BodyWrapper>
@@ -25,12 +26,12 @@ export default MyInfoCard;
 
 const Layout = styled.div`
     width: 100%;
-    background: #ffffff;
+    //background: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: start;
     gap: 8px;
-    padding: 16px 16px 27px 16px;
+    padding: 16px 8px;
     position: relative;
 `;
 
@@ -97,10 +98,10 @@ const UserPlaceholder = styled.img`
 `;
 
 const UserDetails = styled.div`
-//  max-width: 267px;
+  max-width: 267px;
   display: flex;
   flex-direction: column;
-  margin-left: 16px;
+//  margin-left: 16px;
   font-size: 14px;
   gap: 20px;
   flex: 1;
