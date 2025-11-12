@@ -5,6 +5,7 @@ import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
 import MyPage from "./pages/Mypage";
 import MeetingDetailPage from "./pages/MeetingDetail";
+import NotificationPage from "./pages/NotificationPage";
 import { GlobalStyle } from "./styles/global";
 import "./App.css";
 import { useAllLocations } from "./hooks/useAllLocations";
@@ -50,6 +51,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<HomePage />} />
+            <Route path="/notification" element={<NotificationPage />} />
             {/* <Route path="/map" element={<TestMap />} /> */}
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
