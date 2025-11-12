@@ -18,6 +18,12 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
             <Route path="/home/create-meeting" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/step1" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/step2" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/step3" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/step4" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/step5" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/result" element={<CreateMeetingPage />} />
           </Routes>
         </BrowserRouter>
       </div>
