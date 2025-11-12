@@ -180,7 +180,7 @@ const OptionInfo = styled.div`
 
 const OptionTitle = styled.div`
   color: #000;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 30px;
   font-weight: 700;
   line-height: normal;
@@ -226,7 +226,7 @@ const MoreBtn = styled.div`
     cursor: pointer;
 
   color: #000;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 20px;
   font-weight: 700;
   line-height: normal;

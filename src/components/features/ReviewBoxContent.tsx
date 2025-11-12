@@ -4,6 +4,20 @@ import ScoreNav from '../common/ScoreNav'
 import type { Review } from '@/types'
 import WriteButton from '../common/WriteButton'
 
+function getRelativeTime(date: Date | string): string {
+  const now = new Date();
+  const d = date instanceof Date ? date : new Date(date);
+  const diffMs = now.getTime() - d.getTime();
+  const diffMinutes = Math.ceil(diffMs / (1000 * 60));
+  const diffHours = Math.ceil(diffMinutes / 60);
+
+  if (diffHours <= 23) {
+    return `${diffHours}시간 전`;
+  }
+  // 24시간 초과: 날짜로 표기
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function ReviewBoxContent({ review }: { review: Review }){
   return (
     <ContentLayout>
@@ -14,11 +28,17 @@ function ReviewBoxContent({ review }: { review: Review }){
                     <NameText>{review.writer.name}</NameText>
                     <DateText>{review.date}</DateText>
                 </ProfileInfo>
-                {/* <WriteButton /> */}
+                {userId === review.writer.id && (
+                    <WriteButton />
+                )}
             </ProfileLayout>
             <ScoreNav review={review}/>
         </HeaderLayout>
-        <PhotoList></PhotoList>
+        <PhotoList>
+        {review.photoUrl && review.photoUrl.map((src, idx) => (
+            <Photo src={src} key={idx} alt={`photo${idx}`} />
+        ))}
+        </PhotoList>
         <ReviewDetail>{review.detail}</ReviewDetail>
     </ContentLayout>
   )
@@ -90,6 +110,12 @@ const DateText = styled.div`
 const PhotoList = styled.div`
     display: flex;
     gap: 5px;
+    overflow-x: auto;
+    width: 100%;
+    scrollbar-width: thin; // 파이어폭스
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
 `;
 
 const Photo = styled.img`
@@ -98,6 +124,7 @@ const Photo = styled.img`
     flex-shrink: 0;
     border-radius: 8px;
     background: #C4C4C4;
+    object-fit: cover;
 `;
 
 const ReviewDetail = styled.div`

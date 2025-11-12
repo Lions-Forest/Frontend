@@ -13,7 +13,7 @@ function DueList({ meetings }: DueListProps) {
         <ColoredTitle>마감이 임박</ColoredTitle>한 모임
       </Title>
       {meetings.length === 0 ? (
-        <div>마감이 임박한 모임이 없습니다.</div>
+        <NoneText>마감이 임박한 모임이 없습니다.</NoneText>
       ) : (
         meetings.map((meeting) => (
           <CardList>
@@ -31,7 +31,7 @@ const ListLayout = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 8px;
 `;
@@ -40,7 +40,7 @@ const Title = styled.div`
   align-self: stretch;
   color: #000;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 30px;
   font-style: normal;
   font-weight: 700;
@@ -62,12 +62,17 @@ const CardList = styled.div`
   gap: 9px;
 `;
 
-// const Text = styled.div`
-//   align-self: stretch;
-//   color: #000;
-//   font-family: dongleRegular;
-//   font-size: 20px;
-//   font-style: normal;
-//   font-weight: 500;
-//   line-height: normal;
-// `;
+const NoneText = styled.div`
+  color: #000;
+  font-family: dongleLight;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: normal;
+  align-self: stretch;
+  line-height: normal;
+
+  display: flex;
+  padding: 70px 0px;
+  align-items: center;
+  justify-content: center;
+`;

@@ -57,13 +57,13 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
   const progress = meeting.memberNumber / meeting.memberLimit;
   let theme: ColorTheme;
 
-  if (meeting.id % 4 === 0) theme = greenTheme;
-  else if (meeting.id % 4 === 1) theme = blueTheme;
-  else if (meeting.id % 4 === 2) theme = yellowTheme;
+  if (meeting.id % 4 === 1) theme = greenTheme;
+  else if (meeting.id % 4 === 2) theme = blueTheme;
+  else if (meeting.id % 4 === 3) theme = yellowTheme;
   else theme = pinkTheme;
 
   const handleCardClick = () => {
-    navigate('/home/meeting-detail', { state: { meeting } });
+    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting } });
   };
 
   return (
@@ -79,7 +79,14 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
             <Time>{`${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`}</Time>
         </Progress>
             <Body>
-                <ImagePlaceholder src="https://via.placeholder.com/"/>
+                <ImagePlaceholder 
+                    src={
+                        meeting.photo && meeting.photo.length > 0
+                            ? meeting.photo.find(p => p.order === 0)?.photoUrl || meeting.photo[0].photoUrl
+                            : ''
+                    } 
+                    alt={meeting.title}
+                />
                 <Info>
                     <InfoTitle>
                         <div>모임 종류</div>
@@ -137,9 +144,11 @@ const Title = styled.div`
 
 const Progress = styled.div`
   display: flex;
-  margin-left: 16px;
+  // margin-left: 16px;
+  margin: 0px 16px;
   gap: 16px;
   align-items: center;
+  width: 100%;
 `;
 
 const ProgressOuter = styled.div`
@@ -181,7 +190,8 @@ const Time = styled.div`
 `;
 
 const Body = styled.div`
-  width: 340px;
+  // width: 100%;
+  // width: 340px;
   height: 85px;
   border-radius: 7px;
   background: #fff;
@@ -190,10 +200,11 @@ const Body = styled.div`
 `;
 
 const ImagePlaceholder = styled.img`
-  width: 161.845px;
+  width: 48%;
   height: 85px;
   background: #c4c4c4;
   border-radius: 7px;
+  object-fit: cover;
 `;
 
 const Info = styled.div`

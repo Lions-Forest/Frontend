@@ -91,7 +91,7 @@ const Layout = styled.div`
 
 const Title = styled.div`
   color: #000;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-weight: 700;
   font-size: 45px;
   align-self: stretch;
@@ -131,7 +131,7 @@ const Info = styled.div`
 
 const DateInfo = styled.div`
   color: #848484;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 22px;
   font-style: normal;
   font-weight: 700;

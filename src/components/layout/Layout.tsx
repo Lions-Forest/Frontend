@@ -31,6 +31,13 @@ function Layout({ page, children, showBackNavBar = false, backNavBarText = "" }:
                     <Footer />
                 </FooterWrapper>
             )}
+            {/* {page === 'home' || page === 'mypage' || page === 'map' ? (
+                <FooterWrapper>
+                    <Footer />
+                </FooterWrapper>
+            ) : (
+                <></>
+            )} */}
             
         </Root>
     )

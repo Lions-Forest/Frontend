@@ -3,20 +3,22 @@ import { IoMdMap as Map } from "react-icons/io";
 import { MdDiversity3 as Home } from "react-icons/md";
 import { MdAccountCircle as My } from "react-icons/md";
 
+const path = window.location.pathname;
+
 function Footer() {
   return (
     <FooterLayout>
       <Section>
-        <MapIcon />
-        <Title>지도</Title>
+        <MapIcon highlight={path === "/map"} />
+        <Title highlight={path === "/map"}>지도</Title>
       </Section>
       <Section>
-        <HomeIcon />
-        <Title>홈</Title>
+        <HomeIcon highlight={path === "/home"} />
+        <Title highlight={path === "/home"}>홈</Title>
       </Section>
       <Section>
-        <MyIcon />
-        <Title>마이</Title>
+        <MyIcon highlight={path === "/mypage"} />
+        <Title highlight={path === "/mypage"}>마이</Title>
       </Section>
     </FooterLayout>
   );
@@ -46,35 +48,33 @@ const Section = styled.div`
   justify-content: center;
 `;
 
-const MapIcon = styled(Map)`
+interface HighlightProps {
+  highlight?: boolean;
+}
+
+const MapIcon = styled(Map)<HighlightProps>`
   width: 24px;
   height: 24px;
-  fill: #1c1b1f66;
-  opacity: 40%;
-  // fill: ${({ color }) =>
-    color}; // TODO: 페이지 따라서 onClick 기능 + 색 변화 구현
+  opacity: ${({ highlight }) => (highlight ? "1" : "0.4")};
+  fill: ${({ highlight }) => highlight ? "#43D687" : "#1c1b1f66"};
 `;
 
-const HomeIcon = styled(Home)`
+const HomeIcon = styled(Home)<HighlightProps>`
   width: 24px;
   height: 24px;
-  fill: #1c1b1f66;
-  opacity: 40%;
-  // fill: ${({ color }) =>
-    color}; // TODO: 페이지 따라서 onClick 기능 + 색 변화 구현
+  opacity: ${({ highlight }) => (highlight ? "1" : "0.4")};
+  fill: ${({ highlight }) => highlight ? "#43D687" : "#1c1b1f66"};
 `;
 
-const MyIcon = styled(My)`
+const MyIcon = styled(My)<HighlightProps>`
   width: 24px;
   height: 24px;
-  fill: #1c1b1f66;
-  opacity: 40%;
-  // fill: ${({ color }) =>
-    color}; // TODO: 페이지 따라서 onClick 기능 + 색 변화 구현
+  opacity: ${({ highlight }) => (highlight ? "1" : "0.4")};
+  fill: ${({ highlight }) => highlight ? "#43D687" : "#1c1b1f66"};
 `;
 
-const Title = styled.div`
-  color: #848484;
+const Title = styled.div<HighlightProps>`
+  color: ${({ highlight }) => highlight ? "#43D687" : "#848484"};
   text-align: center;
 
   /* Body2/12 */

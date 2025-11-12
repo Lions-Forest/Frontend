@@ -36,11 +36,11 @@ function ReplyInput({ meetingDate, onSubmit }: ReplyInputProps) {
 export default ReplyInput;
 
 const InputLayout = styled.div`
+    width: 100%;
     display: flex;
-    padding: 7px 8px 7px 15px;
+    padding: 7px 10px;
     justify-content: flex-end;
     align-items: center;
-    gap: 185px;
     align-self: stretch;
     border-radius: 8px;
     border: 0.1px solid #FFF;
@@ -72,8 +72,8 @@ const StyledInput = styled.input`
 const SubmitBtn = styled.button`
     display: flex;
     height: 22px;
-    width: 46px;
-    padding: 4px 13px 4px 12px;
+    width: 50px;
+    padding: 4px 12px;
     justify-content: center;
     align-items: center;
     border-radius: 8px;

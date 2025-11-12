@@ -1,9 +1,10 @@
 // TODO: 멤버 클릭할 때 <MemberModal> 띄우기, 프롭스로 익명/실명 전달 로직 구현
+// TODO: Reply에 likesPressed 방법 고안 및 구현하기
 
 import Layout from "@/components/layout/Layout";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import type { Meeting } from "@/types";
+import type { Meeting, Reply } from "@/types";
 import { MdToday as DateIcon} from "react-icons/md";
 import { MdOutlineSchedule as TimeIcon} from "react-icons/md";
 import distance from "../../assets/icons/distance.svg"
@@ -14,23 +15,62 @@ import Line from "@/components/common/Line";
 import InfoButton from "@/components/common/InfoButton";
 import ReviewList from "@/components/features/ReviewList";
 import ReplyList from "@/components/features/ReplyList";
+import CircleArrow from "@/components/common/CircleArrow";
+import { useEffect, useState } from "react";
+import { fetchReplyList, submitReply, toggleReplyLikes } from "@/api/meeting/replyApi";
 
 function formatMeetingDate(date: Date | string) {
     const d: Date = date instanceof Date ? date : new Date(date as string);
+    let formattedDate : string = "";
     
     const year = d.getFullYear();
     const month = d.getMonth() + 1;
     const day = d.getDate();
     const hour = d.getHours();
+    const minutes = d.getMinutes();
     const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     const weekday = weekdays[d.getDay()];
+
+    if ( hour >= 13 ) {
+        if ( minutes !== 0 ) {
+            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour-12}:${minutes} PM)`
+        } else {
+            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour-12}PM)`
+        }
+    } else {
+        if ( minutes !== 0 ) {
+            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour}:${minutes} AM)`
+        } else {
+            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour}AM)`
+        }        
+    }
     
-    return `${year}년 ${month}월 ${day}일 ${weekday} ${hour}시`;
+    return formattedDate;
 }
 
 function index() {
     const location = useLocation();
     const meeting = location.state?.meeting as Meeting | undefined;
+    const [currentIdx, setCurrentIdx] = useState(0);
+  
+    const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
+    const goNext = () => setCurrentIdx(i => Math.min(meeting?.photo.length - 1, i + 1));
+
+    const [ replyList, setReplyList ] = useState<Reply[]>([]);
+  
+    useEffect(() => {
+      const fetchData = async() => {
+        try {
+          const replies = await fetchReplyList(meeting?.id || 0);
+          console.log("전체 모임 리스트: ", replies);
+          setReplyList(replies);
+        } catch (error) {
+          console.error("데이터 로딩 실패: ", error);
+          setReplyList([]); // 에러 발생 시 빈 배열로 설정
+        }
+      };
+      fetchData();
+    }, []);
 
     // 참여 멤버들의 photoUrl 배열 (임시로 owner의 photoUrl을 사용, 실제로는 API에서 받아와야 함)
     // TODO: 실제 API에서 참여 멤버들의 정보를 받아와야 함
@@ -47,15 +87,43 @@ function index() {
         }
     }
 
+    // 좋아요 토글 함수
+    const handleLikeToggle = async (replyId: number) => {
+        await toggleReplyLikes(replyId);
+        const replies = await fetchReplyList(meeting?.id || 0);
+        setReplyList(replies);
+    };
+
+    // 댓글 등록 함수
+    const handleReplySubmit = async (text: string) => {
+        await submitReply(meeting?.id || 0, text);
+        const replies = await fetchReplyList(meeting?.id || 0);
+        setReplyList(replies);
+    };
+
     return (
-        <Layout page="meeting-detail">
+        <Layout showBackNavBar={true} backNavBarText="소모임">
             <DetailLayout>
                 {meeting ? (
                     <>
                     <PicInfo>
-                            <Picture src="via.placeholder.com"/>
+                        <ArrowWrapperLeft>
+                            <CircleArrow direction="left" onClick={goPrev} />
+                        </ArrowWrapperLeft>
+                        <PicHeader>
                             <PicDetail>{meeting.title}</PicDetail>
-                        </PicInfo>
+                        </PicHeader>
+                        <Picture 
+                            src={
+                                meeting.photo && meeting.photo.length > 0
+                                ? meeting.photo.find(p => p.order === 0)?.photoUrl || meeting.photo[0].photoUrl
+                                : ''} 
+                            alt={meeting.title}
+                        />
+                        <ArrowWrapperRight>
+                            <CircleArrow direction="right" onClick={goNext} />
+                        </ArrowWrapperRight>
+                    </PicInfo>
                         <DetailInfoContainer>
                             <BackgroundImage src={background} alt="background" />
                             <StatusBadge>모집중</StatusBadge>
@@ -67,11 +135,7 @@ function index() {
                                     </DetailText>
                                 </Detail>
                                 <Detail>
-                                    <TimeIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
-                                    <DetailText>{meeting.startTime} ~ {meeting.endTime}</DetailText>
-                                </Detail>
-                                <Detail>
-                                    <Icon src={distance}/>
+                                    <Icon src={distance} />
                                     <DetailText>{meeting.location}</DetailText>
                                 </Detail>
                                 <Detail>
@@ -95,7 +159,12 @@ function index() {
                         <Line />
                         {/* <ReviewList review={review}/> */}
                         <Line />
-                        {/* <ReplyList /> */}
+                        <ReplyList 
+                            replies={replyList} 
+                            meetingDate={meeting.date} 
+                            likesPressed={false}
+                            onLikeToggle={handleLikeToggle}
+                            onReplySubmit={handleReplySubmit}/>
 
                         <Buttons>
                             <InfoButton onClose={true} />
@@ -125,34 +194,44 @@ const DetailLayout = styled.div`
 `;
 
 const PicInfo = styled.div`
+    position: relative;
     display: flex;
-    height: 289px;
-    padding: 16px;
+    height: 287px;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    gap: 19px;
     align-self: stretch;
     border-radius: 7px;
     background: #FFF;
 `;
 
 const Picture = styled.img`
-    width: 315px;
-    height: 209px;
-    aspect-ratio: 315/209;
+    width: 100%;
+    // height: 219px;
+    height: 100%;
+    aspect-ratio: 110/70;
+    padding: 14px 16px;
+`;
+
+const PicHeader = styled.div`
+    width: 100%;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 8px 8px 0 0;
+    background: #43D687;
+
+    display: flex;
+    padding: 0px 20px;
+    align-items: center;
+    justify-content: flex-start;
 `;
 
 const PicDetail = styled.div`
-    // height: 19px;
-    align-self: stretch;
     color: #000;
-
-    /* Body1/16 */
-    font-family: Pretendard;
-    font-size: 16px;
+    font-family: dongleRegular;
+    font-size: 22px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: 700;
     line-height: normal;
 `;
 
@@ -169,7 +248,7 @@ const BackgroundImage = styled.img`
     position: absolute;
     top: 20px;
     left: 0;
-    width: 361px;
+    width: 100%;
     height: 261px;
     // object-fit: cover;
     z-index: 1;
@@ -194,7 +273,7 @@ const StatusBadge = styled.div`
 
 const DetailInfo = styled.div`
     position: relative;
-    top: 33.5px;
+    top: 45px;
     z-index: 2;
     display: flex;
     width: 100%;
@@ -277,6 +356,8 @@ const Buttons = styled.div`
     align-items: center;
     justify-content: center;
     gap: 9px;
+    width: 100%;
+    margin: 0px 16px;
 `;
 
 const NoData = styled.div`
@@ -285,4 +366,22 @@ const NoData = styled.div`
     font-size: 16px;
     text-align: center;
     padding: 40px;
+`;
+
+const ArrowWrapperLeft = styled.div`
+  position: absolute;
+  left: 0px;
+  top: 60%;
+  transform: translateY(-50%);
+  z-index: 3;
+  cursor: pointer;
+`;
+
+const ArrowWrapperRight = styled.div`
+  position: absolute;
+  right: 0px;
+  top: 60%;
+  transform: translateY(-50%);
+  z-index: 3;
+  cursor: pointer;
 `;

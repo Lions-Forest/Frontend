@@ -19,6 +19,7 @@ function ReplyList({
     onLikeToggle,
     onReplySubmit
   }: ReplyListProps) {
+
     return (
       <ReplyLayout>
         <Title>댓글</Title>
@@ -28,7 +29,7 @@ function ReplyList({
           ) : (
             replies.map((reply, idx) => (
               <ReplySpan
-                key={reply.writer.id + reply.detail} // 고유키로 조합
+                key={reply.id}
                 reply={reply}
                 pressedLike={likesPressed[idx]}
                 onLikeClick={() => onLikeToggle(idx)}
@@ -53,6 +54,7 @@ const ReplyLayout = styled.div`
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    width: 100%;
 `;
 
 const Title = styled.div`
@@ -80,7 +82,12 @@ const EmptyText = styled.div`
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    padding: 10px 20px;
+
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 0px;
 `;
 
 const ReplyInputWrapper = styled.div`

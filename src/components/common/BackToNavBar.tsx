@@ -4,15 +4,16 @@ import arrowBackIcon from '../../assets/icons/arrowBack.svg'; // Correct path re
 
 interface BackToNavBarProps {
   text: string;
+  isNotificationPage?: boolean; // 알림 페이지 여부 (기본값: false)
 }
 
-const BackToNavBar: React.FC<BackToNavBarProps> = ({ text }) => {
+const BackToNavBar: React.FC<BackToNavBarProps> = ({ text, isNotificationPage = false }) => {
   const handleGoBack = () => {
     window.history.back();
   };
 
   return (
-    <NavBarWrapper>
+    <NavBarWrapper $isNotificationPage={isNotificationPage}>
       <BackButton onClick={handleGoBack}>
         <ArrowIcon src={arrowBackIcon} alt="Back" />
       </BackButton>
@@ -23,11 +24,13 @@ const BackToNavBar: React.FC<BackToNavBarProps> = ({ text }) => {
 
 export default BackToNavBar;
 
-const NavBarWrapper = styled.nav`
+const NavBarWrapper = styled.nav<{ $isNotificationPage: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
   padding: 11px 16px;
+  background-color: ${props => props.$isNotificationPage ? '#ffffff' : '#E2EDE7'};
+  color: black;
 `;
 
 const BackButton = styled.button`

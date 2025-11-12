@@ -55,7 +55,7 @@ function App() {
             <Route path="/notification" element={<NotificationPage />} />
             {/* <Route path="/map" element={<TestMap />} /> */}
             <Route path="/mypage" element={<MyPage />} />
-            <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
+            <Route path="/home/meeting-detail/:id" element={<MeetingDetailPage />} />
             <Route path="/home/create-meeting" element={<CreateMeetingPage />} />
           </Routes>
         </BrowserRouter>
