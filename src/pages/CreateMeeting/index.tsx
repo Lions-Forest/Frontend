@@ -7,10 +7,11 @@ import StepTwoName from "./StepTwoName";
 import StepThreeType from "./StepThreeType";
 import StepFourDate from "./StepFourDate";
 import StepFiveMembers from "./StepFiveMembers";
+import StepSixLocation from "./StepSixLocation";
 import ResultPage from "./ResultPage";
 import InfoButton from "@/components/common/InfoButton";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 function index() {
     const navigate = useNavigate();
@@ -18,7 +19,8 @@ function index() {
 
     // URL에서 현재 step 추출
     const getStepFromPath = (pathname: string): number => {
-        if (pathname.includes('/result')) return 6;
+        if (pathname.includes('/result')) return 7;
+        if (pathname.includes('/step6')) return 6;
         if (pathname.includes('/step5')) return 5;
         if (pathname.includes('/step4')) return 4;
         if (pathname.includes('/step3')) return 3;
@@ -38,7 +40,7 @@ function index() {
     const handleNextStep = () => {
         if (step < TOTAL_STEPS) {
             const nextStep = step + 1;
-            if (nextStep === 6) {
+            if (nextStep === 7) {
                 navigate('/home/create-meeting/result');
             } else {
                 navigate(`/home/create-meeting/step${nextStep}`);
@@ -67,12 +69,17 @@ function index() {
                     {step === 2 && <StepTwoName onNextStep={() => navigate('/home/create-meeting/step3')} onPrevStep={() => handlePrevStep(1)} />}
                     {step === 3 && <StepThreeType onNextStep={() => navigate('/home/create-meeting/step4')} onPrevStep={() => handlePrevStep(2)} />}
                     {step === 4 && <StepFourDate onNextStep={() => navigate('/home/create-meeting/step5')} onPrevStep={() => handlePrevStep(3)} />}
-                    {step === 5 && <StepFiveMembers onNextStep={() => navigate('/home/create-meeting/result')} onPrevStep={() => handlePrevStep(4)} />}
-                    {step === 6 && <ResultPage />}
+                    {step === 5 && <StepFiveMembers onNextStep={() => navigate('/home/create-meeting/step6')} onPrevStep={() => handlePrevStep(4)} />}
+                    {step === 6 && <StepSixLocation onNextStep={() => navigate('/home/create-meeting/result')} onPrevStep={() => handlePrevStep(5)} />}
+                    {step === 7 && <ResultPage />}
                 </StepLayout>
                 {step < TOTAL_STEPS && (
                     <ButtonWrapper>
-                        <InfoButton onNext={true} onClick={handleNextStep} />
+                        <InfoButton 
+                            onNext={step !== 6} 
+                            onComplete={step === 6} 
+                            onClick={handleNextStep} 
+                        />
                     </ButtonWrapper>
                 )}
             </CreateMeetingLayout>

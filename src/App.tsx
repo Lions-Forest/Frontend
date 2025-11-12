@@ -23,6 +23,7 @@ function App() {
             <Route path="/home/create-meeting/step3" element={<CreateMeetingPage />} />
             <Route path="/home/create-meeting/step4" element={<CreateMeetingPage />} />
             <Route path="/home/create-meeting/step5" element={<CreateMeetingPage />} />
+            <Route path="/home/create-meeting/step6" element={<CreateMeetingPage />} />
             <Route path="/home/create-meeting/result" element={<CreateMeetingPage />} />
           </Routes>
         </BrowserRouter>
