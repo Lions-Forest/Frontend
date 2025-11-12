@@ -1,6 +1,27 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { getMyInfo, type MyInfoResponse } from "@/api/user/myInfoCheckAPI";
 
 function MyInfoCard() {
+    const [myInfo, setMyInfo] = useState<MyInfoResponse | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchMyInfo = async () => {
+            setIsLoading(true);
+            try {
+                const data = await getMyInfo();
+                setMyInfo(data);
+            } catch (error) {
+                console.error("Failed to fetch my info:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchMyInfo();
+    }, []);
+
     return(
         
         <Layout> {/* Layout 컴포넌트 아님 */}
@@ -10,13 +31,24 @@ function MyInfoCard() {
             </HeaderWrapper>
 
             <BodyWrapper>
-                <UserImage>
-                    <UserPlaceholder src={'x'} /> {/*임시*/}
+                <UserImage hasImage={!!myInfo?.profile_photo}>
+                    {myInfo?.profile_photo ? (
+                        <UserPlaceholder src={myInfo.profile_photo} alt="프로필 사진" />
+                    ) : null}
                 </UserImage>
                 <UserDetails>
-                    <UserName>이름</UserName>
-                    <UserNickName>닉네임</UserNickName>
-                    <UserIntro>한 줄 소개</UserIntro>
+                    <UserInfoItem>
+                        <UserInfoLabel>이름</UserInfoLabel>
+                        <UserInfoValue>{myInfo?.name || "-"}</UserInfoValue>
+                    </UserInfoItem>
+                    <UserInfoItem>
+                        <UserInfoLabel>닉네임</UserInfoLabel>
+                        <UserInfoValue>{myInfo?.nickname || "-"}</UserInfoValue>
+                    </UserInfoItem>
+                    <UserInfoItem isBio>
+                        <UserInfoLabel isBio>한 줄 소개</UserInfoLabel>
+                        <UserInfoValue>{myInfo?.bio || "-"}</UserInfoValue>
+                    </UserInfoItem>
                 </UserDetails>
             </BodyWrapper>
         </Layout>
@@ -76,7 +108,7 @@ const BodyWrapper = styled.div`
     //align-items: center;
 `;
 
-const UserImage = styled.div`
+const UserImage = styled.div<{ hasImage?: boolean }>`
   width: 78px;
   height: 78px;
   border-radius: 50%;
@@ -85,16 +117,14 @@ const UserImage = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: ${({ hasImage }) => (hasImage ? "transparent" : "#D9D9D9")};
 `;
 
 const UserPlaceholder = styled.img`
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #999;
+  object-fit: cover;
 `;
 
 const UserDetails = styled.div`
@@ -108,14 +138,21 @@ const UserDetails = styled.div`
   color: #000;
 `;
 
-const UserName = styled.div`
-  font-weight: 700;
+const UserInfoItem = styled.div<{ isBio?: boolean }>`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
 `;
 
-const UserNickName = styled.div`
+const UserInfoLabel = styled.div<{ isBio?: boolean }>`
   font-weight: 700;
-  display: flex; // 임시
+  color: #000;
+  flex-shrink: 0;
+  width: ${({ isBio }) => (isBio ? "104px" : "80px")};
 `;
-const UserIntro = styled.div`
-  font-weight: 700;
+
+const UserInfoValue = styled.div`
+  font-weight: 400;
+  color: #000;
 `;
