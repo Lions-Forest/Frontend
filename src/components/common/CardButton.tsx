@@ -1,6 +1,7 @@
+
 import styled from 'styled-components'
 
-interface ButtonProps { 
+interface ButtonProps {
   onJoin?: boolean;
   onJoinCancel?: boolean;
   onMakeCancel?: boolean;
@@ -17,14 +18,14 @@ const CardButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMa
   let bgColor = '#D9D9D9';
   let textColor = '#000';
   let disabled = false;
-  let border = 'none';
+  let border = "none";
 
   // TODO: onClick 기능 임의 설정, 경로 수정 필요
   if (onJoin) {
     text = '참여하기';
     // onClick = () => {location.href = '/join' };
     bgColor = color;
-    textColor = '#fff';
+    textColor = "#fff";
   } else if (onMakeCancel) {
     text = '모임 개설 취소';
     // onClick = () => {location.href = '/make-cancel'};
@@ -38,10 +39,10 @@ const CardButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMa
     textColor = '#000';
     border = `2px solid ${color}` 
   } else if (onClose) {
-    text = '신청 마감';
+    text = "신청 마감";
     disabled = true;
-    bgColor = '#848484';
-    textColor = '#000';
+    bgColor = "#848484";
+    textColor = "#000";
   } else {
     text = '모임 정보 확인';
     // onInfo일 때 전달된 onClick 사용
@@ -63,7 +64,7 @@ const CardButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMa
   )
 }
 
-export default CardButton
+export default CardButton;
 
 interface BtnLayoutProps {
   bgColor: string;
@@ -89,6 +90,5 @@ const BtnLayout = styled.div<BtnLayoutProps>`
   background: ${({ bgColor }) => bgColor};
   color: ${({ textColor }) => textColor};
   border: ${({ border }) => border};
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
 `;
-

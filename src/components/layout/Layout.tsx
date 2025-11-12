@@ -11,7 +11,7 @@ interface LayoutProps {
     backNavBarText?: string; // New prop for BackToNavBar text
 }
 
-function Layout({  page, children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
+function Layout({ page, children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
     return(
         <Root>
             <HeaderWrapper>
