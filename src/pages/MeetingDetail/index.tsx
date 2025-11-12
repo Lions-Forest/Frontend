@@ -62,7 +62,7 @@ function index() {
       const fetchData = async() => {
         try {
           const replies = await fetchReplyList(meeting?.id || 0);
-          console.log("전체 모임 리스트: ", replies);
+          console.log("전체 댓글 리스트: ", replies);
           setReplyList(replies);
         } catch (error) {
           console.error("데이터 로딩 실패: ", error);

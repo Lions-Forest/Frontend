@@ -13,12 +13,13 @@ interface ReplyProps {
 function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
     return(
         <ReplyLayout>
-        <ReplySection>
-          <ProfileImg src={reply.writer.photoUrl || ""} />
-          <DetailSection>
-            <ProfileName>{reply.writer.nickname || reply.writer.name}</ProfileName>
-            <ReplyDetail>{reply.detail}</ReplyDetail>
-          </DetailSection>
+          <ReplySection>
+            <ProfileImg src={""} />
+            <DetailSection>
+              <ProfileName>{reply.userName}</ProfileName>
+              <ReplyDetail>{reply.content}</ReplyDetail>
+            </DetailSection>
+          </ReplySection>
           <LikeSection>
             <LikeIcon onClick={onLikeClick} pressed={pressedLike}>
               {pressedLike
@@ -26,9 +27,8 @@ function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
                 : <EmptyLike size={18} color="#B5B5B5" />
               }
             </LikeIcon>
-            <LikeNum pressed={pressedLike}>{reply.likes}</LikeNum>
+            <LikeNum pressed={pressedLike}>{reply.likeCount}</LikeNum>
           </LikeSection>
-        </ReplySection>
       </ReplyLayout>
     )
 }
@@ -36,10 +36,12 @@ function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
 export default ReplySpan;
 
 const ReplyLayout = styled.div`
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     align-self: stretch;
+    padding: 15px 0px;
 `;
 
 const ReplySection = styled.div`

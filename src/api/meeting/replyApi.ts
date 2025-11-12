@@ -28,7 +28,7 @@ export async function fetchReplyList(group_id : number) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const url = `${BASE_URL}/api/comments/${group_id}`;
+      const url = `${BASE_URL}/api/comments/${group_id}/`;
       console.log("요청 URL:", url);
       console.log("BASE_URL:", BASE_URL);
       
@@ -76,20 +76,20 @@ export async function fetchReplyList(group_id : number) {
     }
 }
 
-export function mapApiResponseToReply(apiReply: ApiReplyResponse): Reply {
-    // date를 Date 객체로 변환
-    const meetingDate = new Date(apiReply.createdAt);
+// export function mapApiResponseToReply(apiReply: ApiReplyResponse): Reply {
+//     // date를 Date 객체로 변환
+//     const meetingDate = new Date(apiReply.createdAt);
 
-    return {
-        id: apiReply.id,
-        groupId: apiReply.groupId,
-        userId: apiReply.userId,
-        userName: apiReply.userName,
-        detail: apiReply.content,
-        likes: apiReply.likeCount,
-        createdAt: meetingDate,
-    };
-}
+//     return {
+//         id: apiReply.id,
+//         groupId: apiReply.groupId,
+//         userId: apiReply.userId,
+//         userName: apiReply.userName,
+//         detail: apiReply.content,
+//         likes: apiReply.likeCount,
+//         createdAt: meetingDate,
+//     };
+// }
 
 export async function toggleReplyLikes(comment_id: number) {
     try {

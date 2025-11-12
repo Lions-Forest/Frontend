@@ -43,8 +43,8 @@ export interface Reply {
     groupId: number,
     userId: number,
     userName: string,
-    detail: string,
-    likes: number,
+    content: string,
+    likeCount: number,
     createdAt: Date,
 }
 
