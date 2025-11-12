@@ -1,11 +1,58 @@
-import StudyingMarker from "@/assets/images/LoadingLion.svg";
-import EatingMarker from "@/assets/images/LoadingLion.svg";
+import eatingLion from "@/assets/lion/eatingLion.svg";
+import studyingLion from "@/assets/lion/studyingLion.svg";
+import workingLion from "@/assets/lion/workingLion.svg";
+import relaxingLion from "@/assets/lion/relaxingLion.svg";
+import boringLion from "@/assets/lion/boringLion.svg";
+import playingLion from "@/assets/lion/playingLion.svg";
+import hungryLion from "@/assets/lion/hungryLion.svg";
+import nothingLion from "@/assets/lion/nothingLion.svg";
+import eatingMarker from "@/assets/marker/eatingMarker.svg";
+import studyingMarker from "@/assets/marker/studyingMarker.svg";
+import workingMarker from "@/assets/marker/workingMarker.svg";
+import relaxingMarker from "@/assets/marker/relaxingMarker.svg";
+import boringMarker from "@/assets/marker/boringMarker.svg";
+import playingMarker from "@/assets/marker/playingMarker.svg";
+import hungryMarker from "@/assets/marker/hungryMarker.svg";
+import nothingMarker from "@/assets/marker/nothingMarker.svg";
 
-export const getMarkerImage = (status: string) => {
-  switch (status) {
-    case "studying":
-      return StudyingMarker;
-    case "eating":
-      return EatingMarker;
+export const getMarkerImage = (status: string, isMe = false) => {
+  if (isMe) {
+    switch (status) {
+      case "eating":
+        return eatingLion;
+      case "studying":
+        return studyingLion;
+      case "working":
+        return workingLion;
+      case "relaxing":
+        return relaxingLion;
+      case "boring":
+        return boringLion;
+      case "playing":
+        return playingLion;
+      case "hungry":
+        return hungryLion;
+      default:
+        return nothingLion;
+    }
+  } else {
+    switch (status) {
+      case "eating":
+        return eatingMarker;
+      case "studying":
+        return studyingMarker;
+      case "working":
+        return workingMarker;
+      case "relaxing":
+        return relaxingMarker;
+      case "boring":
+        return boringMarker;
+      case "playing":
+        return playingMarker;
+      case "hungry":
+        return hungryMarker;
+      default:
+        return nothingMarker;
+    }
   }
 };
