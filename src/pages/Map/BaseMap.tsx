@@ -10,13 +10,13 @@ import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.svg";
 import styled from "styled-components";
 import Footer from "@/components/layout/Footer";
 import BottomSheet from "./BottomSheeet";
+import StatusSelector from "./StatusSelector";
 
 interface BaseMapProps {
   userId: string;
   name: string;
   shareLocation: boolean;
   setShareLocation: (value: boolean) => void;
-  userLocations?: UserLocation[];
 }
 
 const defaultCenter = { lat: 37.504729, lng: 126.957631 };
@@ -26,9 +26,13 @@ export default function BaseMap({
   name,
   shareLocation,
   setShareLocation,
-  userLocations = [],
 }: BaseMapProps) {
-  useMyLocation({ userId, name, shareLocation }); // 내 위치 Firebase에 업로드
+  const [selectedStatus, setSelectedStatus] =
+    useState<NonNullable<UserLocation["status"]>>("nothing");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  useMyLocation({ userId, name, shareLocation, status: selectedStatus }); // 내 위치 Firebase에 업로드
   const locations = useAllLocations(); // 모든 사용자 위치 구독
   const myLocation = locations?.[userId]; // 모든 사용자 위치 중 내 위치 찾아내기 (중심 좌표를 찾기 위해)
 
@@ -40,8 +44,6 @@ export default function BaseMap({
       ? { lat: myLocation.latitude, lng: myLocation.longitude }
       : defaultCenter
   );
-
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
   useEffect(() => {
     if (myLocation?.latitude && myLocation?.longitude) {
@@ -71,7 +73,7 @@ export default function BaseMap({
             setCenter({ lat: newCenter.getLat(), lng: newCenter.getLng() });
           }}
         >
-          {userLocations.map((user) => {
+          {Object.values(locations).map((user) => {
             if (!user.latitude || !user.longitude) return null;
 
             const isMe = user.userId === userId;
@@ -79,9 +81,7 @@ export default function BaseMap({
             if (!shareLocation && !isMe) return null;
 
             const markerImage = {
-              src: shareLocation
-                ? getMarkerImage(user.status, isMe) || defaultLion
-                : defaultLion,
+              src: getMarkerImage(user.status, isMe) || defaultLion,
               size: isMe
                 ? { width: 79, height: 145 }
                 : { width: 93, height: 102 },
@@ -146,12 +146,22 @@ export default function BaseMap({
           onClick={moveToMyLocation}
         />
       </MapWrapper>
+
       <BottomSheet
         isOpen={isBottomSheetOpen}
         onClose={() => setIsBottomSheetOpen(false)}
         shareLocation={shareLocation}
         onToggleShare={() => setShareLocation(!shareLocation)}
-      />
+        status={selectedStatus}
+        setStatus={setSelectedStatus}
+        message={statusMessage}
+        setMessage={setStatusMessage}
+      >
+        <StatusSelector
+          selectedStatus={selectedStatus}
+          onChange={setSelectedStatus}
+        />
+      </BottomSheet>
       <FooterWrap>
         <Footer />
       </FooterWrap>
