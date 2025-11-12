@@ -4,10 +4,12 @@
 
 export interface Member {
     id: number,
+    email: string;
     name: string,
     nickname: string,
+    detail: string;
     photoUrl: string,
-    alarm?: number,
+    // alarm?: number,
 }
 
 export interface Meeting {
@@ -29,6 +31,14 @@ export interface Meeting {
 export interface Reply {
     meeting: Meeting,
     writer: Member,
-    info: string,
+    detail: string,
     likes: number,
+}
+
+export interface Review {
+    meeting: Meeting,
+    writer: Member,
+    photoUrl: string,
+    starNumber: number,
+    detail: string,
 }
