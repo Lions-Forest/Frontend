@@ -3,6 +3,8 @@ import BaseMap from "./pages/Map/BaseMap";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
+import MyPage from "./pages/Mypage";
+import MeetingDetailPage from "./pages/MeetingDetail";
 import NotificationPage from "./pages/NotificationPage";
 import { GlobalStyle } from "./styles/global";
 import "./App.css";
@@ -51,6 +53,8 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             <Route path="/notification" element={<NotificationPage />} />
             {/* <Route path="/map" element={<TestMap />} /> */}
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
           </Routes>
         </BrowserRouter>
       </div>

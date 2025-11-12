@@ -1,10 +1,15 @@
-import DueList from "@/components/common/DueList";
-import WriteButton from "@/components/common/WriteButton";
-import MeetingList from "@/components/features/MeetingList";
-import MyMeeting from "@/components/features/MyMeeting";
-import Layout from "@/components/layout/Layout";
-import type { Meeting, Member } from "@/types";
-import styled from "styled-components";
+import DueList from '@/components/common/DueList';
+import Line from '@/components/common/Line';
+import PreviewCard from '@/components/common/PreviewCard';
+import WriteButton from '@/components/common/WriteButton';
+import MeetingList from '@/components/features/MeetingList';
+import MyMeeting from '@/components/features/MyMeeting';
+import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
+import Layout from '@/components/layout/Layout';
+import type { Meeting, Member } from '@/types';
+import React from 'react'
+import styled from 'styled-components';
 
 const exampleOwner: Member = {
   id: 0,
@@ -123,19 +128,13 @@ function index() {
 export default index;
 
 const HomeLayout = styled.div`
-  background: #e4f2ea;
-  width: 100%;
-  height: auto;
-  // overflow: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  gap: 16px;
-`;
-
-const Line = styled.div`
-  width: 361px;
-  height: 2px;
-  background: #e2e2e2;
+    background: #E4F2EA;
+    width: 100%;
+    height: auto;
+    // overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    gap: 16px;
 `;
