@@ -56,6 +56,10 @@ function index() {
         }
     };
 
+    if (step === 7) {
+        return <ResultPage />;
+    }
+
     return(
         <Layout page="create-meeting" showBackNavBar={true} backNavBarText="모임 개설하기">
             <CreateMeetingLayout>
@@ -71,17 +75,14 @@ function index() {
                     {step === 4 && <StepFourDate onNextStep={() => navigate('/home/create-meeting/step5')} onPrevStep={() => handlePrevStep(3)} />}
                     {step === 5 && <StepFiveMembers onNextStep={() => navigate('/home/create-meeting/step6')} onPrevStep={() => handlePrevStep(4)} />}
                     {step === 6 && <StepSixLocation onNextStep={() => navigate('/home/create-meeting/result')} onPrevStep={() => handlePrevStep(5)} />}
-                    {step === 7 && <ResultPage />}
                 </StepLayout>
-                {step < TOTAL_STEPS && (
-                    <ButtonWrapper>
-                        <InfoButton 
-                            onNext={step !== 6} 
-                            onComplete={step === 6} 
-                            onClick={handleNextStep} 
-                        />
-                    </ButtonWrapper>
-                )}
+                <ButtonWrapper>
+                    <InfoButton 
+                        onNext={step !== 6} 
+                        onComplete={step === 6} 
+                        onClick={handleNextStep} 
+                    />
+                </ButtonWrapper>
             </CreateMeetingLayout>
         </Layout>
     )
