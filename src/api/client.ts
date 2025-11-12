@@ -12,11 +12,11 @@ const apiClient = axios.create({
 // 요청 인터셉터
 apiClient.interceptors.request.use(
   (config) => {
-    // 토큰 등 인증 정보 추가 가능
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // localStorage에서 accessToken 가져오기, 없으면 테스트 계정 토큰 사용
+    const token = localStorage.getItem('accessToken') || 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNzYyOTczOTk0LCJleHAiOjE3NjI5NzU3OTQsImVtYWlsIjoidGVzdDJAZXhhbXBsZS5jb20iLCJhdXRoIjoiUk9MRV9VU0VSIn0.0hMA_lmCRxuqoFUiNqzAzXJedgcOlyDtrC6sAmNmkNU';
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
