@@ -32,7 +32,7 @@ export const getMarkerImage = (status: string, isMe = false) => {
         return playingLion;
       case "hungry":
         return hungryLion;
-      default:
+      case "nothing":
         return nothingLion;
     }
   } else {
@@ -51,7 +51,7 @@ export const getMarkerImage = (status: string, isMe = false) => {
         return playingMarker;
       case "hungry":
         return hungryMarker;
-      default:
+      case "nothing":
         return nothingMarker;
     }
   }

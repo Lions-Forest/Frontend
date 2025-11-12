@@ -1,4 +1,3 @@
-// useMyLocation.ts
 import { useEffect, useRef } from "react";
 import { db } from "@/firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
