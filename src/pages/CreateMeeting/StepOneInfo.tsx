@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import photoIcon from '@/assets/icons/photo.svg';
+import xIcon from '@/assets/icons/x.svg';
 
 interface StepOneInfoProps {
   onNextStep?: () => void;
@@ -56,7 +57,9 @@ const StepOneInfo: React.FC<StepOneInfoProps> = () => {
             {images.map((image, index) => (
               <PhotoItem key={index}>
                 <PhotoImage src={image} alt={`Uploaded ${index + 1}`} />
-                <RemoveButton onClick={() => handleRemoveImage(index)}>×</RemoveButton>
+                <RemoveButton onClick={() => handleRemoveImage(index)}>
+                  <XIcon src={xIcon} alt="Remove" />
+                </RemoveButton>
               </PhotoItem>
             ))}
             <PhotoUploadButton onClick={handlePhotoIconClick}>
@@ -186,25 +189,26 @@ const PhotoImage = styled.img`
 
 const RemoveButton = styled.button`
   position: absolute;
-  top: 4px;
+  bottom: 4px;
   right: 4px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
+  width: 12px;
+  height: 12px;
   border: none;
+  background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  line-height: 1;
   padding: 0;
   
   &:hover {
-    background: rgba(0, 0, 0, 0.8);
+    opacity: 0.8;
   }
+`;
+
+const XIcon = styled.img`
+  width: 12px;
+  height: 12px;
 `;
 
 const PhotoUploadButton = styled.button`
