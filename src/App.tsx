@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import BaseMap from "./pages/Map/BaseMap";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/Landing";
+import HomePage from "./pages/Home";
+import MyPage from "./pages/Mypage";
+import MeetingDetailPage from "./pages/MeetingDetail";
+import { GlobalStyle } from "./styles/global";
+import "./App.css";
+import { useAllLocations } from "./hooks/useAllLocations";
+import PlaceSearchTest from "./pages/Map/PlaceSearchTest";
+
+const myUserId = "testUser1";
+const myName = "내 이름";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const locations = useAllLocations(); // Firestore에서 모든 공유 위치 구독
+  const userLocations = Object.values(locations); // 객체 → 배열
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      {/* <BaseMap />
+
+      <BaseMap
+        width="80vw"
+        height="50vh"
+        center={{ lat: 35.1796, lng: 129.0756 }}
+        markerPosition={{ lat: 35.1796, lng: 129.0756 }}
+        markerLabel="부산"
+        level={4}
+      />
+
+      <BaseMap
+        useCurrentLocation={true}
+        width="100%"
+        height="80vh"
+        markerLabel="내 위치"
+      /> */}
+
+      <GlobalStyle />
+      {/* <LoadingPage /> */}
+      <BaseMap
+        userId={myUserId}
+        name={myName}
+        shareLocation={true}
+        userLocations={userLocations}
+      />
+      <PlaceSearchTest />
+      <div className="container">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/home" element={<HomePage />} />
+            {/* <Route path="/map" element={<TestMap />} /> */}
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
+          </Routes>
+        </BrowserRouter>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
