@@ -9,7 +9,7 @@ function index() {
             <MyPageLayout>
                 <MyInfoCard />
                 <DivideLine />
-                <MyActivities></MyActivities>  {/*여기서부터 다시 봐야함*/}
+                <MyActivities></MyActivities>
             </MyPageLayout>
         </Layout>
     )
