@@ -1,8 +1,9 @@
+import { useState } from "react";
 import styled from "styled-components";
 
 interface ShareLocationToggleProps {
   shareLocation: boolean;
-  onToggle: () => void;
+  onToggle?: (newValue: boolean) => void;
 }
 
 export default function ShareLocationToggle({
@@ -13,13 +14,16 @@ export default function ShareLocationToggle({
     <Wrapper>
       <ToggleRow>
         <Title>사자 레이더</Title>
-        {/* <ToggleContainer onClick={onToggle} $active={shareLocation}>
-          <ToggleLabel $active={!shareLocation}>OFF</ToggleLabel>
-          <ToggleLabel $active={shareLocation}>ON</ToggleLabel>
-          <ToggleSwitch $active={shareLocation} />
-        </ToggleContainer> */}
-        <Button onClick={onToggle}>{shareLocation ? "ON" : "OFF"}</Button>
+
+        <ToggleContainer onClick={() => onToggle?.(!shareLocation)}>
+          <ToggleLabel>OFF</ToggleLabel>
+          <ToggleLabel>ON</ToggleLabel>
+          <ToggleSwitch $active={shareLocation}>
+            <SwitchLabel>{shareLocation ? "ON" : "OFF"}</SwitchLabel>
+          </ToggleSwitch>
+        </ToggleContainer>
       </ToggleRow>
+
       <Description>모임원들과 위치와 상태를 공유할 수 있습니다.</Description>
     </Wrapper>
   );
@@ -28,7 +32,6 @@ export default function ShareLocationToggle({
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 8px;
   margin-bottom: 32px;
 `;
@@ -53,29 +56,50 @@ const Description = styled.p`
   color: #000000;
 `;
 
-// const ToggleContainer = styled.div<{$active: boolean}`
-//   position: relative;
-//   width: 129px;
-//   height: 26px;
-//   border: none;
-//   border-radius: 20px;
-//   background-color: #848484;
-//   cursor: pointer;
-// `;
-
-// const ToggleLabel = styled.span<{$active: boolean}`
-// font-family: Pretendard;
-// font-size: 20px;
-// font-weight: 400;
-// color: ${({$active}) =>($active ? "#000000" : "#FFFFFF"};
-// `
-
-const Button = styled.button`
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: #43d687;
-  color: #fff;
-  font-weight: 500;
-  border: none;
+const ToggleContainer = styled.div`
+  position: relative;
+  width: 129px;
+  height: 26px;
+  border-radius: 20px;
+  background-color: #848484;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-sizing: border-box;
+`;
+
+const ToggleLabel = styled.p`
+  font-family: Dongle;
+  font-size: 20px;
+  font-weight: 400;
+  color: #ffffff;
+  user-select: none;
+  z-index: 1;
+  padding-top: 3px;
+`;
+
+const ToggleSwitch = styled.div<{ $active: boolean }>`
+  position: absolute;
+  left: ${({ $active }) => ($active ? "calc(100% - 75px)" : 0)};
+  width: 75px;
+  height: 26px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+  z-index: 2;
+  padding-top: 3px;
+`;
+
+const SwitchLabel = styled.p`
+  font-family: Dongle;
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  user-select: none;
+  line-height: 26px;
 `;

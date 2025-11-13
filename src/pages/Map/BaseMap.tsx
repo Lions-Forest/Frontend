@@ -21,12 +21,8 @@ interface BaseMapProps {
 
 const defaultCenter = { lat: 37.504729, lng: 126.957631 };
 
-export default function BaseMap({
-  userId,
-  name,
-  shareLocation,
-  setShareLocation,
-}: BaseMapProps) {
+export default function BaseMap({ userId, name }: BaseMapProps) {
+  const [shareLocation, setShareLocation] = useState(false);
   const [selectedStatus, setSelectedStatus] =
     useState<NonNullable<UserLocation["status"]>>("nothing");
   const [statusMessage, setStatusMessage] = useState("");

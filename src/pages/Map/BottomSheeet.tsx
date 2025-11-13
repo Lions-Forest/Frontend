@@ -11,7 +11,7 @@ interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   shareLocation: boolean;
-  onToggleShare: () => void;
+  onToggleShare: (newValue: boolean) => void;
   status: NonNullable<UserLocation["status"]>;
   setStatus: React.Dispatch<
     React.SetStateAction<NonNullable<UserLocation["status"]>>
