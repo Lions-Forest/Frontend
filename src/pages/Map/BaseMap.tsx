@@ -3,80 +3,63 @@ import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
 import React, { useEffect, useState } from "react";
 import LoadingPage from "@/pages/Map/LoadingPage";
-import MarkerImage from "@/assets/images/LoadingLion.svg"; // 임시로 다른 사진 지정
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
-import Layout from "@/components/layout/Layout";
+import defaultLion from "@/assets/lion/defaultLion.svg";
+import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.svg";
 import styled from "styled-components";
+import Footer from "@/components/layout/Footer";
+import BottomSheet from "./BottomSheeet";
+import StatusSelector from "./StatusSelector";
 
 interface BaseMapProps {
   userId: string;
   name: string;
   shareLocation: boolean;
-  userLocations: UserLocation[];
+  setShareLocation: (value: boolean) => void;
 }
 
-const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }; // 서울 시청 좌표 (임시 기본값)
+const defaultCenter = { lat: 37.504729, lng: 126.957631 };
 
-export default function BaseMap({
-  userId,
-  name,
-  shareLocation,
-  userLocations,
-}: BaseMapProps) {
-  useMyLocation({ userId, name, shareLocation }); // 내 위치 Firebase에 업로드
+export default function BaseMap({ userId, name }: BaseMapProps) {
+  const [shareLocation, setShareLocation] = useState(false);
+  const [selectedStatus, setSelectedStatus] =
+    useState<NonNullable<UserLocation["status"]>>("nothing");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  useMyLocation({ userId, name, shareLocation, status: selectedStatus }); // 내 위치 Firebase에 업로드
   const locations = useAllLocations(); // 모든 사용자 위치 구독
   const myLocation = locations?.[userId]; // 모든 사용자 위치 중 내 위치 찾아내기 (중심 좌표를 찾기 위해)
+
   console.log("locations state:", locations);
   console.log("myLocation:", myLocation);
-  const safeUserLocations = Array.isArray(userLocations) ? userLocations : [];
-  const initialCenter = React.useMemo(() => {
-    if (myLocation?.latitude && myLocation?.longitude) {
-      return { lat: myLocation.latitude, lng: myLocation.longitude };
-    }
-    const fallbackUser = safeUserLocations.find(
-      (user) => user.latitude && user.longitude
-    );
-    if (fallbackUser) {
-      return { lat: fallbackUser.latitude, lng: fallbackUser.longitude };
-    }
-    return DEFAULT_CENTER;
-  }, [myLocation, safeUserLocations]);
+
   const [center, setCenter] = useState<{ lat: number; lng: number }>(
-    initialCenter
+    myLocation
+      ? { lat: myLocation.latitude, lng: myLocation.longitude }
+      : defaultCenter
   );
 
   useEffect(() => {
-    if (myLocation) {
+    if (myLocation?.latitude && myLocation?.longitude) {
       setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
     }
   }, [myLocation]);
 
-  useEffect(() => {
-    if (!myLocation && center === DEFAULT_CENTER) {
-      setCenter(initialCenter);
-    }
-  }, [center, initialCenter, myLocation]);
-
-  // 아직 위치 데이터가 전혀 없다면 로딩 화면 표시
-  const hasAnyLocation =
-    myLocation ||
-    safeUserLocations.some((user) => user.latitude && user.longitude);
-  if (!hasAnyLocation && center === DEFAULT_CENTER) {
-    return <LoadingPage />;
-  }
-
-  // const myLocation = { latitude: 37.504729, longitude: 126.957631 };
+  // 아직 위치 데이터가 들어오지 않았다면 로딩 화면 표시
+  const isLoading = !locations || !myLocation;
+  if (isLoading) return <LoadingPage />;
 
   const moveToMyLocation = () => {
-    if (myLocation) {
+    if (myLocation?.latitude && myLocation.longitude) {
       setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
     }
   };
 
   return (
-    <Layout>
-      <MapContainer>
+    <MapContainer>
+      <MapWrapper>
         <Map
           center={center}
           style={{ width: "100%", height: "100%" }}
@@ -86,95 +69,56 @@ export default function BaseMap({
             setCenter({ lat: newCenter.getLat(), lng: newCenter.getLng() });
           }}
         >
-          {safeUserLocations.map((user) => {
+          {Object.values(locations).map((user) => {
             if (!user.latitude || !user.longitude) return null;
 
+            const isMe = user.userId === userId;
+
+            if (!shareLocation && !isMe) return null;
+
             const markerImage = {
-              src: getMarkerImage(user.status) || MarkerImage, // undfined면 기본 이미지
-              size: { width: 50, height: 50 },
+              src: getMarkerImage(user.status, isMe) || defaultLion,
+              size: isMe
+                ? { width: 79, height: 145 }
+                : { width: 93, height: 102 },
               options: { offset: { x: 25, y: 50 } },
             };
 
-            if (user.userId === userId) {
+            if (isMe) {
               return (
                 <React.Fragment key={`current-${user.userId}`}>
                   <MapMarker
-                    key={`marker-${user.userId}`}
+                    key={user.userId}
                     position={{ lat: user.latitude, lng: user.longitude }}
                     image={markerImage}
                     title={`${user.name} (나)`}
                   />
 
-                  {/* 작은 빨간 점 */}
-                  {/* <MapMarker
-                  position={{ lat: user.latitude, lng: user.longitude }}
-                  key={`${user.userId}-dot`}
-                >
-                  <div
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      background: "#FF2370",
-                      border: "2px solid white",
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  />
-                </MapMarker> */}
-
-                  {/* 레이더 같은 반투명한 원 */}
-                  {/* <Circle
-                  key={`${user.userId}-circle`}
-                  center={{ lat: user.latitude, lng: user.longitude }} // 원의 중심 좌표
-                  radius={150} // 반경(m)
-                  strokeWeight={2} // 테두리 굵기
-                  strokeColor={"#FF2370"} // 테두리 색
-                  strokeOpacity={0.8} // 테두리 불투명도
-                  fillColor={"#FF2370"} // 내부 채움 색
-                  fillOpacity={0.2} // 내부 채움 색 불투명도
-                /> */}
-
-                  {/* 그라데이션 원 */}
-                  <CustomOverlayMap
-                    key={`radius-${user.userId}`}
-                    position={{ lat: user.latitude, lng: user.longitude }}
-                  >
-                    <div
-                      style={{
-                        width: "250px",
-                        height: "250px",
-                        borderRadius: "50%",
-                        background:
-                          "radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, rgba(0, 128, 0, 0.7) 90%)",
-                        transform: "translate(-50%, -50%)",
-                        pointerEvents: "none",
-                      }}
-                    />
-                  </CustomOverlayMap>
-
-                  {/* 내 위치 (빨간 점) */}
-                  <CustomOverlayMap
-                    key={`dot-${user.userId}`}
-                    position={{ lat: user.latitude, lng: user.longitude }}
-                  >
-                    <div
-                      style={{
-                        width: "10px",
-                        height: "10px",
-                        borderRadius: "50%",
-                        background: "#00cc00",
-                        border: "none",
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    />
-                  </CustomOverlayMap>
+                  {shareLocation && (
+                    <CustomOverlayMap
+                      position={{ lat: user.latitude, lng: user.longitude }}
+                      zIndex={-1} // 마커보다 뒤에 뜨게
+                    >
+                      <div
+                        style={{
+                          width: "427px",
+                          height: "427px",
+                          borderRadius: "50%",
+                          background:
+                            "radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.30) 28.85%, rgba(67, 214, 135, 0.30) 100%)",
+                          transform: "translate(-18%, -18%)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    </CustomOverlayMap>
+                  )}
                 </React.Fragment>
               );
             }
 
             return (
               <MapMarker
-                key={`marker-${user.userId}`}
+                key={`marker=${user.userId}`}
                 position={{ lat: user.latitude, lng: user.longitude }}
                 image={markerImage}
                 title={user.name}
@@ -183,34 +127,61 @@ export default function BaseMap({
           })}
         </Map>
 
-        <LocateButton onClick={moveToMyLocation}>내 위치로 이동</LocateButton>
-      </MapContainer>
-    </Layout>
+        <img
+          src={moveToMyLocationBtn}
+          alt="내 위치로 이동"
+          style={{
+            position: "absolute",
+            bottom: 116,
+            right: 15,
+            width: 46,
+            height: 46,
+            cursor: "pointer",
+            zIndex: 10,
+          }}
+          onClick={moveToMyLocation}
+        />
+      </MapWrapper>
+
+      <BottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        shareLocation={shareLocation}
+        onToggleShare={() => setShareLocation(!shareLocation)}
+        status={selectedStatus}
+        setStatus={setSelectedStatus}
+        message={statusMessage}
+        setMessage={setStatusMessage}
+      >
+        <StatusSelector
+          selectedStatus={selectedStatus}
+          onChange={setSelectedStatus}
+        />
+      </BottomSheet>
+      <FooterWrap>
+        <Footer />
+      </FooterWrap>
+    </MapContainer>
   );
 }
 
 const MapContainer = styled.div`
-  position: relative;
-  display: flex;
+  max-width: 600px;
   width: 100%;
-  height: 100%;
-  min-height: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 `;
 
-const LocateButton = styled.button`
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  z-index: 10;
-  border: none;
-  border-radius: 8px;
-  background: #222;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+const MapWrapper = styled.div`
+  flex: 1;
+  position: relative;
+`;
 
-  &:hover {
-    background: #333;
-  }
+const FooterWrap = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
 `;

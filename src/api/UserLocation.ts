@@ -3,6 +3,14 @@ export interface UserLocation {
   name: string;
   latitude: number;
   longitude: number;
-  status: "studying" | "eating" | "offline";
+  status:
+    | "nothing"
+    | "studying"
+    | "working"
+    | "relaxing"
+    | "eating"
+    | "playing"
+    | "boring"
+    | "hungry";
   shareLocation: boolean;
 }
