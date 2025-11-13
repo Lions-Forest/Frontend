@@ -4,7 +4,7 @@
 import Layout from "@/components/layout/Layout";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import type { Meeting, Reply } from "@/types";
+import type { Meeting, Participant, Reply } from "@/types";
 import { MdToday as DateIcon} from "react-icons/md";
 import { MdOutlineSchedule as TimeIcon} from "react-icons/md";
 import distance from "../../assets/icons/distance.svg"
@@ -18,6 +18,8 @@ import ReplyList from "@/components/features/ReplyList";
 import CircleArrow from "@/components/common/CircleArrow";
 import { useEffect, useState } from "react";
 import { fetchReplyList, submitReply, toggleReplyLikes } from "@/api/meeting/replyApi";
+import { fetchParticipantList } from "@/api/meeting/meetingMemberApi";
+import MemberModal from "@/components/features/MemberModal";
 
 function formatMeetingDate(date: Date | string) {
     const d: Date = date instanceof Date ? date : new Date(date as string);
@@ -51,15 +53,18 @@ function formatMeetingDate(date: Date | string) {
 function index() {
     const location = useLocation();
     const meeting = location.state?.meeting as Meeting | undefined;
+    const remainingTime = location.state?.remainingTime as string;
     const [currentIdx, setCurrentIdx] = useState(0);
   
     const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
     const goNext = () => setCurrentIdx(i => Math.min(meeting?.photo.length - 1, i + 1));
 
     const [ replyList, setReplyList ] = useState<Reply[]>([]);
+    const [ participantList, setParticipantList ] = useState<Participant[]>([]);
+    const [ selectedParticipant, setSelectedParticipant ] = useState<Participant | null>(null);
   
-    useEffect(() => {
-      const fetchData = async() => {
+    useEffect (() => {
+      const fetchReplyData = async() => {
         try {
           const replies = await fetchReplyList(meeting?.id || 0);
           console.log("전체 댓글 리스트: ", replies);
@@ -69,23 +74,36 @@ function index() {
           setReplyList([]); // 에러 발생 시 빈 배열로 설정
         }
       };
-      fetchData();
+      fetchReplyData();
     }, []);
 
-    // 참여 멤버들의 photoUrl 배열 (임시로 owner의 photoUrl을 사용, 실제로는 API에서 받아와야 함)
-    // TODO: 실제 API에서 참여 멤버들의 정보를 받아와야 함
-    const memberPhotos: (string | undefined)[] = [];
-    if (meeting) {
-        // meeting.memberNumber만큼 photoUrl 할당
-        // 실제로는 참여 멤버들의 배열이 필요하지만, 임시로 owner의 photoUrl 사용
-        for (let i = 0; i < meeting.memberNumber; i++) {
-            memberPhotos.push(meeting.owner.photoUrl);
-        }
-        // 나머지는 undefined로 채움
-        for (let i = meeting.memberNumber; i < meeting.memberLimit; i++) {
-            memberPhotos.push(undefined);
-        }
-    }
+    useEffect (() => {
+        const fetchParticipantData = async() => {
+          try {
+            const participants = await fetchParticipantList(meeting?.id || 0);
+            console.log("전체 참가자 리스트: ", participants);
+            setParticipantList(participants);
+          } catch (error) {
+            console.error("데이터 로딩 실패: ", error);
+            setParticipantList([]); // 에러 발생 시 빈 배열로 설정
+          }
+        };
+        fetchParticipantData();
+    }, []);
+
+    // 참여 멤버 슬롯 (참가자 정보 포함)
+    const memberSlots: (Participant | undefined)[] = meeting
+        ? Array.from({ length: meeting.memberLimit }, (_, index) => participantList[index])
+        : [];
+
+    const handleMemberClick = (participant?: Participant) => {
+        if (!participant) return;
+        setSelectedParticipant(participant);
+    };
+
+    const handleCloseMemberModal = () => {
+        setSelectedParticipant(null);
+    };
 
     // 좋아요 토글 함수
     const handleLikeToggle = async (replyId: number) => {
@@ -101,8 +119,15 @@ function index() {
         setReplyList(replies);
     };
 
+    const isAnonymous = (date: Date | string) => {
+        const now = new Date();
+        const d = date instanceof Date ? date : new Date(date);
+        // date가 now보다 과거면 false, 아니면 true
+        return d.getTime() >= now.getTime();
+      }      
+
     return (
-        <Layout showBackNavBar={true} backNavBarText="소모임">
+        <Layout showBackNavBar={true} backNavBarText="소모임" remainingTime={remainingTime}>
             <DetailLayout>
                 {meeting ? (
                     <>
@@ -146,8 +171,13 @@ function index() {
                                     <MemberIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
                                     <DetailText>
                                         <MemberProfiles>
-                                            {memberPhotos.map((photoUrl, index) => (
-                                                <Profile key={index} src={photoUrl} />
+                                            {memberSlots.map((participant, index) => (
+                                                <Profile
+                                                    key={index}
+                                                    src={participant?.photoUrl}
+                                                    $clickable={!!participant}
+                                                    onClick={() => handleMemberClick(participant)}
+                                                />
                                             ))}
                                         </MemberProfiles>
                                         <MemberCount>{meeting.memberNumber} / {meeting.memberLimit}</MemberCount>
@@ -157,7 +187,7 @@ function index() {
                             </DetailInfo>
                         </DetailInfoContainer>
                         <Line />
-                        {/* <ReviewList review={review}/> */}
+                        <ReviewList groupId={meeting.id}/>
                         <Line />
                         <ReplyList 
                             replies={replyList} 
@@ -165,7 +195,6 @@ function index() {
                             likesPressed={false}
                             onLikeToggle={handleLikeToggle}
                             onReplySubmit={handleReplySubmit}/>
-
                         <Buttons>
                             <InfoButton onClose={true} />
                             <InfoButton onReview={true} />
@@ -175,6 +204,9 @@ function index() {
                     <NoData>모임 정보를 불러올 수 없습니다.</NoData>
                 )}
             </DetailLayout>
+            {selectedParticipant && (
+                <MemberModal participant={selectedParticipant} onClose={handleCloseMemberModal} anonymous={isAnonymous(meeting.date)} />
+            )}
         </Layout>
     )
 }
@@ -316,7 +348,7 @@ const DetailText = styled.div`
     align-items: center;
 `;
 
-const Profile = styled.img`
+const Profile = styled.img<{ $clickable?: boolean }>`
     width: 24px;
     height: 24px;
     flex-shrink: 0;
@@ -324,6 +356,7 @@ const Profile = styled.img`
     background: ${props => props.src ? 'transparent' : '#848484'};
     object-fit: cover;
     border: 1px solid ${props => props.src ? 'transparent' : '#E2E2E2'};
+    cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 `;
 
 const MemberProfiles = styled.div`

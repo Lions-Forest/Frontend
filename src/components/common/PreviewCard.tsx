@@ -54,6 +54,7 @@ function calculateRemaining(meetingDate: Date) {
 function PreviewCard({ meeting }: { meeting: Meeting }) {
   const navigate = useNavigate();
   const remaining = calculateRemaining(meeting.date);
+  const remainingTime = `${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`;
   const progress = meeting.memberNumber / meeting.memberLimit;
   let theme: ColorTheme;
 
@@ -63,7 +64,7 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
   else theme = pinkTheme;
 
   const handleCardClick = () => {
-    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting } });
+    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting, remainingTime } });
   };
 
   return (
@@ -76,7 +77,7 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
                 <ProgressBarInner width={progress * 100} color={theme.loading}/>
                 <ProgressBarLion src={lionHead} left={180 * progress}/>
             </ProgressOuter>
-            <Time>{`${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`}</Time>
+            <Time>{remainingTime}</Time>
         </Progress>
             <Body>
                 <ImagePlaceholder 

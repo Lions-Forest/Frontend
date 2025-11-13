@@ -1,16 +1,33 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import ReviewCard from "./ReviewCard";
 import type { Review } from "@/types";
 import CircleArrow from "../common/CircleArrow";
+import { fetchMeetingReviewList } from "@/api/meeting/reviewListApi";
 
 interface ReviewListProps {
-    reviews: Review[];
+    groupId: number,
     onPrev?: () => void;
     onNext?: () => void;
 }
 
-function ReviewList({ reviews, onPrev, onNext }: ReviewListProps) {
+function ReviewList({ groupId, onPrev, onNext }: ReviewListProps) {
+  const [ reviews, setReviews ] = useState<Review[]>([]);
+  
+  useEffect (() => {
+    const fetchReviewData = async() => {
+      try {
+        const result = await fetchMeetingReviewList(groupId || 0);
+        console.log("전체 후기 리스트: ", result);
+        setReviews(Array.isArray(result) ? result : []);
+      } catch (error) {
+        console.error("데이터 로딩 실패: ", error);
+        setReviews([]); // 에러 발생 시 빈 배열로 설정
+      }
+    };
+    fetchReviewData();
+  }, []);
+
     return (
         <ReviewLayout>
           <ReviewTitle>모임 후기</ReviewTitle>
@@ -19,9 +36,13 @@ function ReviewList({ reviews, onPrev, onNext }: ReviewListProps) {
               <CircleArrow direction="left" />
             </ArrowWrapperLeft>
             <CardSection>
-              {reviews.map(review => (
-                <ReviewCard key={review.meeting.id + "-" + review.writer.id} review={review} />
-              ))}
+              {reviews && reviews.length > 0 ? (
+                reviews.map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))
+              ) : (
+                <EmptyText>아직 모임 후기가 없습니다</EmptyText>
+              )}
             </CardSection>
             <ArrowWrapperRight onClick={onNext}>
               <CircleArrow direction="right" />
@@ -38,6 +59,7 @@ const ReviewLayout = styled.div`
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    width: 100%;
 `;
 
 const ReviewTitle = styled.div`
@@ -51,12 +73,13 @@ const ReviewTitle = styled.div`
 
 const ListLayout = styled.div`
     display: flex;
-    width: 345px;
-    height: 160px;
+    width: 95%;
+    // width: 345px;
+    height: 100%;
     padding: 8px 4px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    // gap: 10px;
     flex-shrink: 0;
     margin: 2px 8px 16px 8px;
     position: relative;
@@ -68,21 +91,37 @@ const ListLayout = styled.div`
 
 const CardSection = styled.div`
     display: flex;
+    flex: 1;
+    // width: 100%;
+    height: 100%;
     gap: 5px;
-    overflow-x: auto;
-    align-items: stretch;
+    justify-content: start;
+    align-items: center;
+    padding: 8px 4px;
+`;
+
+const EmptyText = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6B7280;
+    font-family: Pretendard;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
 `;
 
 const ArrowWrapperLeft = styled.div`
-  position: relative;
-  margin-right: 4px;
+  position: absolute;
+  left: -15px;
   z-index: 2;
   cursor: pointer;
 `;
 
 const ArrowWrapperRight = styled.div`
-  position: relative;
-  margin-left: 4px;
+  position: absolute;
+  right: -15px;
   z-index: 2;
   cursor: pointer;
 `;

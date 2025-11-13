@@ -1,35 +1,60 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import type { Member } from "@/types";
+import type { Member, Participant } from "@/types";
 import { IoIosClose as Close } from "react-icons/io";
+import { fetchParticipantDetail } from "@/api/meeting/meetingMemberApi";
 
 interface MemberModalProps {
-  member: Member;
+  participant: Participant;
   onClose: () => void;
+  anonymous?: boolean;
 }
 
-function isAnonymous(member: Member) {
-  // 로직 구성 필요
-  return member.nickname;
+function pickMemberFromResponse(data: Member | Member[] | null): Member | null {
+  if (!data) return null;
+  if (Array.isArray(data)) {
+    return data.find((item) => item != null) ?? null;
+  }
+  return data;
 }
 
-function MemberModal({ member, onClose }: MemberModalProps) {
-  const anonymous = isAnonymous(member);
+function MemberModal({ participant, onClose, anonymous = true }: MemberModalProps) {
+  const [detail, setDetail] = useState<Member | null>(null);
+  console.log('해당 참가자 정보: ', detail);
+
+  useEffect(() => {
+    const fetchDetailedData = async () => {
+      try {
+        const result = await fetchParticipantDetail(participant?.userId || 0);
+        console.log("참가자 정보: ", result);
+        setDetail(pickMemberFromResponse(result));
+      } catch (error) {
+        console.error("데이터 로딩 실패: ", error);
+        setDetail(null);
+      }
+    };
+    fetchDetailedData();
+  }, [participant?.userId]);
+
+  const displayName = anonymous
+    ? detail?.nickname || participant.nickname || "별명 없음"
+    : detail?.name || participant.name || "이름 없음";
+  const profileSrc = detail?.photoUrl || participant.photoUrl || "";
+  const introduction = detail?.detail || "한 줄 소개 없음";
 
   return (
     <Overlay>
       <ModalBox>
         <CloseBtn onClick={onClose} />
-        <Name>{anonymous ? member.nickname : member.name}</Name>
-        <ProfileImg src={member.photoUrl || ""} />
+        <Name>{displayName || "-"}</Name>
+        <ProfileImg src={profileSrc} alt={displayName} />
         <DetailRow>
-          {anonymous 
-            ? null 
-            : <>
-                <MemberDetail>한 줄 소개</MemberDetail>
-                <MemberDetail>{member.detail}</MemberDetail>
-              </>
-          }
+          {anonymous ? null : (
+            <>
+              <ParticipantDetail>한 줄 소개</ParticipantDetail>
+              <ParticipantDetail>{introduction}</ParticipantDetail>
+            </>
+          )}
         </DetailRow>
       </ModalBox>
     </Overlay>
@@ -48,14 +73,16 @@ const Overlay = styled.div`
   justify-content: center;
 `;
 
-const ModalBox = styled.div`
+const ModalBox = styled.div<{ anonymous?: boolean }>`
   position: relative;
   width: 245px;
   height: 179px;
   flex-shrink: 0;
   border-radius: 5px;
   border: 0.1px solid #000;
-  background: #FFF;  
+  background: #FFF; 
+  padding: 36px 0px 30px 0px; 
+  gap: ${({ anonymous }) => (anonymous ? "20px" : "17px")};
   
   display: flex;
   flex-direction: column;
@@ -72,7 +99,6 @@ const CloseBtn = styled(Close)`
 `;
 
 const Name = styled.div`
-    margin-bottom: 8px;
     color: #000;
     font-family: Pretendard;
     font-size: 14px;
@@ -81,25 +107,25 @@ const Name = styled.div`
     line-height: normal;
 `;
 
-const ProfileImg = styled.img`
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
+const ProfileImg = styled.img<{ anonymous?: boolean }>`
+  width: ${({ anonymous }) => (anonymous ? "64px" : "49px")};
+  height: ${({ anonymous }) => (anonymous ? "64px" : "49px")};
+  flex-shrink: 0;
   object-fit: cover;
   border-radius: 64px;
-  margin-bottom: 13px;
   background: #eee;
 `;
 
 const DetailRow = styled.div`
   display: flex;
+  width: 100%;
+  padding: 0px 35px;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 23px;
-  margin-top: 19px;
 `;
 
-const MemberDetail = styled.div`
+const ParticipantDetail = styled.div`
     color: #000;
     font-family: Pretendard;
     font-size: 10px;

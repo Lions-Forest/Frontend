@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import { HiOutlineStar as FullStar} from "react-icons/hi";
 import { HiStar as EmptyStar} from "react-icons/hi";
+import { HiOutlineStar as Star} from "react-icons/hi";
 
 const MAX_STARS = 5;
 
@@ -11,9 +12,9 @@ function ScoreNav({ review }: { review: Review }){
     <StarSection>
         {[...Array(MAX_STARS)].map((_, i) =>
             i < review.starNumber ? (
-                <StyledStar as={FullStar} key={i} filled />
+                <StyledStar key={i} filled />
             ) : (
-                <StyledStar as={EmptyStar} key={i} />
+                <StyledStar key={i} />
             )
         )}
     </StarSection>
@@ -23,18 +24,20 @@ function ScoreNav({ review }: { review: Review }){
 export default ScoreNav
 
 const StarSection = styled.div`
-    width: 64.753px;
-    height: 13px;
-    flex-shrink: 0;
+  width: 100%;
+  height: 13px;
+  // flex-shrink: 0;
+  gap: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 `;
 
-const StyledStar = styled.span<{ filled?: boolean }>`
+const StyledStar = styled(Star)<{ filled?: boolean }>`
   font-size: 15px;
   vertical-align: middle;
-  color: ${({ filled }) => (filled ? "#FEFF00" : "#848484")};
-  filter: ${({ filled }) =>
-    filled
-      ? "drop-shadow(0px 0px 2px #000000B2)"
-      : ""};
+  fill: ${({ filled }) => (filled ? "#FEFF00" : "none")};
+  color: ${({ filled }) => (filled ? "transparent" : " #808080")};
+  filter: ${({ filled }) => (filled ? "drop-shadow(0px 0px 2px #000000B2)" : "")};
   margin-right: 1.5px;
 `;

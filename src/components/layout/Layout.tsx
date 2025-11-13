@@ -9,15 +9,16 @@ interface LayoutProps {
     children: React.ReactNode;
     showBackNavBar?: boolean; // New prop for conditional rendering
     backNavBarText?: string; // New prop for BackToNavBar text
+    remainingTime?: string; // New prop for remainingTime
 }
 
-function Layout({ page, children, showBackNavBar = false, backNavBarText = "" }: LayoutProps) {
+function Layout({ page, children, showBackNavBar = false, backNavBarText = "", remainingTime }: LayoutProps) {
     return(
         <Root>
             <HeaderWrapper>
                 <Header page={page} />
             </HeaderWrapper>
-            {showBackNavBar && <BackToNavBar text={backNavBarText} />} {/* 뒤로가기 NavBar 필요할 때만 사용 */}
+            {showBackNavBar && <BackToNavBar text={backNavBarText} remainingTime={remainingTime} />} {/* 뒤로가기 NavBar 필요할 때만 사용 */}
             <Content>
                 {children}
             </Content>
