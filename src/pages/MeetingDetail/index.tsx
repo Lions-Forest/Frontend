@@ -1,4 +1,3 @@
-// TODO: 멤버 클릭할 때 <MemberModal> 띄우기, 프롭스로 익명/실명 전달 로직 구현
 // TODO: Reply에 likesPressed 방법 고안 및 구현하기
 
 import Layout from "@/components/layout/Layout";
@@ -6,7 +5,6 @@ import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import type { Meeting, Participant, Reply } from "@/types";
 import { MdToday as DateIcon} from "react-icons/md";
-import { MdOutlineSchedule as TimeIcon} from "react-icons/md";
 import distance from "../../assets/icons/distance.svg"
 import { MdAccountCircle as OwnerIcon} from "react-icons/md";
 import { MdDiversity3 as MemberIcon} from "react-icons/md";
@@ -20,6 +18,8 @@ import { useEffect, useState } from "react";
 import { fetchReplyList, submitReply, toggleReplyLikes } from "@/api/meeting/replyApi";
 import { fetchParticipantList } from "@/api/meeting/meetingMemberApi";
 import MemberModal from "@/components/features/MemberModal";
+import { fetchMeetingDetail } from "@/api/meeting/meetingListApi";
+import { cancelJoinMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
 
 function formatMeetingDate(date: Date | string) {
     const d: Date = date instanceof Date ? date : new Date(date as string);
@@ -34,17 +34,11 @@ function formatMeetingDate(date: Date | string) {
     const weekday = weekdays[d.getDay()];
 
     if ( hour >= 13 ) {
-        if ( minutes !== 0 ) {
-            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour-12}:${minutes} PM)`
-        } else {
-            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour-12}PM)`
-        }
+        if ( minutes !== 0 ) formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour-12}:${minutes} PM)`
+        else formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour-12}PM)`
     } else {
-        if ( minutes !== 0 ) {
-            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour}:${minutes} AM)`
-        } else {
-            formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour}AM)`
-        }        
+        if ( minutes !== 0 ) formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour}:${minutes} AM)`
+        else formattedDate = `${year}년 ${month}월 ${day}일 ${weekday} (${hour}AM)`        
     }
     
     return formattedDate;
@@ -52,21 +46,77 @@ function formatMeetingDate(date: Date | string) {
 
 function index() {
     const location = useLocation();
-    const meeting = location.state?.meeting as Meeting | undefined;
+    const initialMeeting = location.state?.meeting as Meeting | undefined;
     const remainingTime = location.state?.remainingTime as string;
+    const [meeting, setMeeting] = useState<Meeting | undefined>(initialMeeting);
     const [currentIdx, setCurrentIdx] = useState(0);
+    const now = new Date();
   
+    // const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
+    // const goNext = () => setCurrentIdx(i => Math.min(meeting?.photo.length - 1, i + 1));
     const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
-    const goNext = () => setCurrentIdx(i => Math.min(meeting?.photo.length - 1, i + 1));
-
+    const goNext = () => {
+        setCurrentIdx(i => {
+            const maxIdx = Math.max((meeting?.photo?.length ?? 1) - 1, 0);
+            return Math.min(maxIdx, i + 1);
+        });
+    };
+    
     const [ replyList, setReplyList ] = useState<Reply[]>([]);
     const [ participantList, setParticipantList ] = useState<Participant[]>([]);
     const [ selectedParticipant, setSelectedParticipant ] = useState<Participant | null>(null);
+    const [ joinState, setJoinState ] = useState<'join' | 'cancel'>('join');
+
+    const handleJoin = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await joinMeeting(meeting.id);
+            setJoinState('cancel');
+
+            const meetingDetail = await fetchMeetingDetail(meeting.id);
+            console.log("해당 모임 정보: ", meetingDetail);
+            if (meetingDetail) {
+                setMeeting(meetingDetail);
+            }
+            
+            const participants = await fetchParticipantList(meeting.id);
+            console.log("전체 참가자 리스트: ", participants);
+            setParticipantList(participants);
+
+        } catch(e) {
+            console.log("handleJoin 함수 실패: ", e);
+        }
+    }
+
+    const handleJoinCancel = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await cancelJoinMeeting(meeting.id);
+            setJoinState('join');
+
+            const meetingDetail = await fetchMeetingDetail(meeting.id);
+            console.log("해당 모임 정보: ", meetingDetail);
+            if (meetingDetail) {
+                setMeeting(meetingDetail);
+            }
+            
+            const participants = await fetchParticipantList(meeting.id);
+            console.log("전체 참가자 리스트: ", participants);
+            setParticipantList(participants);
+
+        } catch(e) {
+            console.log("handleJoin 함수 실패: ", e);
+        }
+    }
   
+    // 해당 모임 댓글 정보 불러오기
     useEffect (() => {
       const fetchReplyData = async() => {
+        if (!meeting?.id) return;
         try {
-          const replies = await fetchReplyList(meeting?.id || 0);
+          const replies = await fetchReplyList(meeting.id);
           console.log("전체 댓글 리스트: ", replies);
           setReplyList(replies);
         } catch (error) {
@@ -75,21 +125,30 @@ function index() {
         }
       };
       fetchReplyData();
-    }, []);
+    }, [meeting?.id]);
 
+    // 해당 모임 참가자 정보 불러오기
     useEffect (() => {
         const fetchParticipantData = async() => {
+          if (!meeting?.id) return;
           try {
-            const participants = await fetchParticipantList(meeting?.id || 0);
+            const participants = await fetchParticipantList(meeting.id);
             console.log("전체 참가자 리스트: ", participants);
             setParticipantList(participants);
+
+            // 나의 참여 여부 확인하기
+            const myUserId = Number(localStorage.getItem("userId"));
+            const isJoined = participants.some(p => Number(p.userId) === myUserId);
+            if (isJoined) setJoinState('cancel');
+            else setJoinState('join');
           } catch (error) {
             console.error("데이터 로딩 실패: ", error);
-            setParticipantList([]); // 에러 발생 시 빈 배열로 설정
+            setParticipantList([]);
+            setJoinState('join');
           }
         };
         fetchParticipantData();
-    }, []);
+    }, [meeting?.id]);
 
     // 참여 멤버 슬롯 (참가자 정보 포함)
     const memberSlots: (Participant | undefined)[] = meeting
@@ -120,7 +179,6 @@ function index() {
     };
 
     const isAnonymous = (date: Date | string) => {
-        const now = new Date();
         const d = date instanceof Date ? date : new Date(date);
         // date가 now보다 과거면 false, 아니면 true
         return d.getTime() >= now.getTime();
@@ -165,7 +223,10 @@ function index() {
                                 </Detail>
                                 <Detail>
                                     <OwnerIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
-                                    <DetailText> <Profile src={meeting.owner.photoUrl} /> {meeting.owner.name}</DetailText>
+                                    <DetailText> 
+                                        <Profile src={isAnonymous(meeting.date) ? '' : meeting.owner.photoUrl} /> 
+                                        {isAnonymous(meeting.date) ? meeting.owner.nickname : meeting.owner.name}
+                                    </DetailText>
                                 </Detail>
                                 <Detail>
                                     <MemberIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
@@ -174,7 +235,7 @@ function index() {
                                             {memberSlots.map((participant, index) => (
                                                 <Profile
                                                     key={index}
-                                                    src={participant?.photoUrl}
+                                                    src={isAnonymous(meeting.date) ? '' : participant?.photoUrl}
                                                     $clickable={!!participant}
                                                     onClick={() => handleMemberClick(participant)}
                                                 />
@@ -192,19 +253,33 @@ function index() {
                         <ReplyList 
                             replies={replyList} 
                             meetingDate={meeting.date} 
-                            likesPressed={false}
+                            likesPressed={[]}
                             onLikeToggle={handleLikeToggle}
                             onReplySubmit={handleReplySubmit}/>
                         <Buttons>
-                            <InfoButton onClose={true} />
-                            <InfoButton onReview={true} />
+                            {isAnonymous(meeting.date) ? (
+                                meeting.memberNumber === meeting.memberLimit ? (
+                                    <InfoButton onClose={true} />
+                                ) : (
+                                    joinState === 'join' ? (
+                                        <InfoButton onJoin={true} onClick={handleJoin} />
+                                    ) : (
+                                        <InfoButton onJoinCancel={true} onClick={handleJoinCancel} />
+                                    )
+                                )
+                            ) : (
+                            <>
+                                <InfoButton onClose={true} />
+                                <InfoButton onReview={true} />
+                            </>
+                            )}
                         </Buttons>
                     </>
                 ) : (
                     <NoData>모임 정보를 불러올 수 없습니다.</NoData>
                 )}
             </DetailLayout>
-            {selectedParticipant && (
+            {selectedParticipant && meeting && (
                 <MemberModal participant={selectedParticipant} onClose={handleCloseMemberModal} anonymous={isAnonymous(meeting.date)} />
             )}
         </Layout>
@@ -322,7 +397,6 @@ const Detail = styled.div`
 `;
 
 const DateIconStyled = styled(DateIcon)``;
-const TimeIconStyled = styled(TimeIcon)``;
 const OwnerIconStyled = styled(OwnerIcon)``;
 const MemberIconStyled = styled(MemberIcon)``;
 
@@ -353,7 +427,7 @@ const Profile = styled.img<{ $clickable?: boolean }>`
     height: 24px;
     flex-shrink: 0;
     border-radius: 4px;
-    background: ${props => props.src ? 'transparent' : '#848484'};
+    background: ${({ $clickable }) => ($clickable ? '#848484' : '#D9D9D9')};
     object-fit: cover;
     border: 1px solid ${props => props.src ? 'transparent' : '#E2E2E2'};
     cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};

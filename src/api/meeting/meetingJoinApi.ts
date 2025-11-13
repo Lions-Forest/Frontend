@@ -2,21 +2,89 @@ import type { Review } from "@/types";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.lions-forest.p-e.kr';
 
-// API 응답 타입 정의 (실제 API 응답 구조에 맞게 수정 필요)
 interface ApiReviewResponse{
     id: number,
     groupId: number,
     userId: number,
-    userName?: string,
-    userNickname?: string,
-    profilePhotoUrl?: string,
-    content: string,
-    score: number,
+    userName: string,
+    userNickname: string,
+    profilePhotoUrl: string,
     createdAt: Date,
-    photos?: Array<{ photoUrl: string; order: number }>,
 }
 
-export async function fetchMeetingReviewList(group_id : number) {
+export async function joinMeeting(group_id: number) {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+  
+      const response = await fetch(`${BASE_URL}/api/participation/${group_id}/`, {
+        method: 'POST',
+        headers,
+      });
+  
+      if (!response.ok) {
+        throw new Error(`서버 에러: ${response.status}`);
+      }
+  
+      return await response.json();
+    } catch (e) {
+      console.error('모임 참여 실패:', e);
+      return null;
+    }
+}
+
+export async function cancelJoinMeeting(group_id: number) {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+  
+      const response = await fetch(`${BASE_URL}/api/participation/${group_id}/`, {
+        method: 'DELETE',
+        headers,
+      });
+  
+      if (!response.ok) {
+        throw new Error(`서버 에러: ${response.status}`);
+      }
+
+      const responseText = await response.text();
+      console.log("API Data:", responseText);
+  
+      return null;
+    } catch (e) {
+      console.error('모임 취소 실패:', e);
+      return null;
+    }
+}
+
+interface ApiMyMeetingResponse {
+    id: number;
+    leaderId: number;
+    leaderNickname: string;
+    leaderName?: string;
+    title: string;
+    category: string;
+    capacity: number;
+    meetingAt: Date; // ISO date string
+    location: string;
+    state: string; // "OPEN" | "CLOSED" 또는 boolean
+    // participation?: number;
+    participantCount: number;
+    photos?: Array<{ photoUrl: string; order: number }>;
+    // leaderPhotoUrl?: string;
+}
+
+export async function fetchMyMeetingList() {
     try {
       const token = localStorage.getItem('accessToken');
       
@@ -30,7 +98,7 @@ export async function fetchMeetingReviewList(group_id : number) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const url = `${BASE_URL}/api/reviews/by-group/${group_id}/`;
+      const url = `${BASE_URL}/api/groups/`;
       console.log("요청 URL:", url);
       console.log("BASE_URL:", BASE_URL);
       
@@ -71,31 +139,9 @@ export async function fetchMeetingReviewList(group_id : number) {
         return [];
       }
       
-      return data.map((item) => mapApiResponseToMeeting(item as ApiReviewResponse));
+      return data;
     } catch (err) {
       console.error("유저 데이터 불러오기 에러:", err);
       return [];
     }
-}
-
-// API 응답을 Meeting 타입으로 변환하는 함수
-export function mapApiResponseToMeeting(apiMeetingReview: ApiReviewResponse): Review {
-
-    // date를 Date 객체로 변환
-    const meetingDate = new Date(apiMeetingReview.createdAt);
-
-    // photos 배열 변환
-    const photos = apiMeetingReview.photos || [];
-
-    return {
-        id: apiMeetingReview.id,
-        meetingId: apiMeetingReview.groupId,
-        userId: apiMeetingReview.userId,
-        detail: apiMeetingReview.content,
-        starNumber: apiMeetingReview.score,
-        date: meetingDate,
-        photo: photos,
-        userName: apiMeetingReview.userName || '',
-        userProfile: apiMeetingReview.profilePhotoUrl || '',
-    };
 }

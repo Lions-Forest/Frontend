@@ -10,7 +10,7 @@ interface ApiParticipantResponse {
     userName: string,
     userNickname: string,
     createdAt: Date,
-    photoUrl?: string,
+    profilePhotoUrl?: string,
 }
 
 interface ApiMemberResponse {
@@ -19,7 +19,7 @@ interface ApiMemberResponse {
     email?: string,
     nickname?: string,
     bio?: string | null,
-    profile_photo?: string | null,
+    profilePhotoUrl?: string | null,
 }
 
 export async function fetchParticipantList(group_id : number) {
@@ -77,7 +77,7 @@ export async function fetchParticipantList(group_id : number) {
         return [];
       }
       
-      return data;
+      return data.map((item) => mapApiResponseToParticipant(item as ApiParticipantResponse));
     } catch (err) {
       console.error("유저 데이터 불러오기 에러:", err);
       return [];
@@ -162,7 +162,7 @@ export function mapApiResponseToParticipant(apiParticipant: ApiParticipantRespon
         name: apiParticipant.userName,
         nickname: apiParticipant.userNickname,
         date: participantDate,
-        photoUrl: apiParticipant.photoUrl || '',
+        photoUrl: apiParticipant.profilePhotoUrl || '',
     };
 }
 
@@ -173,7 +173,7 @@ export function mapApiResponseToMember(apiMember: ApiMemberResponse | null | und
         name: apiMember?.name ?? "",
         nickname: apiMember?.nickname ?? "",
         detail: apiMember?.bio ?? "",
-        photoUrl: apiMember?.profile_photo ?? "",
+        photoUrl: apiMember?.profilePhotoUrl ?? "",
         // alarm?: number,
     };
 }

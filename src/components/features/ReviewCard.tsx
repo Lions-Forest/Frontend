@@ -11,8 +11,7 @@ function ReviewCard({ review }: { review: Review }){
         <CardLayout>
             <Header>
             <ProfileImg src={review.userProfile || ""} />
-                <ProfileName>김중앙</ProfileName>
-                {/* <ProfileName>{review.userName}</ProfileName> */}
+                <ProfileName>{review.userName}</ProfileName>
             </Header>
             <CardPhoto src={(review.photo && (review.photo.find(p => p.order === 0)?.photoUrl || review.photo[0]?.photoUrl)) || ''}/>
             <DetailSection>

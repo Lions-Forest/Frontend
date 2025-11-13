@@ -27,12 +27,12 @@ function ReplyList({
           {replies.length === 0 ? (
             <EmptyText>아직 댓글이 없습니다.</EmptyText>
           ) : (
-            replies.map((reply, idx) => (
+            replies.map((reply) => (
               <ReplySpan
                 key={reply.id}
                 reply={reply}
-                pressedLike={likesPressed[idx]}
-                onLikeClick={() => onLikeToggle(idx)}
+                pressedLike={likesPressed[reply.id]}
+                onLikeClick={() => onLikeToggle(reply.id)}
               />
             ))
           )}

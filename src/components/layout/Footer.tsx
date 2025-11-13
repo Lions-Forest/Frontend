@@ -2,21 +2,28 @@ import styled from "styled-components";
 import { IoMdMap as Map } from "react-icons/io";
 import { MdDiversity3 as Home } from "react-icons/md";
 import { MdAccountCircle as My } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const path = window.location.pathname;
 
 function Footer() {
+  const navigate = useNavigate();
+  const handleFooterClick = (text : string) => {
+    if (text === '마이') navigate('/mypage');
+    else if (text === '지도') navigate('/home/map');
+    else navigate('/home');
+  }
   return (
     <FooterLayout>
-      <Section>
+      <Section onClick={() => handleFooterClick('지도')}>
         <MapIcon highlight={path === "/map"} />
         <Title highlight={path === "/map"}>지도</Title>
       </Section>
-      <Section>
+      <Section onClick={() => handleFooterClick('홈')}>
         <HomeIcon highlight={path === "/home"} />
         <Title highlight={path === "/home"}>홈</Title>
       </Section>
-      <Section>
+      <Section onClick={() => handleFooterClick('마이')}>
         <MyIcon highlight={path === "/mypage"} />
         <Title highlight={path === "/mypage"}>마이</Title>
       </Section>

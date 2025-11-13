@@ -109,8 +109,11 @@ export async function toggleReplyLikes(comment_id: number) {
       if (!response.ok) {
         throw new Error(`서버 에러: ${response.status}`);
       }
+
+      const responseText = await response.text();
+      console.log("API Data:", responseText);
   
-      return await response.json();
+      return null;
     } catch (e) {
       console.error('좋아요 토글 실패:', e);
       return null;

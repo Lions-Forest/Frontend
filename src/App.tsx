@@ -40,12 +40,12 @@ function App() {
 
       <GlobalStyle />
       {/* <LoadingPage /> */}
-      <BaseMap
+      {/* <BaseMap
         userId={myUserId}
         name={myName}
         shareLocation={true}
         userLocations={userLocations}
-      />
+      /> */}
       <PlaceSearchTest />
       <div className="container">
         <BrowserRouter>

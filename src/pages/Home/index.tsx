@@ -34,10 +34,7 @@ function index() {
   // const { userId } = useUserStore();
 
   const dueMeetings = meetingList.filter((m) => {
-    // 잔여 인원 1명일 경우
     const isNearlyFull = m.memberLimit - m.memberNumber === 1;
-
-    // 마감 1시간 이하 남은 경우
     const diffMs = new Date(m.date).getTime() - new Date().getTime();
     const isOneHourLeft = diffMs > 0 && diffMs <= 60 * 60 * 1000; // 0 < diff <= 1시간
 

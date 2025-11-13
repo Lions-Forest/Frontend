@@ -110,6 +110,7 @@ const EmptyText = styled.div`
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
+    padding: 40px 0px;
 `;
 
 const ArrowWrapperLeft = styled.div`
