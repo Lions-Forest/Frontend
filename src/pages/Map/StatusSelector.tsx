@@ -83,11 +83,12 @@ const BtnContainer = styled.div`
   margin-top: 7px;
 `;
 
+// 버튼 눌렸을 때 active 적용해야 함
 const StatusButton = styled.button.withConfig({
   shouldForwardProp: (prop) => prop !== "active",
 })<{ active: boolean }>`
   padding: 0;
-  border: ${({ active }) => (active ? "3px solid #000000" : "none")};
+  border: none;
   border-radius: 50%;
   background: none;
   cursor: pointer;
@@ -95,5 +96,5 @@ const StatusButton = styled.button.withConfig({
 
 const Icon = styled.img`
   width: 65.6px;
-  height: 65.6px;
+  height: 96px;
 `;
