@@ -110,7 +110,7 @@ const SheetContainer = styled.div`
   left: 0;
   right: 0;
   weight: 100%;
-  height: 532px;
+  //   height: 532px;
   padding: 0 17px;
   background: #ffffff;
   border-radius: 4px 4px 0 0;

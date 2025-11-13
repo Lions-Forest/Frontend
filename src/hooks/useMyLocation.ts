@@ -31,7 +31,7 @@ export function useMyLocation({
             latitude,
             longitude
           );
-          if (distance < 10) return; // 10m 미만이면 Firestore에 안 올림
+          if (distance < 20) return; // 20m 미만이면 Firestore에 안 올림
         }
 
         lastLocationRef.current = { lat: latitude, lng: longitude };

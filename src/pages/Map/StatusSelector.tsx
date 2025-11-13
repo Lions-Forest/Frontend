@@ -11,9 +11,7 @@ import Hungry from "@/assets/status/hungry.svg";
 
 interface StatusSelectorProps {
   selectedStatus: NonNullable<UserLocation["status"]>;
-  onChange: React.Dispatch<
-    React.SetStateAction<NonNullable<UserLocation["status"]>>
-  >;
+  onChange: (newStatus: NonNullable<UserLocation["status"]>) => void;
 }
 
 const statuses = [
