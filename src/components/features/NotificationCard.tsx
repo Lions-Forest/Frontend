@@ -3,18 +3,31 @@ import styled from 'styled-components';
 
 // NotificationCard props interface 정의
 export interface NotificationCardProps {
-  meetingDate: string;
-  meetingName: string;
+  id: number;
+  content: string;
   imageUrl?: string;
+  read: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({
-  meetingDate,
-  meetingName,
+  content,
   imageUrl,
+  read,
+  onClick,
+  disabled,
 }) => {
+  const isDisabled = disabled ?? read;
+
   return (
-    <CardContainer>
+    <CardContainer
+      type="button"
+      onClick={isDisabled ? undefined : onClick}
+      disabled={isDisabled}
+      $isUnread={!read}
+      aria-disabled={isDisabled}
+    >
       <ImageWrapper>
         {imageUrl ? (
           <MeetingImage src={imageUrl} alt="Meeting" />
@@ -24,7 +37,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
       </ImageWrapper>
       <TextContent>
         <NotificationText>
-          <BoldText>[{meetingDate}] {meetingName}</BoldText> 모임 참여가 확정되었어요!  
+          {content}
         </NotificationText>
       </TextContent>
     </CardContainer>
@@ -33,11 +46,25 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
 
 export default NotificationCard;
 
-const CardContainer = styled.div`
+const CardContainer = styled.button<{ $isUnread?: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
   padding: 22px 29px;
+  background-color: ${props => props.$isUnread ? '#E4F2EA' : 'transparent'};
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #d8e9df;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
 `;
 
 const ImageWrapper = styled.div`
@@ -74,6 +101,3 @@ const NotificationText = styled.span`
   color: #333;
   line-height: 1.5; // 눈대중
 `;
-const BoldText = styled.span`
-  font-weight: 700;
-`
