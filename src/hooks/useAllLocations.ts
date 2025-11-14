@@ -12,8 +12,11 @@ export function useAllLocations(currentUserId: string) {
       const newLocations: Record<string, UserLocation> = {};
       snapshot.docs.forEach((doc) => {
         const data = doc.data() as UserLocation;
-        if (data.userId === currentUserId || data.shareLocation) {
-          newLocations[data.userId] = data;
+        if (
+          String(data.userId) === String(currentUserId) ||
+          data.shareLocation
+        ) {
+          newLocations[String(data.userId)] = data;
         }
       });
       console.log("newLocations:", newLocations);

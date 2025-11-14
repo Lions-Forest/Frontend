@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "@/firebase/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 
 export function useMyLocation({
   userId,
@@ -22,11 +22,17 @@ export function useMyLocation({
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
+    if (!shareLocation) {
+      deleteDoc(doc(db, "locations", userId));
+      return;
+    }
+  }, [shareLocation, userId]);
+
+  useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         setMyPosition({ lat: latitude, lng: longitude });
-        if (!shareLocation) return;
 
         const last = lastLocationRef.current;
 
