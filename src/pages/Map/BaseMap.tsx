@@ -83,7 +83,12 @@ export default function BaseMap({
 
           {/** 🔥 shareLocation 켜졌을 때만 오라라 효과 */}
           {shareLocation && (
-            <CustomOverlayMap position={myPosition} zIndex={-1}>
+            <CustomOverlayMap
+              position={myPosition}
+              zIndex={-1}
+              xAnchor={0.5}
+              yAnchor={0.5}
+            >
               <div
                 style={{
                   width: 427,
@@ -91,7 +96,6 @@ export default function BaseMap({
                   borderRadius: "50%",
                   background:
                     "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
-                  transform: "translate(-18%, -18%)",
                   pointerEvents: "none",
                 }}
               />
