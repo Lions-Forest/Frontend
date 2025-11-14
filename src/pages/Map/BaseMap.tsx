@@ -201,6 +201,7 @@ export default function BaseMap({
         <StatusSelector
           selectedStatus={selectedStatus}
           onChange={setSelectedStatus}
+          shareLocation={shareLocation}
         />
       </BottomSheet>
 

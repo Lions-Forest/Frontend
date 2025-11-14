@@ -1,6 +1,5 @@
 import { useSpring, animated } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
-import { useEffect } from "react";
 import styled from "styled-components";
 import ShareLocationToggle from "./ShareLocationToggle";
 import StatusSelector from "./StatusSelector";
@@ -93,7 +92,11 @@ export default function BottomSheet({
             shareLocation={shareLocation}
           />
 
-          <StatusMessageInput message={message} onChange={setMessage} />
+          <StatusMessageInput
+            message={message}
+            onChange={setMessage}
+            shareLocation={shareLocation}
+          />
         </SheetContainer>
       </animated.div>
     </>

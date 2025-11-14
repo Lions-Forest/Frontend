@@ -4,11 +4,13 @@ import PencilIcon from "@/assets/icons/statusMessage.svg";
 interface StatusMessageInputProps {
   message: string;
   onChange: (msg: string) => void;
+  shareLocation: boolean;
 }
 
 export default function StatusMessageInput({
   message,
   onChange,
+  shareLocation,
 }: StatusMessageInputProps) {
   return (
     <Wrapper>
@@ -19,6 +21,7 @@ export default function StatusMessageInput({
           value={message}
           placeholder="내용을 입력해주세요."
           onChange={(e) => onChange(e.target.value)}
+          disabled={!shareLocation}
         />
         <Icon src={PencilIcon} />
       </InputWrapper>
@@ -67,6 +70,10 @@ const Input = styled.input`
     color: #b8b8b8;
     font-size: 16px;
     font-weight: 500;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
   }
 `;
 
