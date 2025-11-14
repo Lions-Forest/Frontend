@@ -1,13 +1,21 @@
 import type { UserLocation } from "@/api/UserLocation";
 import styled from "styled-components";
 import Nothing from "@/assets/status/nothing.svg";
+import NothingActive from "@/assets/status/nothingActive.svg";
 import Studying from "@/assets/status/studying.svg";
+import StudyingActive from "@/assets/status/studyingActive.svg";
 import Working from "@/assets/status/working.svg";
+import WorkingActive from "@/assets/status/workingActive.svg";
 import Relaxing from "@/assets/status/relaxing.svg";
+import RelaxingActive from "@/assets/status/relaxingActive.svg";
 import Eating from "@/assets/status/eating.svg";
+import EatingActive from "@/assets/status/eatingActive.svg";
 import Playing from "@/assets/status/playing.svg";
+import PlayingActive from "@/assets/status/playingActive.svg";
 import Boring from "@/assets/status/boring.svg";
+import BoringActive from "@/assets/status/boringActive.svg";
 import Hungry from "@/assets/status/hungry.svg";
+import HungryActive from "@/assets/status/hungryActive.svg";
 
 interface StatusSelectorProps {
   selectedStatus: NonNullable<UserLocation["status"]>;
@@ -15,14 +23,14 @@ interface StatusSelectorProps {
 }
 
 const statuses = [
-  { id: "nothing", img: Nothing },
-  { id: "studying", img: Studying },
-  { id: "working", img: Working },
-  { id: "relaxing", img: Relaxing },
-  { id: "eating", img: Eating },
-  { id: "playing", img: Playing },
-  { id: "boring", img: Boring },
-  { id: "hungry", img: Hungry },
+  { id: "nothing", defaultImg: Nothing, activeImg: NothingActive },
+  { id: "studying", defaultImg: Studying, activeImg: StudyingActive },
+  { id: "working", defaultImg: Working, activeImg: WorkingActive },
+  { id: "relaxing", defaultImg: Relaxing, activeImg: RelaxingActive },
+  { id: "eating", defaultImg: Eating, activeImg: EatingActive },
+  { id: "playing", defaultImg: Playing, activeImg: PlayingActive },
+  { id: "boring", defaultImg: Boring, activeImg: BoringActive },
+  { id: "hungry", defaultImg: Hungry, activeImg: HungryActive },
 ];
 
 export default function StatusSelector({
@@ -35,17 +43,23 @@ export default function StatusSelector({
       <Description>내 상태를 나타내는 아이콘을 설정해주세요.</Description>
 
       <BtnContainer>
-        {statuses.map((status) => (
-          <StatusButton
-            key={status.id}
-            active={selectedStatus === status.id}
-            onClick={() =>
-              onChange(status.id as NonNullable<UserLocation["status"]>)
-            }
-          >
-            <Icon src={status.img} alt={status.id} />
-          </StatusButton>
-        ))}
+        {statuses.map((status) => {
+          const isActive = selectedStatus === status.id;
+          return (
+            <StatusButton
+              key={status.id}
+              active={isActive}
+              onClick={() =>
+                onChange(status.id as NonNullable<UserLocation["status"]>)
+              }
+            >
+              <Icon
+                src={isActive ? status.activeImg : status.defaultImg}
+                alt={status.id}
+              />
+            </StatusButton>
+          );
+        })}
       </BtnContainer>
     </Wrap>
   );
@@ -81,7 +95,12 @@ const BtnContainer = styled.div`
   margin-top: 7px;
 `;
 
-// 버튼 눌렸을 때 active 설정해야 함
+const Icon = styled.img`
+  width: 65.6px;
+  height: 96px;
+  transition: transform 0.2s ease-in-out;
+`;
+
 const StatusButton = styled.button.withConfig({
   shouldForwardProp: (prop) => prop !== "active",
 })<{ active: boolean }>`
@@ -90,9 +109,12 @@ const StatusButton = styled.button.withConfig({
   border-radius: 50%;
   background: none;
   cursor: pointer;
-`;
 
-const Icon = styled.img`
-  width: 65.6px;
-  height: 96px;
+  ${(props) =>
+    props.active &&
+    `
+    ${Icon} {
+      transform: scale(1.25); 
+    }
+  `}
 `;
