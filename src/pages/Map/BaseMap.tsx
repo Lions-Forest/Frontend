@@ -76,7 +76,7 @@ export default function BaseMap({
                 ? getMarkerImage(selectedStatus, true) || defaultLion
                 : defaultLion,
               size: { width: 79, height: 145 },
-              options: { offset: { x: 25, y: 50 } },
+              options: { offset: { x: 39, y: 145 } },
             }}
             title={`${name} (나)`}
           />
@@ -87,7 +87,7 @@ export default function BaseMap({
               position={myPosition}
               zIndex={-1}
               xAnchor={0.5}
-              yAnchor={0.5}
+              yAnchor={1}
             >
               <div
                 style={{
@@ -96,6 +96,7 @@ export default function BaseMap({
                   borderRadius: "50%",
                   background:
                     "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
+                  transform: "translateY(30%)",
                   pointerEvents: "none",
                 }}
               />
