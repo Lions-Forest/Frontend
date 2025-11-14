@@ -20,6 +20,7 @@ import HungryActive from "@/assets/status/hungryActive.svg";
 interface StatusSelectorProps {
   selectedStatus: NonNullable<UserLocation["status"]>;
   onChange: (newStatus: NonNullable<UserLocation["status"]>) => void;
+  shareLocation: boolean;
 }
 
 const statuses = [
@@ -36,6 +37,7 @@ const statuses = [
 export default function StatusSelector({
   selectedStatus,
   onChange,
+  shareLocation,
 }: StatusSelectorProps) {
   return (
     <Wrap>
@@ -49,12 +51,19 @@ export default function StatusSelector({
             <StatusButton
               key={status.id}
               active={isActive}
+              disabled={!shareLocation}
               onClick={() =>
                 onChange(status.id as NonNullable<UserLocation["status"]>)
               }
             >
               <Icon
-                src={isActive ? status.activeImg : status.defaultImg}
+                src={
+                  !shareLocation
+                    ? status.defaultImg
+                    : isActive
+                    ? status.activeImg
+                    : status.defaultImg
+                }
                 alt={status.id}
               />
             </StatusButton>
@@ -112,9 +121,14 @@ const StatusButton = styled.button.withConfig({
 
   ${(props) =>
     props.active &&
+    !props.disabled &&
     `
     ${Icon} {
       transform: scale(1.25); 
     }
   `}
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;

@@ -87,7 +87,11 @@ export default function BottomSheet({
             onToggle={onToggleShare}
           />
 
-          <StatusSelector selectedStatus={status} onChange={setStatus} />
+          <StatusSelector
+            selectedStatus={status}
+            onChange={setStatus}
+            shareLocation={shareLocation}
+          />
 
           <StatusMessageInput message={message} onChange={setMessage} />
         </SheetContainer>
