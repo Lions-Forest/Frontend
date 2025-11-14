@@ -24,7 +24,7 @@ export default function BaseMap({
   const [selectedStatus, setSelectedStatus] =
     useState<NonNullable<UserLocation["status"]>>("nothing");
   const [statusMessage, setStatusMessage] = useState("");
-
+  const [mapLevel, setMapLevel] = useState(3);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [followMe, setFollowMe] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserLocation | null>(null);
@@ -64,7 +64,8 @@ export default function BaseMap({
       <MapWrapper>
         <Map
           center={center}
-          level={3}
+          level={mapLevel}
+          onZoomChanged={(map) => setMapLevel(map.getLevel())}
           style={{ width: "100%", height: "100%" }}
           onDragStart={() => setFollowMe(false)}
           onCenterChanged={(map) => {
@@ -172,6 +173,7 @@ export default function BaseMap({
             if (myPosition) {
               setCenter(myPosition);
               setFollowMe(true);
+              setMapLevel(3);
             }
           }}
           style={{
