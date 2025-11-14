@@ -3,7 +3,7 @@ import { db } from "@/firebase/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-export function useAllLocations() {
+export function useAllLocations(currentUserId: string) {
   const [locations, setLocations] = useState<Record<string, UserLocation>>({});
 
   useEffect(() => {
@@ -12,12 +12,18 @@ export function useAllLocations() {
       const newLocations: Record<string, UserLocation> = {};
       snapshot.docs.forEach((doc) => {
         const data = doc.data() as UserLocation;
-        if (data.shareLocation) newLocations[data.userId] = data;
+        if (
+          String(data.userId) === String(currentUserId) ||
+          data.shareLocation
+        ) {
+          newLocations[String(data.userId)] = data;
+        }
       });
       console.log("newLocations:", newLocations);
       setLocations(newLocations);
     });
     return () => unsubscribe();
-  }, []);
+  }, [currentUserId]);
+
   return locations;
 }
