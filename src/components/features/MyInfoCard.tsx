@@ -2,16 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { getMyInfo, type MyInfoResponse } from "@/api/user/myInfoCheckAPI";
 import { reviseMyInfo } from "@/api/user/myInfoReviseAPI";
-
-// 랜덤 닉네임 생성용 데이터
-const adjectives = ["귀여운", "멋진", "똑똑한", "용감한", "친절한"];
-const animals = ["사자", "호랑이", "곰", "토끼", "펭귄"];
-
-function generateRandomNickname(): string {
-    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
-    return `${randomAdjective} ${randomAnimal}`;
-}
+import { getRandomNickname } from "@/api/user/randomNickAPI";
+import cameraReviseIcon from "@/assets/icons/cameraRevise.svg";
+import refreshIcon from "@/assets/icons/refresh.svg";
 
 function MyInfoCard() {
     const [myInfo, setMyInfo] = useState<MyInfoResponse | null>(null);
@@ -21,6 +14,7 @@ function MyInfoCard() {
     const [editBio, setEditBio] = useState("");
     const [editProfilePhotoFile, setEditProfilePhotoFile] = useState<File | null>(null);
     const [editProfilePhotoPreview, setEditProfilePhotoPreview] = useState<string | null>(null);
+    const [shouldRemovePhoto, setShouldRemovePhoto] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const nicknameInputRef = useRef<HTMLInputElement>(null);
     const bioInputRef = useRef<HTMLInputElement>(null);
@@ -52,6 +46,7 @@ function MyInfoCard() {
             setEditBio(myInfo.bio || "");
             setEditProfilePhotoPreview(myInfo.profile_photo);
             setEditProfilePhotoFile(null);
+            setShouldRemovePhoto(false);
         }
     };
 
@@ -60,51 +55,69 @@ function MyInfoCard() {
 
         setIsLoading(true);
         try {
-            // 항상 FormData로 전송
-            const formData = new FormData();
-            formData.append("nickname", editNickname || "");
-            formData.append("bio", editBio || "");
+            // nickname, bio, removePhoto는 필수 입력
+            // 수정사항이 없으면 기존 값 사용
+            const requestData: {
+                nickname: string;
+                bio: string;
+                removePhoto: boolean;
+                photo?: File;
+            } = {
+                nickname: editNickname || myInfo.nickname || "",
+                bio: editBio || myInfo.bio || "",
+                removePhoto: shouldRemovePhoto ? true : false,
+            };
             
-            // 파일이 있으면 파일을, 없으면 빈 Blob을 추가
-            if (editProfilePhotoFile) {
-                formData.append("profile_photo", editProfilePhotoFile);
+            // photo 처리 (선택적)
+            if (shouldRemovePhoto) {
+                // removePhoto=true일 때는 photo를 보내지 않음
+                // requestData.photo는 undefined로 유지
+            } else if (editProfilePhotoFile) {
+                // removePhoto=false이고 photo가 있으면 보낸 사진으로 수정
+                requestData.photo = editProfilePhotoFile;
+            }
+            // removePhoto=false이고 photo가 없으면 기존 사진 유지 (photo 필드 자체를 보내지 않음)
+            
+            // requestData 로그 출력
+            console.log("=== requestData 확인 ===");
+            console.log("requestData:", requestData);
+            console.log("requestData.nickname:", requestData.nickname);
+            console.log("requestData.bio:", requestData.bio);
+            console.log("requestData.removePhoto:", requestData.removePhoto, `(타입: ${typeof requestData.removePhoto})`);
+            if (requestData.photo) {
+                console.log("requestData.photo:", requestData.photo);
+                console.log("requestData.photo 타입:", requestData.photo instanceof File ? "File" : typeof requestData.photo);
+                console.log("requestData.photo.name:", requestData.photo.name);
+                console.log("requestData.photo.size:", requestData.photo.size, "bytes");
+                console.log("requestData.photo.type:", requestData.photo.type);
             } else {
-                // 파일이 없을 때 빈 Blob 추가
-                formData.append("profile_photo", new Blob());
+                console.log("requestData.photo: 없음");
             }
+            console.log("=======================");
             
-            // 디버깅: FormData 내용 확인
-            console.log("FormData contents:");
-            for (const [key, value] of formData.entries()) {
-                if (value instanceof File) {
-                    console.log(`${key}:`, value.name, value.type, value.size);
-                } else {
-                    console.log(`${key}:`, value);
-                }
-            }
+            // 그냥 일반 객체로 보내기 (axios가 자동으로 처리)
+            const response = await reviseMyInfo(requestData);
             
-            const response = await reviseMyInfo(formData);
-
+            // 성공 시 상태 업데이트
             setMyInfo(response);
             setIsEditMode(false);
-            // 페이지 재렌더링을 위해 정보 다시 불러오기
-            const refreshedData = await getMyInfo();
-            setMyInfo(refreshedData);
             setEditProfilePhotoFile(null);
-            setEditProfilePhotoPreview(refreshedData.profile_photo);
+            setEditProfilePhotoPreview(response.profile_photo);
+            setShouldRemovePhoto(false);
         } catch (error: any) {
-            console.error("Failed to revise my info:", error);
-            if (error.response) {
-                console.error("Error response:", error.response.data);
-                console.error("Error status:", error.response.status);
-            }
+            console.error("내 정보 수정 실패:", error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleRandomNickname = () => {
-        setEditNickname(generateRandomNickname());
+    const handleRandomNickname = async () => {
+        try {
+            const response = await getRandomNickname();
+            setEditNickname(response.nickname);
+        } catch (error) {
+            console.error("랜덤 닉네임 생성 실패:", error);
+        }
     };
 
     const handleImageClick = () => {
@@ -113,10 +126,29 @@ function MyInfoCard() {
         }
     };
 
+    const handlePhotoEditButtonClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handlePhotoEditButtonContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // 프사 삭제 확인
+        if (window.confirm("프로필 사진을 삭제하시겠습니까?")) {
+            setEditProfilePhotoFile(null);
+            setEditProfilePhotoPreview(null);
+            setShouldRemovePhoto(true);
+        }
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setEditProfilePhotoFile(file);
+            setShouldRemovePhoto(false); // 새 파일이 선택되면 삭제 플래그 해제
             // 미리보기를 위해 Base64로 변환
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -149,24 +181,37 @@ function MyInfoCard() {
             </HeaderWrapper>
 
             <BodyWrapper>
-                <UserImage 
-                    hasImage={!!(isEditMode ? editProfilePhotoPreview : myInfo?.profile_photo)}
-                    isEditMode={isEditMode}
-                    onClick={handleImageClick}
-                >
-                    {(isEditMode ? editProfilePhotoPreview : myInfo?.profile_photo) ? (
-                        <UserPlaceholder 
-                            src={(isEditMode ? editProfilePhotoPreview : myInfo?.profile_photo) || ""} 
-                            alt="프로필 사진" 
+                <UserImageWrapper>
+                    <UserImage 
+                        hasImage={!!(isEditMode ? editProfilePhotoPreview : (myInfo?.profile_photo && myInfo.profile_photo.trim() !== ""))}
+                        isEditMode={isEditMode}
+                    >
+                        {(() => {
+                            const imageSrc = isEditMode ? editProfilePhotoPreview : (myInfo?.profile_photo && myInfo.profile_photo.trim() !== "" ? myInfo.profile_photo : null);
+                            return imageSrc ? (
+                            <UserPlaceholder 
+                                    src={imageSrc} 
+                                alt="프로필 사진" 
+                            />
+                            ) : null;
+                        })()}
+                        <HiddenFileInput
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
                         />
-                    ) : null}
-                    <HiddenFileInput
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                    />
-                </UserImage>
+                    </UserImage>
+                    {isEditMode && (
+                        <PhotoEditButton 
+                            onClick={handlePhotoEditButtonClick}
+                            onContextMenu={handlePhotoEditButtonContextMenu}
+                            title="클릭: 사진 변경, 우클릭: 사진 삭제"
+                        >
+                            <CameraIcon src={cameraReviseIcon} alt="프로필 사진 수정" />
+                        </PhotoEditButton>
+                    )}
+                </UserImageWrapper>
                 <UserDetails>
                     <UserInfoItem>
                         <UserInfoLabel>이름</UserInfoLabel>
@@ -183,7 +228,8 @@ function MyInfoCard() {
                                     onClick={(e) => e.stopPropagation()}
                                 />
                                 <RandomButton onClick={handleRandomNickname}>
-                                    랜덤 생성
+                                    <RefreshIcon src={refreshIcon} alt="새로고침" />
+                                    <span>랜덤 생성</span>
                                 </RandomButton>
                             </NicknameEditWrapper>
                         ) : (
@@ -262,6 +308,11 @@ const BodyWrapper = styled.div`
     //align-items: center;
 `;
 
+const UserImageWrapper = styled.div`
+  position: relative;
+  flex-shrink: 0;
+`;
+
 const UserImage = styled.div<{ hasImage?: boolean; isEditMode?: boolean }>`
   width: 78px;
   height: 78px;
@@ -270,9 +321,7 @@ const UserImage = styled.div<{ hasImage?: boolean; isEditMode?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   background: ${({ hasImage }) => (hasImage ? "transparent" : "#D9D9D9")};
-  cursor: ${({ isEditMode }) => (isEditMode ? "pointer" : "default")};
   position: relative;
   overflow: hidden;
 `;
@@ -379,14 +428,52 @@ const NicknameEditWrapper = styled.div`
 `;
 
 const RandomButton = styled.button`
-  background: #017F3B;
-  color: #ffffff;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
   border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 600;
+  border: 0.5px solid #000;
+  background: #FFF;
   cursor: pointer;
   font-family: Pretendard;
   white-space: nowrap;
+`;
+
+const RefreshIcon = styled.img`
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+`;
+
+const PhotoEditButton = styled.button`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #FBBC04;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+  z-index: 10;
+  padding: 0;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const CameraIcon = styled.img`
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
 `;
