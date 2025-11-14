@@ -1,3 +1,4 @@
+// BaseMap.tsx
 import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
@@ -12,156 +13,151 @@ import Footer from "@/components/layout/Footer";
 import BottomSheet from "./BottomSheeet";
 import StatusSelector from "./StatusSelector";
 
-interface BaseMapProps {
+export default function BaseMap({
+  userId,
+  name,
+}: {
   userId: string;
   name: string;
-}
-
-const defaultCenter = { lat: 37.504729, lng: 126.957631 };
-
-export default function BaseMap({ userId, name }: BaseMapProps) {
+}) {
   const [shareLocation, setShareLocation] = useState(false);
   const [selectedStatus, setSelectedStatus] =
     useState<NonNullable<UserLocation["status"]>>("nothing");
   const [statusMessage, setStatusMessage] = useState("");
+
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [followMe, setFollowMe] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<UserLocation | null>(null);
 
-  useMyLocation({ userId, name, shareLocation, status: selectedStatus }); // 내 위치 Firebase에 업로드
-  const locations = useAllLocations(userId); // 모든 사용자 위치 구독
-  const myLocation = locations[userId]; // 모든 사용자 위치 중 내 위치 찾아내기 (중심 좌표를 찾기 위해)
+  // GPS 기반 실시간 내 위치
+  const myPosition = useMyLocation({
+    userId,
+    name,
+    shareLocation,
+    status: selectedStatus,
+    message: statusMessage,
+  });
 
-  console.log("📍 locations:", locations);
-  console.log("📍 myLocation:", myLocation);
+  // Firestore에서 모든 사용자 구독
+  const locations = useAllLocations(userId);
+  const [center, setCenter] = useState({ lat: 37.504729, lng: 126.957631 });
 
-  const [center, setCenter] = useState<{ lat: number; lng: number }>(
-    myLocation
-      ? { lat: myLocation.latitude, lng: myLocation.longitude }
-      : defaultCenter
-  );
-
+  // 🔥 GPS 기반으로 내 화면 중심 계속 이동
   useEffect(() => {
-    if (myLocation?.latitude && myLocation?.longitude) {
-      setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
+    if (followMe && myPosition) {
+      setCenter(myPosition);
     }
-  }, [myLocation]);
+  }, [myPosition, followMe]);
 
-  const handleStatusChange = (
-    newStatus: NonNullable<UserLocation["status"]>
-  ) => {
-    setSelectedStatus(newStatus);
-  };
-
-  const handleShareToggle = (newValue: boolean) => {
-    setShareLocation(newValue);
-  };
-
-  const moveToMyLocation = () => {
-    if (myLocation?.latitude && myLocation?.longitude) {
-      setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
-    }
-  };
-
-  console.log("🕵️‍♀️ [DEBUG 1] locations:", locations);
-  console.log("🕵️‍♀️ [DEBUG 2] myLocation:", myLocation);
-
-  // ✅ 디버깅 로그
-  useEffect(() => {
-    console.log("📍 BaseMap 렌더링 상태 =====================");
-    console.log("shareLocation:", shareLocation);
-    console.log("selectedStatus:", selectedStatus);
-    console.log("locations:", locations);
-    console.log("myLocation:", myLocation);
-    console.log("center:", center);
-    console.log("============================================");
-  }, [locations, myLocation, shareLocation, selectedStatus]);
-
-  // 아직 위치 데이터가 들어오지 않았다면 로딩 화면 표시
-  if (!myLocation) return <LoadingPage />;
+  if (!myPosition) return <LoadingPage />;
 
   return (
     <MapContainer>
       <MapWrapper>
         <Map
           center={center}
-          style={{ width: "100%", height: "100%" }}
           level={3}
+          style={{ width: "100%", height: "100%" }}
+          onDragStart={() => setFollowMe(false)}
           onCenterChanged={(map) => {
-            const newCenter = map.getCenter();
-            setCenter({ lat: newCenter.getLat(), lng: newCenter.getLng() });
+            if (!followMe) {
+              const c = map.getCenter();
+              setCenter({ lat: c.getLat(), lng: c.getLng() });
+            }
           }}
         >
-          {locations &&
-            Object.values(locations).map((user) => {
-              if (!user.latitude || !user.longitude) return null;
+          {/** ---------------------------
+              🔹 내 마커 (GPS 기반, 항상 표시됨)
+            ---------------------------- */}
+          <MapMarker
+            position={myPosition}
+            image={{
+              src: shareLocation
+                ? getMarkerImage(selectedStatus, true) || defaultLion
+                : defaultLion,
+              size: { width: 79, height: 145 },
+              options: { offset: { x: 25, y: 50 } },
+            }}
+            title={`${name} (나)`}
+          />
 
-              const isMe = user.userId === userId;
-              if (!isMe && !shareLocation) return null;
-              if (!isMe && !user.shareLocation) return null;
+          {/** 🔥 shareLocation 켜졌을 때만 오라라 효과 */}
+          {shareLocation && (
+            <CustomOverlayMap position={myPosition} zIndex={-1}>
+              <div
+                style={{
+                  width: 427,
+                  height: 427,
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
+                  transform: "translate(-18%, -18%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </CustomOverlayMap>
+          )}
 
-              let markerSrc: string | undefined;
+          {/** ---------------------------
+              🔹 다른 사용자 마커 표시 (Firestore 기반)
+            ---------------------------- */}
+          {Object.values(locations).map((user) => {
+            if (user.userId === userId) return null; // 내 Firestore 기록은 내가 안 봄
+            if (!user.shareLocation) return null;
 
-              if (isMe) {
-                markerSrc = shareLocation
-                  ? getMarkerImage(user.status, true) || defaultLion
-                  : defaultLion;
-              } else {
-                markerSrc = getMarkerImage(user.status, false) || defaultLion;
-              }
+            return (
+              <MapMarker
+                key={user.userId}
+                position={{ lat: user.latitude, lng: user.longitude }}
+                image={{
+                  src: getMarkerImage(user.status, false) || defaultLion,
+                  size: { width: 93, height: 102 },
+                  options: { offset: { x: 25, y: 50 } },
+                }}
+                onClick={() => {
+                  setSelectedUser((prev) => {
+                    if (prev?.userId === user.userId) return null;
+                    return user;
+                  });
+                }}
+              />
+            );
+          })}
 
-              const markerImage = {
-                src: markerSrc,
-                size: isMe
-                  ? { width: 79, height: 145 }
-                  : { width: 93, height: 102 },
-                options: { offset: { x: 25, y: 50 } },
-              };
-
-              if (isMe) {
-                return (
-                  <React.Fragment key={`current-${user.userId}`}>
-                    <MapMarker
-                      key={user.userId}
-                      position={{ lat: user.latitude, lng: user.longitude }}
-                      image={markerImage}
-                      title={`${user.name} (나)`}
-                    />
-
-                    {shareLocation && (
-                      <CustomOverlayMap
-                        position={{ lat: user.latitude, lng: user.longitude }}
-                        zIndex={-1} // 마커보다 뒤에 뜨게
-                      >
-                        <div
-                          style={{
-                            width: "427px",
-                            height: "427px",
-                            borderRadius: "50%",
-                            background:
-                              "radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.30) 28.85%, rgba(67, 214, 135, 0.30) 100%)",
-                            transform: "translate(-18%, -18%)",
-                            pointerEvents: "none",
-                          }}
-                        />
-                      </CustomOverlayMap>
-                    )}
-                  </React.Fragment>
-                );
-              }
-
-              return (
-                <MapMarker
-                  key={`marker=${user.userId}`}
-                  position={{ lat: user.latitude, lng: user.longitude }}
-                  image={markerImage}
-                  title={user.name}
-                />
-              );
-            })}
+          {/** 🔹 말풍선 */}
+          {selectedUser && (
+            <CustomOverlayMap
+              position={{
+                lat: selectedUser.latitude,
+                lng: selectedUser.longitude,
+              }}
+              yAnchor={1.2}
+            >
+              <div
+                style={{
+                  background: "white",
+                  padding: "8px 12px",
+                  borderRadius: 12,
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  maxWidth: 200,
+                  whiteSpace: "pre-wrap",
+                  textAlign: "center",
+                }}
+              >
+                {selectedUser.message}
+              </div>
+            </CustomOverlayMap>
+          )}
         </Map>
 
         <img
           src={moveToMyLocationBtn}
-          alt="내 위치로 이동"
+          onClick={() => {
+            if (myPosition) {
+              setCenter(myPosition);
+              setFollowMe(true);
+            }
+          }}
           style={{
             position: "absolute",
             bottom: 145,
@@ -171,7 +167,6 @@ export default function BaseMap({ userId, name }: BaseMapProps) {
             cursor: "pointer",
             zIndex: 10,
           }}
-          onClick={moveToMyLocation}
         />
       </MapWrapper>
 
@@ -179,7 +174,7 @@ export default function BaseMap({ userId, name }: BaseMapProps) {
         isOpen={isBottomSheetOpen}
         onClose={() => setIsBottomSheetOpen(false)}
         shareLocation={shareLocation}
-        onToggleShare={handleShareToggle}
+        onToggleShare={setShareLocation}
         status={selectedStatus}
         setStatus={setSelectedStatus}
         message={statusMessage}
@@ -187,9 +182,10 @@ export default function BaseMap({ userId, name }: BaseMapProps) {
       >
         <StatusSelector
           selectedStatus={selectedStatus}
-          onChange={handleStatusChange}
+          onChange={setSelectedStatus}
         />
       </BottomSheet>
+
       <FooterWrap>
         <Footer />
       </FooterWrap>
@@ -197,6 +193,7 @@ export default function BaseMap({ userId, name }: BaseMapProps) {
   );
 }
 
+// 스타일
 const MapContainer = styled.div`
   max-width: 600px;
   width: 100%;

@@ -13,4 +13,5 @@ export interface UserLocation {
     | "boring"
     | "hungry";
   shareLocation: boolean;
+  message?: string;
 }

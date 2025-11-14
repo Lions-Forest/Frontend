@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "@/firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -7,20 +7,27 @@ export function useMyLocation({
   name,
   shareLocation,
   status,
+  message,
 }: {
   userId: string;
   name: string;
   shareLocation: boolean;
   status: string;
+  message: string;
 }) {
+  const [myPosition, setMyPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    if (!shareLocation) return;
-
     const watchId = navigator.geolocation.watchPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        setMyPosition({ lat: latitude, lng: longitude });
+        if (!shareLocation) return;
+
         const last = lastLocationRef.current;
 
         // 위치 변화가 충분히 큰지 확인 (10m 이상)
@@ -44,6 +51,7 @@ export function useMyLocation({
           longitude,
           shareLocation,
           status,
+          message,
           updatedAt: Date.now(),
         });
       },
@@ -52,7 +60,9 @@ export function useMyLocation({
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [userId, name, shareLocation, status]);
+  }, [userId, name, shareLocation, status, message]);
+
+  return myPosition;
 }
 
 // 거리 계산 함수 (Haversine 공식)
