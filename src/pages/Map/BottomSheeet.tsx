@@ -39,7 +39,7 @@ export default function BottomSheet({
   const openY = window.innerHeight - sheetHeight;
 
   const [{ y }, api] = useSpring(() => ({
-    y: closedY,
+    y: isOpen ? openY : closedY,
   }));
 
   const bind = useDrag(
@@ -57,35 +57,28 @@ export default function BottomSheet({
           api.start({ y: openY });
         }
       } else {
-        api.start({ y: newY });
+        api.start({ y: newY, immediate: true });
       }
       return memo;
     },
-    { from: () => [0, y.get()] }
+    { from: () => [0, y.get()], filterTaps: true }
   );
-
-  // isOpen 상태가 변하면 시트 위치 조정
-  useEffect(() => {
-    if (isOpen) api.start({ y: openY });
-    else api.start({ y: closedY });
-  }, [isOpen]);
 
   return (
     <>
       <animated.div
-        {...bind()}
         style={{
           transform: y.to((val) => `translateY(${val}px)`),
           position: "fixed",
           left: 0,
           right: 0,
           zIndex: 100,
-          touchAction: "none",
+          //   touchAction: "none",
           willChange: "transform",
         }}
       >
         <SheetContainer>
-          <HandleBarWrapper>
+          <HandleBarWrapper {...bind()}>
             <HandleBar />
           </HandleBarWrapper>
 
@@ -109,18 +102,19 @@ const SheetContainer = styled.div`
   flex-direction: column;
   left: 0;
   right: 0;
-  weight: 100%;
-  //   height: 532px;
+  width: 100%;
   padding: 0 17px;
   background: #ffffff;
   border-radius: 4px 4px 0 0;
   z-index: 50;
-  touch-action: none;
+  //   touch-action: none;
 `;
 
 const HandleBarWrapper = styled.div`
   display: flex;
   justify-content: center;
+  touch-action: none;
+  cursor: grab;
 `;
 
 const HandleBar = styled.div`

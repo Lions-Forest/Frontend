@@ -2,7 +2,7 @@
 import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingPage from "@/pages/Map/LoadingPage";
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
@@ -41,6 +41,14 @@ export default function BaseMap({
   // Firestore에서 모든 사용자 구독
   const locations = useAllLocations(userId);
   const [center, setCenter] = useState({ lat: 37.504729, lng: 126.957631 });
+
+  const handleToggle = (newValue: boolean) => {
+    setShareLocation(newValue);
+    if (!newValue) {
+      setSelectedStatus("nothing");
+      setStatusMessage("");
+    }
+  };
 
   // 🔥 GPS 기반으로 내 화면 중심 계속 이동
   useEffect(() => {
@@ -182,7 +190,7 @@ export default function BaseMap({
         isOpen={isBottomSheetOpen}
         onClose={() => setIsBottomSheetOpen(false)}
         shareLocation={shareLocation}
-        onToggleShare={setShareLocation}
+        onToggleShare={handleToggle}
         status={selectedStatus}
         setStatus={setSelectedStatus}
         message={statusMessage}
