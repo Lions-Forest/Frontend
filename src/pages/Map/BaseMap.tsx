@@ -1,4 +1,3 @@
-// BaseMap.tsx
 import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
@@ -50,7 +49,7 @@ export default function BaseMap({
     }
   };
 
-  // 🔥 GPS 기반으로 내 화면 중심 계속 이동
+  // GPS 기반으로 내 화면 중심 계속 이동
   useEffect(() => {
     if (followMe && myPosition) {
       setCenter(myPosition);
@@ -75,9 +74,7 @@ export default function BaseMap({
             }
           }}
         >
-          {/** ---------------------------
-              🔹 내 마커 (GPS 기반, 항상 표시됨)
-            ---------------------------- */}
+          {/* 내 마커 (GPS 기반, 항상 표시됨) */}
           <MapMarker
             position={myPosition}
             image={{
@@ -89,8 +86,7 @@ export default function BaseMap({
             }}
             title={`${name} (나)`}
           />
-
-          {/** 🔥 shareLocation 켜졌을 때만 오라라 효과 */}
+          {/* shareLocation 켜졌을 때만 그라데이션 원 표시 */}
           {shareLocation && (
             <CustomOverlayMap
               position={myPosition}
@@ -111,10 +107,7 @@ export default function BaseMap({
               />
             </CustomOverlayMap>
           )}
-
-          {/** ---------------------------
-              🔹 다른 사용자 마커 표시 (Firestore 기반)
-            ---------------------------- */}
+          {/* 다른 사용자 마커 표시 (Firestore 기반) */}
           {Object.values(locations).map((user) => {
             if (user.userId === userId) return null; // 내 Firestore 기록은 내가 안 봄
             if (!user.shareLocation) return null;
@@ -140,8 +133,7 @@ export default function BaseMap({
               />
             );
           })}
-
-          {/** 🔹 말풍선 */}
+          {/* 상태메세지 말풍선 */}
           {selectedUser && (
             <CustomOverlayMap
               position={{
@@ -152,13 +144,17 @@ export default function BaseMap({
             >
               <div
                 style={{
-                  background: "white",
-                  padding: "8px 12px",
-                  borderRadius: 12,
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                  maxWidth: 200,
-                  whiteSpace: "pre-wrap",
+                  height: "19px",
+                  background: "#ffffff",
+                  padding: "0 4px",
+                  borderRadius: 4,
+                  color: "#00B353",
                   textAlign: "center",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  maxWidth: 120,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
                 {selectedUser.message}
@@ -212,7 +208,6 @@ export default function BaseMap({
   );
 }
 
-// 스타일
 const MapContainer = styled.div`
   max-width: 600px;
   width: 100%;
