@@ -1,5 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import styled from "styled-components";
+import { getMyClassList, type MyClassListResponse } from "@/api/class/myClassListAPI";
+import { getMyOpenList } from "@/api/class/myOpenListAPI";
+import starOnIcon from "@/assets/icons/starOn.svg";
+import starOffIcon from "@/assets/icons/starOff.svg";
+import pencilIcon from "@/assets/icons/pencil.svg";
 
 const tabs = ["신청 내역", "개설 내역", "모임 후기 관리"] as const;
 type TabType = (typeof tabs)[number];
@@ -37,6 +42,7 @@ interface ReviewHistory {
   content: string;
   score: number;
   createdAt: string;
+  meetingAt: string;
   photos: { photoUrl: string; order: number }[];
 }
 
@@ -122,6 +128,7 @@ const reviewDummy: ReviewHistory[] = [
     content: "분위기가 너무 좋아서 다음에도 꼭 참여하고 싶어요!",
     score: 5,
     createdAt: "2025-11-12T09:14:01.611Z",
+    meetingAt: "2025-11-10T18:00:00",
     photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
   },
   {
@@ -131,6 +138,17 @@ const reviewDummy: ReviewHistory[] = [
     content: "음식도 맛있고 사람들도 친절했어요.",
     score: 4,
     createdAt: "2025-11-01T13:22:48.611Z",
+    meetingAt: "2025-11-05T19:00:00",
+    photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
+  },
+  {
+    id: 3,
+    groupId: 502,
+    userId: 10,
+    content: "정말 즐거운 시간이었습니다. 다음에도 또 참여하고 싶어요!",
+    score: 5,
+    createdAt: "2025-11-15T10:30:00.611Z",
+    meetingAt: "2025-11-12T20:00:00",
     photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
   },
 ];
@@ -146,14 +164,65 @@ function formatDate(dateString: string) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}(${hour12}${minutes !== "00" ? `:${minutes}` : ""}${period})`;
 }
 
+/**
+ * meetingAt을 "2025.11.06(6PM)" 형식으로 변환합니다.
+ */
+function formatMeetingDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = date.getHours();
+  const period = hours >= 12 ? "PM" : "AM";
+  let hour12 = hours % 12;
+  if (hour12 === 0) hour12 = 12;
+
+  return `${year}.${month}.${day}(${hour12}${period})`;
+}
+
 function MyActivities() {
   const [selectedTab, setSelectedTab] = useState<TabType>("신청 내역");
+  const [myClassList, setMyClassList] = useState<MyClassListResponse[]>([]);
+  const [myOpenList, setMyOpenList] = useState<MyClassListResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchMyClassList = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getMyClassList();
+        setMyClassList(data);
+      } catch (error) {
+        console.error("Failed to fetch my class list:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchMyOpenList = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getMyOpenList();
+        setMyOpenList(data);
+      } catch (error) {
+        console.error("Failed to fetch my open list:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (selectedTab === "신청 내역") {
+      fetchMyClassList();
+    } else if (selectedTab === "개설 내역") {
+      fetchMyOpenList();
+    }
+  }, [selectedTab]);
 
   const tabData = useMemo(() => {
-    if (selectedTab === "신청 내역") return applicationDummy;
-    if (selectedTab === "개설 내역") return creationDummy;
+    if (selectedTab === "신청 내역") return myClassList;
+    if (selectedTab === "개설 내역") return myOpenList;
     return reviewDummy;
-  }, [selectedTab]);
+  }, [selectedTab, myClassList, myOpenList]);
 
   return (
     <Layout>
@@ -173,7 +242,9 @@ function MyActivities() {
       </HeaderWrapper>
 
       <BodyWrapper>
-        {tabData.length === 0 ? (
+        {isLoading ? (
+          <EmptyState>로딩 중...</EmptyState>
+        ) : tabData.length === 0 ? (
           <EmptyState>해당 내역이 아직 없어요</EmptyState>
         ) : (
           tabData.map((data, index) => (
@@ -192,7 +263,7 @@ function MyActivities() {
 
 export default MyActivities;
 
-type ActivityData = ApplicationHistory | CreationHistory | ReviewHistory;
+type ActivityData = ApplicationHistory | CreationHistory | ReviewHistory | MyClassListResponse;
 
 interface ActivityCardProps {
   tab: TabType;
@@ -201,56 +272,119 @@ interface ActivityCardProps {
 }
 
 function ActivityCard({ tab, data, background }: ActivityCardProps) {
-  const info = useMemo(() => {
+  const cardContent = useMemo(() => {
     if (tab === "신청 내역") {
-      const item = data as ApplicationHistory;
-      return [
-        { label: "참여 모임 ID", value: item.groupId },
-        { label: "신청자", value: item.userName },
-        { label: "닉네임", value: item.userNickname },
-        { label: "신청일시", value: formatDate(item.createdAt) },
-      ];
+      const item = data as MyClassListResponse;
+      const statusText = item.state === "OPEN" ? "모집중" : "모임완료";
+      return {
+        statusText,
+        title: item.title,
+        meetingDate: formatMeetingDate(item.meetingAt),
+        participantInfo: `${item.participantCount}/${item.capacity}`,
+        leaderNickname: item.leaderNickname,
+        location: item.location,
+        category: item.category,
+        state: item.state,
+      };
     }
 
     if (tab === "개설 내역") {
-      const item = data as CreationHistory;
-      return [
-        { label: "모임명", value: item.title },
-        { label: "카테고리", value: item.category },
-        {
-          label: "인원",
-          value: `${item.participantCount}/${item.capacity}`,
-        },
-        { label: "모임일시", value: formatDate(item.meetingAt) },
-        { label: "장소", value: item.location },
-        { label: "상태", value: item.state },
-      ];
+      const item = data as MyClassListResponse;
+      const statusText = item.state === "OPEN" ? "모집중" : "모임완료";
+      return {
+        statusText,
+        title: item.title,
+        meetingDate: formatMeetingDate(item.meetingAt),
+        participantInfo: `${item.participantCount}/${item.capacity}`,
+        leaderNickname: item.leaderNickname,
+        location: item.location,
+        category: item.category,
+        state: item.state,
+      };
     }
 
-    const item = data as ReviewHistory;
-    return [
-      { label: "참여 모임 ID", value: item.groupId },
-      { label: "후기 작성일", value: formatDate(item.createdAt) },
-      { label: "평점", value: `${item.score}점` },
-      { label: "후기", value: item.content },
-    ];
+    // 리뷰 내역은 기존 형식 유지
+    return null;
   }, [tab, data]);
+
+  // 리뷰 내역인 경우 새로운 형식으로 표시
+  if (tab === "모임 후기 관리") {
+    const item = data as ReviewHistory;
+    const photoUrl = item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : null;
+
+    return (
+      <ReviewCardLayout backgroundColor={background}>
+        <ReviewCardHeader>
+          <ReviewCardTitle>모임 후기</ReviewCardTitle>
+          <ReviewMeetingDate>{formatMeetingDate(item.meetingAt)}</ReviewMeetingDate>
+        </ReviewCardHeader>
+        <ReviewCardBody>
+          {photoUrl && <ReviewPhoto src={photoUrl} alt="모임 사진" />}
+          <ReviewContentWrapper>
+            <StarRating>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <StarIcon
+                  key={star}
+                  src={star <= item.score ? starOnIcon : starOffIcon}
+                  alt={star <= item.score ? "채워진 별" : "빈 별"}
+                />
+              ))}
+            </StarRating>
+            <ReviewText>{item.content}</ReviewText>
+            <EditButton>
+              <EditIcon src={pencilIcon} alt="수정" />
+            </EditButton>
+          </ReviewContentWrapper>
+        </ReviewCardBody>
+      </ReviewCardLayout>
+    );
+  }
+
+  // 신청 내역 또는 개설 내역인 경우 새로운 형식으로 표시
+  if (!cardContent) return null;
 
   return (
     <CardLayout backgroundColor={background}>
       <CardHeader>
-        <CardTitle>{tab}</CardTitle>
-        <CardSubInfo>id: {data.id}</CardSubInfo>
+        <StatusText>{cardContent.statusText}</StatusText>
+        <CardTitleNew>{cardContent.title}</CardTitleNew>
+        <MeetingDateText>{cardContent.meetingDate}</MeetingDateText>
       </CardHeader>
       <CardBody>
-        <InfoTable>
-          {info.map((row) => (
-            <InfoRow key={row.label}>
-              <InfoLabel>{row.label}</InfoLabel>
-              <InfoValue>{row.value}</InfoValue>
-            </InfoRow>
-          ))}
-        </InfoTable>
+        <CardBodyContent>
+          <FirstRow>
+            <InfoItem isFirst>
+              <InfoLabel>인원</InfoLabel>
+              <Separator>|</Separator>
+              <InfoValue>{cardContent.participantInfo}</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>모임장</InfoLabel>
+              <Separator>|</Separator>
+              <InfoValue>{cardContent.leaderNickname}</InfoValue>
+            </InfoItem>
+          </FirstRow>
+          <SecondRow>
+            <InfoItem isFirst>
+              <InfoLabel>장소</InfoLabel>
+              <Separator>|</Separator>
+              <InfoValue>{cardContent.location}</InfoValue>
+            </InfoItem>
+            <InfoItem>
+              <InfoLabel>모임종류</InfoLabel>
+              <Separator>|</Separator>
+              <InfoValue>{cardContent.category}</InfoValue>
+            </InfoItem>
+          </SecondRow>
+          <ButtonRow isOpen={cardContent.state === "OPEN"}>
+            <InfoButton isOpen={cardContent.state === "OPEN"}>
+              모임 정보 확인
+            </InfoButton>
+            {cardContent.state !== "OPEN" && (
+              <ReviewButton>후기 작성하기</ReviewButton>
+            )}
+          </ButtonRow>
+        </CardBodyContent>
       </CardBody>
     </CardLayout>
   );
@@ -335,8 +469,33 @@ const CardHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 12px;
+  padding: 12px 35px;
   background: #ffffff;
+`;
+
+const StatusText = styled.div`
+  color: #017F3B;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+`;
+
+const CardTitleNew = styled.div`
+  color: #000;
+  font-family: dongleRegular;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 700;
+`;
+
+const MeetingDateText = styled.div`
+  color: #848484;
+  font-family: Pretendard;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
 `;
 
 const CardTitle = styled.div`
@@ -353,34 +512,221 @@ const CardSubInfo = styled.div`
 `;
 
 const CardBody = styled.div`
-  padding: 16px 20px 20px;
+  padding: 0 27px;
 `;
 
-const InfoTable = styled.div`
+const CardBodyContent = styled.div`
+  width: 307px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
-  color: #000;
+`;
+
+const FirstRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+  width: 100%;
+`;
+
+const SecondRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+  width: 100%;
+  margin-top: 7px;
+`;
+
+const InfoItem = styled.div<{ isFirst?: boolean }>`
+  display: flex;
+  align-items: flex-start;
+  ${({ isFirst }) => isFirst && `
+    width: 120px;
+    flex-shrink: 0;
+  `}
+`;
+
+const Separator = styled.div`
+  margin-right: 10px;
+  color: #404040;
   font-family: Pretendard;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  flex-shrink: 0;
+`;
+
+const ButtonRow = styled.div<{ isOpen?: boolean }>`
+  display: flex;
+  flex-direction: ${({ isOpen }) => (isOpen ? "column" : "row")};
+  gap: ${({ isOpen }) => (isOpen ? "0" : "23px")};
+  width: 100%;
+  margin-top: 15px;
 `;
 
 const InfoRow = styled.div`
   display: flex;
   gap: 12px;
   align-items: flex-start;
+  width: 100%;
 `;
 
 const InfoLabel = styled.div`
-  min-width: 80px;
   color: #404040;
+  font-family: Pretendard;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 10px;
 `;
 
 const InfoValue = styled.div`
   flex: 1;
   font-weight: 500;
   color: #000;
-  word-break: break-word;
-  white-space: pre-line;
+  font-family: Pretendard;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const InfoButton = styled.button<{ isOpen?: boolean }>`
+  width: ${({ isOpen }) => (isOpen ? "287px" : "132px")};
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #D9D9D9;
+  border: none;
+  cursor: pointer;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-weight: 600;
+  color: #000;
+`;
+
+const ReviewButton = styled.button`
+  width: 132px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #088C45;
+  border: none;
+  cursor: pointer;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+`;
+
+const ReviewCardLayout = styled.div<{ backgroundColor: string }>`
+  height: 199px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: 8px;
+  background: ${({ backgroundColor }) => backgroundColor};
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+`;
+
+const ReviewCardHeader = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const ReviewCardTitle = styled.div`
+  color: #fff;
+  font-family: dongleRegular;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 700;
+`;
+
+const ReviewMeetingDate = styled.div`
+  color: #fff;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+`;
+
+const ReviewCardBody = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+  position: relative;
+`;
+
+const ReviewPhoto = styled.img`
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+`;
+
+const ReviewContentWrapper = styled.div`
+  width: 151px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  position: relative;
+`;
+
+const StarRating = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+`;
+
+const StarIcon = styled.img`
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+`;
+
+const ReviewText = styled.div`
+  overflow: hidden;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  width: 100%;
+  text-align: center;
+`;
+
+const EditButton = styled.button`
+  position: absolute;
+  right: 0;
+  bottom: -100px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #CFFFE5;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+`;
+
+const EditIcon = styled.img`
+  width: 20px;
+  height: 20px;
 `;
