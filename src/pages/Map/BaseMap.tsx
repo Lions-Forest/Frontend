@@ -105,12 +105,15 @@ export default function BaseMap({
             if (user.userId === userId) return null; // 내 Firestore 기록은 내가 안 봄
             if (!user.shareLocation) return null;
 
+            const markerImg = getMarkerImage(user.status, false);
+            if (!markerImg) return null;
+
             return (
               <MapMarker
                 key={user.userId}
                 position={{ lat: user.latitude, lng: user.longitude }}
                 image={{
-                  src: getMarkerImage(user.status, false) || defaultLion,
+                  src: markerImg,
                   size: { width: 93, height: 102 },
                   options: { offset: { x: 25, y: 50 } },
                 }}

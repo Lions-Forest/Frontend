@@ -53,17 +53,44 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/notification" element={<NotificationPage />} />
-            {/* <Route path="/map" element={<TestMap />} /> */}
+            {/* <Route path="/map" element={<BaseMap />} /> */}
             <Route path="/mypage" element={<MyPage />} />
-            <Route path="/home/meeting-detail" element={<MeetingDetailPage />} />
-            <Route path="/home/create-meeting" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/step1" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/step2" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/step3" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/step4" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/step5" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/step6" element={<CreateMeetingPage />} />
-            <Route path="/home/create-meeting/result" element={<CreateMeetingPage />} />
+            <Route
+              path="/home/meeting-detail"
+              element={<MeetingDetailPage />}
+            />
+            <Route
+              path="/home/create-meeting"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step1"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step2"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step3"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step4"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step5"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step6"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/result"
+              element={<CreateMeetingPage />}
+            />
           </Routes>
         </BrowserRouter>
       </div>

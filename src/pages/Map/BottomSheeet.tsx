@@ -23,7 +23,7 @@ interface BottomSheetProps {
 
 const footerHeight = 75;
 const peekHeight = 59;
-const sheetHeight = 532;
+const sheetHeight = 580;
 
 export default function BottomSheet({
   isOpen,
@@ -128,6 +128,6 @@ const HandleBar = styled.div`
   height: 1.5px;
   background: #000000;
   border-radius: 3px;
-  margin-top: 15px;
-  margin-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 38px;
 `;
