@@ -10,14 +10,23 @@ export function useAllLocations(currentUserId: string) {
     const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
       console.log("snapshot docs:", snapshot.docs);
       const newLocations: Record<string, UserLocation> = {};
+
       snapshot.docs.forEach((doc) => {
         const data = doc.data() as UserLocation;
-        if (
-          String(data.userId) === String(currentUserId) ||
-          data.shareLocation
-        ) {
+
+        if (String(data.userId) === String(currentUserId)) {
           newLocations[String(data.userId)] = data;
+          return;
         }
+
+        if (!data.shareLocation) {
+          return;
+        }
+
+        if (data.status === "") {
+          data.status = "nothing";
+        }
+        newLocations[String(data.userId)] = data;
       });
       console.log("newLocations:", newLocations);
       setLocations(newLocations);

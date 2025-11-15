@@ -41,6 +41,8 @@ export default function MapNotification({
 
     Object.values(locations).forEach((user) => {
       if (user.userId === userId) return;
+      if (!user.shareLocation) return;
+
       const distance = getDistanceFromLatLonInMeters(
         myPosition.lat,
         myPosition.lng,
@@ -49,8 +51,10 @@ export default function MapNotification({
       );
       if (distance <= radiusMeters) {
         if (shareLocation) {
+          const theirStatus = user.status === "" ? "nothing" : user.status;
+
           // 내 상태와 같은 사람만 카운트
-          if (user.status === selectedStatus) count++;
+          if (theirStatus === selectedStatus) count++;
         } else {
           count++;
         }

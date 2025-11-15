@@ -5,9 +5,11 @@ import ShareLocationToggle from "./ShareLocationToggle";
 import StatusSelector from "./StatusSelector";
 import StatusMessageInput from "./StatusMessageInput";
 import type { UserLocation } from "@/api/UserLocation";
+import { useEffect } from "react";
 
 interface BottomSheetProps {
   isOpen: boolean;
+  onOpen: () => void;
   onClose: () => void;
   shareLocation: boolean;
   onToggleShare: (newValue: boolean) => void;
@@ -26,6 +28,7 @@ const sheetHeight = 580;
 
 export default function BottomSheet({
   isOpen,
+  onOpen,
   onClose,
   shareLocation,
   onToggleShare,
@@ -39,6 +42,7 @@ export default function BottomSheet({
 
   const [{ y }, api] = useSpring(() => ({
     y: isOpen ? openY : closedY,
+    config: { tension: 250, friction: 30 },
   }));
 
   const bind = useDrag(
@@ -54,6 +58,7 @@ export default function BottomSheet({
           onClose();
         } else {
           api.start({ y: openY });
+          onOpen();
         }
       } else {
         api.start({ y: newY, immediate: true });
@@ -62,6 +67,14 @@ export default function BottomSheet({
     },
     { from: () => [0, y.get()], filterTaps: true }
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      api.start({ y: openY });
+    } else {
+      api.start({ y: closedY });
+    }
+  }, [isOpen, api, openY, closedY]);
 
   return (
     <>

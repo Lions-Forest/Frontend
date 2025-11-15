@@ -6,6 +6,7 @@ import LoadingPage from "@/pages/Map/LoadingPage";
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
 import defaultLion from "@/assets/lion/defaultLion.svg";
+import nothingMarker from "@/assets/marker/nothingMarker.svg";
 import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.svg";
 import styled from "styled-components";
 import Footer from "@/components/layout/Footer";
@@ -48,6 +49,8 @@ export default function BaseMap({
     if (!newValue) {
       setSelectedStatus("nothing");
       setStatusMessage("");
+    } else {
+      setSelectedStatus("nothing");
     }
   };
 
@@ -121,10 +124,10 @@ export default function BaseMap({
           {/* 다른 사용자 마커 표시 (Firestore 기반) */}
           {Object.values(locations).map((user) => {
             if (user.userId === userId) return null; // 내 Firestore 기록은 내가 안 봄
-            if (!user.shareLocation) return null;
+            if (!shareLocation || !user.shareLocation) return null;
 
-            const markerImg = getMarkerImage(user.status, false);
-            if (!markerImg) return null;
+            const markerImg =
+              getMarkerImage(user.status, false) || nothingMarker;
 
             return (
               <MapMarker
@@ -180,6 +183,7 @@ export default function BaseMap({
 
       <BottomSheet
         isOpen={isBottomSheetOpen}
+        onOpen={() => setIsBottomSheetOpen(true)}
         onClose={() => setIsBottomSheetOpen(false)}
         shareLocation={shareLocation}
         onToggleShare={handleToggle}
