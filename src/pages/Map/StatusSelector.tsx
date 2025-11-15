@@ -16,6 +16,7 @@ import Boring from "@/assets/status/boring.svg";
 import BoringActive from "@/assets/status/boringActive.svg";
 import Hungry from "@/assets/status/hungry.svg";
 import HungryActive from "@/assets/status/hungryActive.svg";
+import { useState } from "react";
 
 interface StatusSelectorProps {
   selectedStatus: NonNullable<UserLocation["status"]>;
@@ -39,6 +40,17 @@ export default function StatusSelector({
   onChange,
   shareLocation,
 }: StatusSelectorProps) {
+  const [showMessage, setShowMessage] = useState(false);
+
+  const handleClick = (statusId: string, disabled: boolean) => {
+    if (disabled) {
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000); // 3초 후 사라짐
+      return;
+    }
+    onChange(statusId as NonNullable<UserLocation["status"]>);
+  };
+
   return (
     <Wrap>
       <Title>내 상태 설정</Title>
@@ -47,18 +59,17 @@ export default function StatusSelector({
       <BtnContainer>
         {statuses.map((status) => {
           const isActive = selectedStatus === status.id;
+          const isDisabled = !shareLocation;
           return (
             <StatusButton
               key={status.id}
               active={isActive}
-              disabled={!shareLocation}
-              onClick={() =>
-                onChange(status.id as NonNullable<UserLocation["status"]>)
-              }
+              $disabled={isDisabled}
+              onClick={() => handleClick(status.id, isDisabled)}
             >
               <Icon
                 src={
-                  !shareLocation
+                  isDisabled
                     ? status.defaultImg
                     : isActive
                     ? status.activeImg
@@ -70,6 +81,7 @@ export default function StatusSelector({
           );
         })}
       </BtnContainer>
+      <Message show={showMessage}>레이더를 켜주세요</Message>
     </Wrap>
   );
 }
@@ -111,8 +123,9 @@ const Icon = styled.img`
 `;
 
 const StatusButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== "active",
-})<{ active: boolean }>`
+  shouldForwardProp: (prop) => prop !== "active" && prop !== "$disabled",
+})<{ active: boolean; $disabled: boolean }>`
+  position: relative;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -121,14 +134,51 @@ const StatusButton = styled.button.withConfig({
 
   ${(props) =>
     props.active &&
-    !props.disabled &&
+    !props.$disabled &&
     `
     ${Icon} {
       transform: scale(1.25); 
     }
   `}
 
-  &:disabled {
+  ${(props) =>
+    props.$disabled &&
+    `
     cursor: not-allowed;
-  }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 65.6px;
+      height: 65.6px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  `}
+`;
+
+const Message = styled.div<{ show: boolean }>`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  bottom: 225px;
+  left: 85%;
+  transform: translateX(-50%);
+  width: 104px;
+  height: 23px;
+  padding: 0 5px;
+  background-color: #fbbc04;
+  border: none;
+  border-radius: 50px;
+  font-family: dongleRegular;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: ${(props) => (props.show ? 1 : 0)};
+  transition: opacity 0.3s ease-in-out;
+  z-index: 100;
+  pointer-events: none;
 `;
