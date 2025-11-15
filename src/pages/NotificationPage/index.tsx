@@ -2,10 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import BackToNavBar from "@/components/common/BackToNavBar";
 import styled from 'styled-components';
 import NotificationCard, {type NotificationCardProps } from '@/components/features/NotificationCard';
-import { 
-    getNotificationList, 
-    transformNotifications
-} from '@/api/notification/noteListAPI';
+import { getNotificationList, transformNotifications} from '@/api/notification/noteListAPI';
 import { markNotificationAsRead } from '@/api/notification/readNoteAPI';
 import notNoteIcon from '@/assets/icons/notNote.png';
 
