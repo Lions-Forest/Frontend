@@ -63,7 +63,7 @@ export default function StatusSelector({
           return (
             <StatusButton
               key={status.id}
-              active={isActive}
+              $active={isActive}
               $disabled={isDisabled}
               onClick={() => handleClick(status.id, isDisabled)}
             >
@@ -81,7 +81,7 @@ export default function StatusSelector({
           );
         })}
       </BtnContainer>
-      <Message show={showMessage}>레이더를 켜주세요</Message>
+      <Message $show={showMessage}>레이더를 켜주세요</Message>
     </Wrap>
   );
 }
@@ -122,9 +122,7 @@ const Icon = styled.img`
   transition: transform 0.2s ease-in-out;
 `;
 
-const StatusButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== "active" && prop !== "$disabled",
-})<{ active: boolean; $disabled: boolean }>`
+const StatusButton = styled.button<{ $active: boolean; $disabled: boolean }>`
   position: relative;
   padding: 0;
   border: none;
@@ -133,7 +131,7 @@ const StatusButton = styled.button.withConfig({
   cursor: pointer;
 
   ${(props) =>
-    props.active &&
+    props.$active &&
     !props.$disabled &&
     `
     ${Icon} {
@@ -159,7 +157,7 @@ const StatusButton = styled.button.withConfig({
   `}
 `;
 
-const Message = styled.div<{ show: boolean }>`
+const Message = styled.div<{ $show: boolean }>`
   position: absolute;
   display: flex;
   justify-content: center;
@@ -177,7 +175,7 @@ const Message = styled.div<{ show: boolean }>`
   font-family: dongleRegular;
   font-size: 16px;
   font-weight: 400;
-  opacity: ${(props) => (props.show ? 1 : 0)};
+  opacity: ${(props) => (props.$show ? 1 : 0)};
   transition: opacity 0.3s ease-in-out;
   z-index: 100;
   pointer-events: none;

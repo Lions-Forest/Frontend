@@ -45,7 +45,7 @@ export default function BottomSheet({
     config: { tension: 250, friction: 30 },
   }));
 
-  const bind = useDrag(
+  const bindHandle = useDrag(
     ({ last, movement: [, my], memo = y.get() }) => {
       let newY = memo + my;
       if (newY < openY) newY = openY;
@@ -54,9 +54,11 @@ export default function BottomSheet({
       if (last) {
         // 드래그 끝났을 때 위치 결정
         if (newY > (openY + closedY) / 2) {
+          // 닫기
           api.start({ y: closedY });
           onClose();
         } else {
+          // 열기
           api.start({ y: openY });
           onOpen();
         }
@@ -90,7 +92,7 @@ export default function BottomSheet({
         }}
       >
         <SheetContainer>
-          <HandleBarWrapper {...bind()}>
+          <HandleBarWrapper {...bindHandle()}>
             <HandleBar />
           </HandleBarWrapper>
 
