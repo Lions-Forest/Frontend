@@ -30,6 +30,7 @@ export default function BaseMap({
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [followMe, setFollowMe] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserLocation | null>(null);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
 
   // GPS 기반 실시간 내 위치
   const myPosition = useMyLocation({
@@ -52,6 +53,13 @@ export default function BaseMap({
     } else {
       setSelectedStatus("nothing");
     }
+  };
+
+  const handleLike = (likedUserId: string) => {
+    setLikeCounts((prevCounts) => ({
+      ...prevCounts,
+      [likedUserId]: (prevCounts[likedUserId] || 0) + 1,
+    }));
   };
 
   // GPS 기반으로 내 화면 중심 계속 이동
@@ -154,8 +162,8 @@ export default function BaseMap({
                 ...selectedUser,
                 message: selectedUser.message || "",
               }}
-              likeCount={0}
-              onLike={(userId) => console.log("좋아요 클릭: ", userId)}
+              likeCount={likeCounts[selectedUser.userId] || 0}
+              onLike={handleLike}
             />
           )}
         </Map>

@@ -15,16 +15,8 @@ interface Props {
   onLike: (userId: string) => void;
 }
 
-export default function StatusMessage({
-  user,
-  likeCount: initialLikeCount,
-  onLike,
-}: Props) {
-  const [likeCount, setLikeCount] = useState(initialLikeCount);
-
+export default function StatusMessage({ user, likeCount, onLike }: Props) {
   const handleLike = () => {
-    const newCount = likeCount + 1;
-    setLikeCount(newCount);
     onLike(user.userId);
   };
 
