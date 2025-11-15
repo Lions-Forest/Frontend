@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { IoMdMap as Map } from "react-icons/io";
 import { MdDiversity3 as Home } from "react-icons/md";
 import { MdAccountCircle as My } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
 
 const path = window.location.pathname;
 
