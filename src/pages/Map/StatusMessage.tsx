@@ -2,7 +2,6 @@ import Heart from "@/assets/icons/heart.svg";
 import EmptyHeart from "@/assets/icons/emptyHeart.svg";
 import styled from "styled-components";
 import { CustomOverlayMap } from "react-kakao-maps-sdk";
-import { useState } from "react";
 
 interface Props {
   user: {
