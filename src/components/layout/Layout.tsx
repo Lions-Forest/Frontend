@@ -21,9 +21,16 @@ function Layout({ page, children, showBackNavBar = false, backNavBarText = "" }:
             <Content>
                 {children}
             </Content>
-            <FooterWrapper>
-                <Footer />
-            </FooterWrapper>
+            {page === 'create-meeting' ? (
+                <></>
+                // <ButtonWrapper>
+                //     <InfoButton onNext={true} />
+                // </ButtonWrapper>
+            ) : (
+                <FooterWrapper>
+                    <Footer />
+                </FooterWrapper>
+            )}
         </Root>
     )
 }
@@ -54,5 +61,10 @@ const Content = styled.div`
 const FooterWrapper = styled.div`
     flex-shrink: 0;
     width: 100%;
+`;
+
+const ButtonWrapper = styled.div`
+    width: 100%;
+    margin: 0px 16px 54px 16px;
 `;
 

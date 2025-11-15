@@ -1,216 +1,230 @@
 import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingPage from "@/pages/Map/LoadingPage";
-import MarkerImage from "@/assets/images/LoadingLion.svg"; // 임시로 다른 사진 지정
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
-import Layout from "@/components/layout/Layout";
+import defaultLion from "@/assets/lion/defaultLion.svg";
+import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.svg";
 import styled from "styled-components";
-
-interface BaseMapProps {
-  userId: string;
-  name: string;
-  shareLocation: boolean;
-  userLocations: UserLocation[];
-}
-
-const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }; // 서울 시청 좌표 (임시 기본값)
+import Footer from "@/components/layout/Footer";
+import BottomSheet from "./BottomSheeet";
+import StatusSelector from "./StatusSelector";
 
 export default function BaseMap({
   userId,
   name,
-  shareLocation,
-  userLocations,
-}: BaseMapProps) {
-  useMyLocation({ userId, name, shareLocation }); // 내 위치 Firebase에 업로드
-  const locations = useAllLocations(); // 모든 사용자 위치 구독
-  const myLocation = locations?.[userId]; // 모든 사용자 위치 중 내 위치 찾아내기 (중심 좌표를 찾기 위해)
-  console.log("locations state:", locations);
-  console.log("myLocation:", myLocation);
-  const safeUserLocations = Array.isArray(userLocations) ? userLocations : [];
-  const initialCenter = React.useMemo(() => {
-    if (myLocation?.latitude && myLocation?.longitude) {
-      return { lat: myLocation.latitude, lng: myLocation.longitude };
-    }
-    const fallbackUser = safeUserLocations.find(
-      (user) => user.latitude && user.longitude
-    );
-    if (fallbackUser) {
-      return { lat: fallbackUser.latitude, lng: fallbackUser.longitude };
-    }
-    return DEFAULT_CENTER;
-  }, [myLocation, safeUserLocations]);
-  const [center, setCenter] = useState<{ lat: number; lng: number }>(
-    initialCenter
-  );
+}: {
+  userId: string;
+  name: string;
+}) {
+  const [shareLocation, setShareLocation] = useState(false);
+  const [selectedStatus, setSelectedStatus] =
+    useState<NonNullable<UserLocation["status"]>>("nothing");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [mapLevel, setMapLevel] = useState(3);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [followMe, setFollowMe] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<UserLocation | null>(null);
 
-  useEffect(() => {
-    if (myLocation) {
-      setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
-    }
-  }, [myLocation]);
+  // GPS 기반 실시간 내 위치
+  const myPosition = useMyLocation({
+    userId,
+    name,
+    shareLocation,
+    status: selectedStatus,
+    message: statusMessage,
+  });
 
-  useEffect(() => {
-    if (!myLocation && center === DEFAULT_CENTER) {
-      setCenter(initialCenter);
-    }
-  }, [center, initialCenter, myLocation]);
+  // Firestore에서 모든 사용자 구독
+  const locations = useAllLocations(userId);
+  const [center, setCenter] = useState({ lat: 37.504729, lng: 126.957631 });
 
-  // 아직 위치 데이터가 전혀 없다면 로딩 화면 표시
-  const hasAnyLocation =
-    myLocation ||
-    safeUserLocations.some((user) => user.latitude && user.longitude);
-  if (!hasAnyLocation && center === DEFAULT_CENTER) {
-    return <LoadingPage />;
-  }
-
-  // const myLocation = { latitude: 37.504729, longitude: 126.957631 };
-
-  const moveToMyLocation = () => {
-    if (myLocation) {
-      setCenter({ lat: myLocation.latitude, lng: myLocation.longitude });
+  const handleToggle = (newValue: boolean) => {
+    setShareLocation(newValue);
+    if (!newValue) {
+      setSelectedStatus("nothing");
+      setStatusMessage("");
     }
   };
 
+  // GPS 기반으로 내 화면 중심 계속 이동
+  useEffect(() => {
+    if (followMe && myPosition) {
+      setCenter(myPosition);
+    }
+  }, [myPosition, followMe]);
+
+  if (!myPosition) return <LoadingPage />;
+
   return (
-    <Layout>
-      <MapContainer>
+    <MapContainer>
+      <MapWrapper>
         <Map
           center={center}
+          level={mapLevel}
+          onZoomChanged={(map) => setMapLevel(map.getLevel())}
           style={{ width: "100%", height: "100%" }}
-          level={4}
+          onDragStart={() => setFollowMe(false)}
           onCenterChanged={(map) => {
-            const newCenter = map.getCenter();
-            setCenter({ lat: newCenter.getLat(), lng: newCenter.getLng() });
+            if (!followMe) {
+              const c = map.getCenter();
+              setCenter({ lat: c.getLat(), lng: c.getLng() });
+            }
           }}
         >
-          {safeUserLocations.map((user) => {
-            if (!user.latitude || !user.longitude) return null;
+          {/* 내 마커 (GPS 기반, 항상 표시됨) */}
+          <MapMarker
+            position={myPosition}
+            image={{
+              src: shareLocation
+                ? getMarkerImage(selectedStatus, true) || defaultLion
+                : defaultLion,
+              size: { width: 79, height: 145 },
+              options: { offset: { x: 39, y: 145 } },
+            }}
+            title={`${name} (나)`}
+          />
+          {/* shareLocation 켜졌을 때만 그라데이션 원 표시 */}
+          {shareLocation && (
+            <CustomOverlayMap
+              position={myPosition}
+              zIndex={-1}
+              xAnchor={0.5}
+              yAnchor={1}
+            >
+              <div
+                style={{
+                  width: 427,
+                  height: 427,
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
+                  transform: "translateY(30%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </CustomOverlayMap>
+          )}
+          {/* 다른 사용자 마커 표시 (Firestore 기반) */}
+          {Object.values(locations).map((user) => {
+            if (user.userId === userId) return null; // 내 Firestore 기록은 내가 안 봄
+            if (!user.shareLocation) return null;
 
-            const markerImage = {
-              src: getMarkerImage(user.status) || MarkerImage, // undfined면 기본 이미지
-              size: { width: 50, height: 50 },
-              options: { offset: { x: 25, y: 50 } },
-            };
-
-            if (user.userId === userId) {
-              return (
-                <React.Fragment key={`current-${user.userId}`}>
-                  <MapMarker
-                    key={`marker-${user.userId}`}
-                    position={{ lat: user.latitude, lng: user.longitude }}
-                    image={markerImage}
-                    title={`${user.name} (나)`}
-                  />
-
-                  {/* 작은 빨간 점 */}
-                  {/* <MapMarker
-                  position={{ lat: user.latitude, lng: user.longitude }}
-                  key={`${user.userId}-dot`}
-                >
-                  <div
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      background: "#FF2370",
-                      border: "2px solid white",
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  />
-                </MapMarker> */}
-
-                  {/* 레이더 같은 반투명한 원 */}
-                  {/* <Circle
-                  key={`${user.userId}-circle`}
-                  center={{ lat: user.latitude, lng: user.longitude }} // 원의 중심 좌표
-                  radius={150} // 반경(m)
-                  strokeWeight={2} // 테두리 굵기
-                  strokeColor={"#FF2370"} // 테두리 색
-                  strokeOpacity={0.8} // 테두리 불투명도
-                  fillColor={"#FF2370"} // 내부 채움 색
-                  fillOpacity={0.2} // 내부 채움 색 불투명도
-                /> */}
-
-                  {/* 그라데이션 원 */}
-                  <CustomOverlayMap
-                    key={`radius-${user.userId}`}
-                    position={{ lat: user.latitude, lng: user.longitude }}
-                  >
-                    <div
-                      style={{
-                        width: "250px",
-                        height: "250px",
-                        borderRadius: "50%",
-                        background:
-                          "radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, rgba(0, 128, 0, 0.7) 90%)",
-                        transform: "translate(-50%, -50%)",
-                        pointerEvents: "none",
-                      }}
-                    />
-                  </CustomOverlayMap>
-
-                  {/* 내 위치 (빨간 점) */}
-                  <CustomOverlayMap
-                    key={`dot-${user.userId}`}
-                    position={{ lat: user.latitude, lng: user.longitude }}
-                  >
-                    <div
-                      style={{
-                        width: "10px",
-                        height: "10px",
-                        borderRadius: "50%",
-                        background: "#00cc00",
-                        border: "none",
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    />
-                  </CustomOverlayMap>
-                </React.Fragment>
-              );
-            }
+            const markerImg = getMarkerImage(user.status, false);
+            if (!markerImg) return null;
 
             return (
               <MapMarker
-                key={`marker-${user.userId}`}
+                key={user.userId}
                 position={{ lat: user.latitude, lng: user.longitude }}
-                image={markerImage}
-                title={user.name}
+                image={{
+                  src: markerImg,
+                  size: { width: 93, height: 102 },
+                  options: { offset: { x: 25, y: 50 } },
+                }}
+                onClick={() => {
+                  setSelectedUser((prev) => {
+                    if (prev?.userId === user.userId) return null;
+                    return user;
+                  });
+                }}
               />
             );
           })}
+          {/* 상태메세지 말풍선 */}
+          {selectedUser && (
+            <CustomOverlayMap
+              position={{
+                lat: selectedUser.latitude,
+                lng: selectedUser.longitude,
+              }}
+              yAnchor={1.2}
+            >
+              <div
+                style={{
+                  height: "19px",
+                  background: "#ffffff",
+                  padding: "0 4px",
+                  borderRadius: 4,
+                  color: "#00B353",
+                  textAlign: "center",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  maxWidth: 120,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {selectedUser.message}
+              </div>
+            </CustomOverlayMap>
+          )}
         </Map>
 
-        <LocateButton onClick={moveToMyLocation}>내 위치로 이동</LocateButton>
-      </MapContainer>
-    </Layout>
+        <img
+          src={moveToMyLocationBtn}
+          onClick={() => {
+            if (myPosition) {
+              setCenter(myPosition);
+              setFollowMe(true);
+              setMapLevel(3);
+            }
+          }}
+          style={{
+            position: "absolute",
+            bottom: 145,
+            right: 15,
+            width: 46,
+            height: 46,
+            cursor: "pointer",
+            zIndex: 10,
+          }}
+        />
+      </MapWrapper>
+
+      <BottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        shareLocation={shareLocation}
+        onToggleShare={handleToggle}
+        status={selectedStatus}
+        setStatus={setSelectedStatus}
+        message={statusMessage}
+        setMessage={setStatusMessage}
+      >
+        <StatusSelector
+          selectedStatus={selectedStatus}
+          onChange={setSelectedStatus}
+          shareLocation={shareLocation}
+        />
+      </BottomSheet>
+
+      <FooterWrap>
+        <Footer />
+      </FooterWrap>
+    </MapContainer>
   );
 }
 
 const MapContainer = styled.div`
-  position: relative;
-  display: flex;
+  max-width: 600px;
   width: 100%;
-  height: 100%;
-  min-height: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 `;
 
-const LocateButton = styled.button`
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  z-index: 10;
-  border: none;
-  border-radius: 8px;
-  background: #222;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+const MapWrapper = styled.div`
+  flex: 1;
+  position: relative;
+`;
 
-  &:hover {
-    background: #333;
-  }
+const FooterWrap = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
 `;

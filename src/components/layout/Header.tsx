@@ -5,6 +5,7 @@ import two from '../../assets/icons/alarmTwo.png'
 import three from '../../assets/icons/alarmThree.png'
 import more from '../../assets/icons/alarmMore.png'
 import type { Member } from '@/types';
+import { IoIosArrowBack } from "react-icons/io";
 
 // TODO: subtitle이 소모임 일 때, 오른쪽에 시간 display 보이기 (어떻게 가져올 지 생각해보자)
 
@@ -30,10 +31,10 @@ function Header({ member, page = 'home' }: HeaderProps = {}) {
     // subheader 타이틀 설정
     if (page === 'meeting-detail') {
         text = '소모임';
-    // } else if (page === 'home') {
-    //     text = '내가 신청한 모임';
-    } else {
+    } else if (page === 'create-meeting'){
         text = '모임 개설하기';
+    } else {
+        text = '사진 선택';
     }
 
     
@@ -51,7 +52,7 @@ function Header({ member, page = 'home' }: HeaderProps = {}) {
             </HeaderLayout>
             {page !== 'home' &&
             <HeaderLayout> 
-                <SubTitle>{text}</SubTitle>
+                {/*<SubTitle>{text}</SubTitle>*/}
             </HeaderLayout>
             }
         </Layout>

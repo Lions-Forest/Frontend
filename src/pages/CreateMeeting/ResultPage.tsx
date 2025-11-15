@@ -1,0 +1,130 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import resultOutButtonIcon from '@/assets/icons/resultOutButton.svg';
+import resultLionImage from '@/assets/images/resultLion.png';
+import resultpageTextImage from '@/assets/icons/resultpageText.png';
+
+const ResultPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleIconClick = () => {
+    navigate('/home');
+  };
+
+  return (
+    <ResultContainer>
+      <TopSection>
+        <CongratulationsImage src={resultpageTextImage} alt="Congratulations" />
+        <CompletionText>모임 개설이 완료되었어요</CompletionText>
+      </TopSection>
+      <ContentArea>
+        {/* ResultPage 내용 영역 */}
+      </ContentArea>
+      <LionImage src={resultLionImage} alt="Result Lion" />
+      <BottomActionBar>
+        <ActionText>확인하러 가볼까요?</ActionText>
+        <ActionIconButton onClick={handleIconClick}>
+          <ActionIcon src={resultOutButtonIcon} alt="Go to Home" />
+        </ActionIconButton>
+      </BottomActionBar>
+    </ResultContainer>
+  );
+};
+
+export default ResultPage;
+
+const ResultContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background-color: #E2EDE7;
+`;
+
+const TopSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: 127px;
+  gap: 13px;
+  z-index: 10;
+`;
+
+const CongratulationsImage = styled.img`
+  display: block;
+`;
+
+const CompletionText = styled.div`
+  color: #000;
+  font-family: Pretendard;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+`;
+
+const ContentArea = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
+const LionImage = styled.img`
+  position: fixed;
+  bottom: 228px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+`;
+
+const BottomActionBar = styled.div`
+  position: fixed;
+  bottom: 111px;
+  right: 46px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 100;
+`;
+
+const ActionText = styled.div`
+  color: #000;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+`;
+
+const ActionIconButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &:focus {
+    outline: none;
+  }
+`;
+
+const ActionIcon = styled.img`
+  width: 48px;
+  height: 48px;
+`;

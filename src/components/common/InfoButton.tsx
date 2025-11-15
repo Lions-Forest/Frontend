@@ -7,10 +7,12 @@ interface ButtonProps {
   onClose?: boolean;
   onInfo?: boolean;
   onReview?: boolean;
+  onNext?: boolean;
+  onComplete?: boolean;
   onClick?: () => void;
 }
 
-const InfoButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMakeCancel = false, onClose = false, onReview = false, onClick }: ButtonProps) => {
+const InfoButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMakeCancel = false, onClose = false, onReview = false, onNext = false, onComplete = false, onClick }: ButtonProps) => {
 
   let text = '';
   let clickHandler: (() => void) | undefined = undefined;
@@ -46,6 +48,16 @@ const InfoButton = ({ onJoin = false, onInfo = false, onJoinCancel = false, onMa
     text = '신청 마감';
     disabled = true;
     bgColor = '#848484';
+    textColor = '#fff';
+  } else if (onComplete) {
+    text = '완료';
+    // onClick = () => {location.href = '/complete' };
+    bgColor = '#017F3B';
+    textColor = '#fff';
+  } else if (onNext) {
+    text = '다음';
+    // onClick = () => {location.href = '/next' };
+    bgColor = '#017F3B';
     textColor = '#fff';
   } else {
     text = '모임 정보 확인';
