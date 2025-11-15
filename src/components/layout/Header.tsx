@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import none from '../../assets/icons/alarmNone.png'
 import one from '../../assets/icons/alarmOne.png'
 import two from '../../assets/icons/alarmTwo.png'
@@ -15,6 +16,7 @@ interface HeaderProps {
 }
 
 function Header({ member, page = 'home' }: HeaderProps = {}) {
+    const navigate = useNavigate();
     
     let text : string = '';
 
@@ -27,6 +29,11 @@ function Header({ member, page = 'home' }: HeaderProps = {}) {
     else if ( alarmValue === 3 ) alarmImgSrc = three;
     else if ( alarmValue >= 4 ) alarmImgSrc = more;
     else alarmImgSrc = none;
+
+    // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
+    const handleAlarmClick = () => {
+        navigate('/notification');
+    };
 
     // subheader 타이틀 설정
     if (page === 'meeting-detail') {
@@ -48,7 +55,7 @@ function Header({ member, page = 'home' }: HeaderProps = {}) {
                     <TitleLetter color='#FBBC04'>의</TitleLetter>
                     <TitleLetter color='#43D687'>숲</TitleLetter>
                 </Title>
-                <AlarmImg src={alarmImgSrc} />
+                <AlarmImg src={alarmImgSrc} onClick={handleAlarmClick} /> {/*핸들러 추가 p.s. 정건*/}
             </HeaderLayout>
             {page !== 'home' &&
             <HeaderLayout> 
@@ -93,6 +100,7 @@ const TitleLetter = styled.div`
 
 const AlarmImg = styled.img`
     width: 23px;
+    cursor: pointer; // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
 `;
 
 const SubTitle = styled.div`
