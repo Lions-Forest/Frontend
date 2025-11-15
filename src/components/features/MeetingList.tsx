@@ -176,6 +176,7 @@ const OptionInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
+  position: relative;
 `;
 
 const OptionTitle = styled.div`
@@ -232,16 +233,15 @@ const MoreBtn = styled.div`
   line-height: normal;
 `;
 
-// styled-components 추가 부분
 const Dropdown = styled.div`
   position: absolute;
-  margin-top: 40px;
+  top: 100%;
   left: 0;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0px 2px 8px #0001;
   z-index: 99;
-  min-width: 90px;
+  min-width: 100px;
 `;
 
 const DropdownItem = styled.div`
@@ -261,6 +261,8 @@ const NoList = styled.div`
 
 const ListUp = styled.div`
   display: flex;
+  // width: 100%;
+  width: 95%;
   flex-direction: column;
   // align-items: center;
   gap: 16px;

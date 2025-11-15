@@ -18,17 +18,21 @@ function index() {
   const [ meetingList, setMeetingList ] = useState<Meeting[]>([]);
   const [ myMeetingList, setMyMeetingList ] = useState<Meeting[]>([]);
   const { fetchMeetingList } = useMeetingStore();
+  const [loading, setLoading] = useState(false);
 
   // 전체 모임 리스트 가져오기
   useEffect(() => {
     const fetchData = async() => {
       try {
+        setLoading(true);
         const meetings = await fetchMeetingList();
         console.log("전체 모임 리스트: ", meetings);
         setMeetingList(meetings);
       } catch (error) {
         console.error("데이터 로딩 실패: ", error);
         setMeetingList([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -50,6 +54,7 @@ function index() {
   }, []);
 
   const dueMeetings = meetingList.filter((m) => {
+    if (m.complete) return false;
     const isNearlyFull = m.memberLimit - m.memberNumber === 1;
     const diffMs = new Date(m.date).getTime() - new Date().getTime();
     const isOneHourLeft = diffMs > 0 && diffMs <= 60 * 60 * 1000; // 0 < diff <= 1시간
@@ -60,13 +65,19 @@ function index() {
   return (
     <Layout>
       <HomeLayout>
-        <MyMeeting meetings={myMeetingList}/>
-        <Line />
-        <MeetingList meetings={meetingList} />
-        <Line />
-        <DueList meetings={dueMeetings} />
-        <Line />
-        <HomeReviewList />
+        {loading ? (
+          <LoadingText>로딩 중...</LoadingText>
+        ) : (
+          <>
+            <MyMeeting meetings={myMeetingList}/>
+            <Line />
+            <MeetingList meetings={meetingList} />
+            <Line />
+            <DueList meetings={dueMeetings} />
+            <Line />
+            <HomeReviewList />
+          </>
+        )}
         <WriteButton />
       </HomeLayout>
     </Layout>
@@ -85,4 +96,18 @@ const HomeLayout = styled.div`
     align-items: center;
     padding: 16px;
     gap: 16px;
+`;
+
+const LoadingText = styled.div`
+    font-family: dongleRegular;
+    font-size: 40px;
+    color: #848484;
+    leading-trim: NONE;
+    line-height: 100%;
+    letter-spacing: 0%;
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
 `;

@@ -7,27 +7,45 @@ import three from '../../assets/icons/alarmThree.png'
 import more from '../../assets/icons/alarmMore.png'
 import type { Member } from '@/types';
 import { IoIosArrowBack } from "react-icons/io";
-
-// TODO: subtitle이 소모임 일 때, 오른쪽에 시간 display 보이기 (어떻게 가져올 지 생각해보자)
+import { useEffect, useState } from 'react';
+import { getNotificationNumber } from '@/api/notification/numberAPI';
 
 interface HeaderProps {
     member?: Member;
     page?: string;
 }
 
-function Header({ member, page = 'home' }: HeaderProps = {}) {
+function Header({ page = 'home' }: HeaderProps = {}) {
     const navigate = useNavigate();
     
     let text : string = '';
 
+    const [notification, setNotification] = useState(0);
+    let userId = localStorage.getItem("userId");
+
+    // 나의 알림 개수 가져오기
+    useEffect(() => {
+        const fetchNotification = async() => {
+        try {
+            const notification = await getNotificationNumber(Number(userId));
+            console.log("알림 개수: ", notification);
+            setNotification(notification);
+        } catch (error) {
+            console.error("데이터 로딩 실패: ", error);
+            setNotification(0);
+        }
+        };
+        fetchNotification();
+    }, []);
+    
+
     // 알림 아이콘 설정
-    const alarmValue = member?.alarm ?? 0;
     let alarmImgSrc = none;
 
-    if ( alarmValue === 1 ) alarmImgSrc = one;
-    else if ( alarmValue === 2 ) alarmImgSrc = two;
-    else if ( alarmValue === 3 ) alarmImgSrc = three;
-    else if ( alarmValue >= 4 ) alarmImgSrc = more;
+    if ( notification === 1 ) alarmImgSrc = one;
+    else if ( notification === 2 ) alarmImgSrc = two;
+    else if ( notification === 3 ) alarmImgSrc = three;
+    else if ( notification >= 4 ) alarmImgSrc = more;
     else alarmImgSrc = none;
 
     // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
@@ -43,7 +61,6 @@ function Header({ member, page = 'home' }: HeaderProps = {}) {
     } else {
         text = '사진 선택';
     }
-
     
     return(
         <Layout>

@@ -182,7 +182,8 @@ export default PreviewCard;
 const PreviewCardLayout = styled.div<{ backgroundColor: string }>`
     // width: 361px;
     width: 100%;
-    height: 216px;
+    height: 100%;
+    min-height: 216px;
     border-radius: 7px;
     background: ${({ backgroundColor }) => backgroundColor};
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.10);
@@ -211,7 +212,6 @@ const Title = styled.div`
 
 const Progress = styled.div`
   display: flex;
-  // margin-left: 16px;
   margin: 0px 16px;
   gap: 16px;
   align-items: center;
@@ -312,6 +312,7 @@ const InfoDetail = styled.div`
 
 const Buttons = styled.div`
   display: flex;
+  justify-content: space-between;
   gap: 16px;
-  margin: 8px 11px 11px 11px;
+  margin: 11px;
 `;
