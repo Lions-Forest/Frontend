@@ -3,6 +3,7 @@ import styled from "styled-components";
 import type { Member, Participant } from "@/types";
 import { IoIosClose as Close } from "react-icons/io";
 import { fetchParticipantDetail } from "@/api/meeting/meetingMemberApi";
+import defaultProfile from '../../assets/images/LoadingLion.svg'
 
 interface MemberModalProps {
   participant: Participant;
@@ -47,7 +48,10 @@ function MemberModal({ participant, onClose, anonymous = true }: MemberModalProp
       <ModalBox>
         <CloseBtn onClick={onClose} />
         <Name>{displayName || "-"}</Name>
-        <ProfileImg src={profileSrc} alt={displayName} />
+        <ProfileImg 
+          src={anonymous ? defaultProfile : profileSrc} 
+          alt={displayName} 
+        />
         <DetailRow>
           {anonymous ? null : (
             <>
@@ -63,7 +67,16 @@ function MemberModal({ participant, onClose, anonymous = true }: MemberModalProp
 
 export default MemberModal;
 
-// 스타일
+// const ModalOverlay = styled.div`
+//   position: fixed;
+//   top: 0; left: 0; right: 0; bottom: 0;
+//   z-index: 1000;
+//   background: rgba(0,0,0,0.55);  // 원하는 투명도 조절 (0.5~0.7 추천)
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// `;
+
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
@@ -71,6 +84,7 @@ const Overlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(0,0,0,0.25);
 `;
 
 const ModalBox = styled.div<{ anonymous?: boolean }>`
@@ -111,9 +125,9 @@ const ProfileImg = styled.img<{ anonymous?: boolean }>`
   width: ${({ anonymous }) => (anonymous ? "64px" : "49px")};
   height: ${({ anonymous }) => (anonymous ? "64px" : "49px")};
   flex-shrink: 0;
-  object-fit: cover;
+  object-fit: scale-down;
   border-radius: 64px;
-  background: #eee;
+  background: #fff;
 `;
 
 const DetailRow = styled.div`

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
 import MeetingDetailPage from "./pages/MeetingDetail/index";
+import ReviewCollectionPage from "./pages/ReviewCollection/index"
 import CreateMeetingPage from "./pages/CreateMeeting";
 import MyPage from "./pages/Mypage";
 import NotificationPage from "./pages/NotificationPage";
@@ -56,6 +57,7 @@ function App() {
             {/* <Route path="/map" element={<TestMap />} /> */}
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/home/meeting-detail/:id" element={<MeetingDetailPage />} />
+            <Route path="/home/meeting-collection" element={<ReviewCollectionPage />} />
             <Route path="/home/create-meeting" element={<CreateMeetingPage />} />
             <Route path="/home/create-meeting/step1" element={<CreateMeetingPage />} />
             <Route path="/home/create-meeting/step2" element={<CreateMeetingPage />} />

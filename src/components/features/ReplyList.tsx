@@ -3,6 +3,7 @@ import styled from "styled-components";
 import ReplySpan from "./ReplySpan";
 import ReplyInput from "./ReplyInput";
 import type { Reply } from "@/types";
+import { fetchLikeState } from "@/api/meeting/replyApi";
 
 interface ReplyListProps {
     replies: Reply[];
@@ -18,8 +19,7 @@ function ReplyList({
     likesPressed,
     onLikeToggle,
     onReplySubmit
-  }: ReplyListProps) {
-
+  }: ReplyListProps) {  
     return (
       <ReplyLayout>
         <Title>댓글</Title>
@@ -31,7 +31,6 @@ function ReplyList({
               <ReplySpan
                 key={reply.id}
                 reply={reply}
-                pressedLike={likesPressed[reply.id]}
                 onLikeClick={() => onLikeToggle(reply.id)}
               />
             ))

@@ -19,24 +19,27 @@ function getRelativeTime(date: Date | string): string {
 }
 
 function ReviewBoxContent({ review }: { review: Review }){
+
+  const userId = localStorage.getItem("userId");
+
   return (
     <ContentLayout>
         <HeaderLayout>
             <ProfileLayout>
-                <ProfileImg src={review.writer.photoUrl}/>
+                <ProfileImg src={review.userProfile}/>
                 <ProfileInfo>
-                    <NameText>{review.writer.name}</NameText>
-                    <DateText>{review.date}</DateText>
+                    <NameText>{review.userName}</NameText>
+                    <DateText>{getRelativeTime(review.date)}</DateText>
                 </ProfileInfo>
-                {userId === review.writer.id && (
+                {Number(userId) === review.userId && (
                     <WriteButton />
                 )}
             </ProfileLayout>
             <ScoreNav review={review}/>
         </HeaderLayout>
         <PhotoList>
-        {review.photoUrl && review.photoUrl.map((src, idx) => (
-            <Photo src={src} key={idx} alt={`photo${idx}`} />
+        {review.photo && review.photo.map((photo, index) => (
+            <Photo src={photo.photoUrl} key={photo.order || index} alt={`meeting review photo ${photo.order || index}`} />
         ))}
         </PhotoList>
         <ReviewDetail>{review.detail}</ReviewDetail>
@@ -60,11 +63,11 @@ const HeaderLayout = styled.div`
     justify-content: space-between;
     align-items: flex-start;
     align-self: stretch;
-    margin-right: 15.5px;
 `;
 
 const ProfileLayout = styled.div`
     display: flex;
+    width: 100%;
     gap: 8px;
     align-items: center;
 `;

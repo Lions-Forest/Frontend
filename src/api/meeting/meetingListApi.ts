@@ -3,7 +3,7 @@ import type { Meeting, Member } from "@/types";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.lions-forest.p-e.kr';
 
 // API 응답 타입 정의 (실제 API 응답 구조에 맞게 수정 필요)
-interface ApiMeetingResponse {
+export interface ApiMeetingResponse {
     id: number;
     leaderId: number;
     leaderNickname: string;
@@ -82,92 +82,6 @@ export async function fetchMeetingList() {
     }
 }
 
-// API 응답을 Meeting 타입으로 변환하는 함수
-function convertCategory(type: string | undefined): string {
-    switch (type) {
-        case 'MEAL':
-            return '식사';
-        case 'WORK':
-            return '모각작';
-        case 'SOCIAL':
-            return '소모임';
-        case 'CULTURE':
-            return '문화예술';
-        case 'ETC':
-            return '기타';
-        default:
-            return type || '기타';
-    }
-}
-
-function normalizePhotos(rawPhotos: unknown): Array<{ photoUrl: string; order: number }> {
-    if (!Array.isArray(rawPhotos)) {
-        return [];
-    }
-
-    return rawPhotos.map((photo, index) => {
-        if (typeof photo === 'object' && photo !== null) {
-            const typed = photo as Record<string, unknown>;
-            const photoUrl =
-                typeof typed.photoUrl === 'string'
-                    ? typed.photoUrl
-                    : typeof typed.url === 'string'
-                        ? typed.url
-                        : typeof typed.photo === 'string'
-                            ? typed.photo
-                            : '';
-            const order =
-                typeof typed.order === 'number'
-                    ? typed.order
-                    : typeof typed.sequence === 'number'
-                        ? typed.sequence
-                        : index;
-            return { photoUrl, order };
-        }
-
-        return { photoUrl: '', order: index };
-    });
-}
-
-function normalizeOwner(raw: unknown, fallbackNickname?: string): Member {
-    if (raw && typeof raw === 'object') {
-        const owner = raw as Record<string, unknown>;
-        const name =
-            typeof owner.name === 'string'
-                ? owner.name
-                : typeof owner.nickname === 'string'
-                    ? owner.nickname
-                    : fallbackNickname || '';
-
-        return {
-            id: typeof owner.id === 'number'
-                ? owner.id
-                : typeof owner.userId === 'number'
-                    ? owner.userId
-                    : 0,
-            email: typeof owner.email === 'string' ? owner.email : '',
-            name,
-            nickname: typeof owner.nickname === 'string' ? owner.nickname : name,
-            detail: typeof owner.detail === 'string' ? owner.detail : '',
-            photoUrl:
-                typeof owner.photoUrl === 'string'
-                    ? owner.photoUrl
-                    : typeof owner.profileImageUrl === 'string'
-                        ? owner.profileImageUrl
-                        : '',
-        };
-    }
-
-    return {
-        id: 0,
-        email: '',
-        name: fallbackNickname || '',
-        nickname: fallbackNickname || '',
-        detail: '',
-        photoUrl: '',
-    };
-}
-
 export function mapApiResponseToMeeting(apiMeeting: ApiMeetingResponse): Meeting {
   // owner 객체 생성 // TODO: id 받아와서 member랑 매칭시키기
   const owner: Member = {
@@ -216,73 +130,6 @@ export function mapApiResponseToMeeting(apiMeeting: ApiMeetingResponse): Meeting
       photo: photos,
   };
 }
-
-// function normalizeMeetingResponse(rawMeeting: any): Meeting {
-//     const meetingId = rawMeeting?.id || 0;
-//     const meetingDateSource =
-//         rawMeeting?.meetingAt ||
-//         rawMeeting?.meetingDate ||
-//         rawMeeting?.date ||
-//         rawMeeting?.startAt ||
-//         rawMeeting?.scheduledAt;
-//     const meetingDate = meetingDateSource ? new Date(meetingDateSource) : new Date();
-
-//     const owner =
-//         normalizeOwner(
-//             rawMeeting?.owner ||
-//             rawMeeting?.leader ||
-//             rawMeeting?.leaderInfo ||
-//             rawMeeting?.host,
-//             typeof rawMeeting?.leaderNickname === 'string' ? rawMeeting.leaderNickname : undefined,
-//         );
-
-//     const memberLimit =
-//         typeof rawMeeting?.capacity === 'number'
-//             ? rawMeeting.capacity
-//             : typeof rawMeeting?.memberLimit === 'number'
-//                 ? rawMeeting.memberLimit
-//                 : typeof rawMeeting?.limit === 'number'
-//                     ? rawMeeting.limit
-//                     : typeof rawMeeting?.maxParticipants === 'number'
-//                         ? rawMeeting.maxParticipants
-//                     : 0;
-
-//     const participantCount =
-//         typeof rawMeeting?.participantCount === 'number'
-//             ? rawMeeting.participantCount
-//             : typeof rawMeeting?.memberNumber === 'number'
-//                 ? rawMeeting.memberNumber
-//                 : Array.isArray(rawMeeting?.participants)
-//                     ? rawMeeting.participants.length
-//                     : 0;
-
-//     const state = rawMeeting?.state ?? rawMeeting?.status ?? rawMeeting?.complete;
-
-//     return {
-//         id: meetingId,
-//         title: rawMeeting?.title ?? '',
-//         date: meetingDate,
-//         type: convertCategory(
-//             typeof rawMeeting?.category === 'string' ? rawMeeting.category : rawMeeting?.type,
-//         ),
-//         location: rawMeeting?.location ?? rawMeeting?.place ?? '',
-//         owner,
-//         memberLimit,
-//         memberNumber: participantCount,
-//         memberDetail: rawMeeting?.memberDetail,
-//         complete:
-//             typeof state === 'string'
-//                 ? state !== 'OPEN'
-//                 : typeof state === 'boolean'
-//                     ? state
-//                     : false,
-//         photo: normalizePhotos(rawMeeting?.photos || rawMeeting?.photo || []),
-//     };
-// }
-
-// export function mapApiResponseToMeeting(apiMeeting: ApiMeetingResponse): Meeting {
-//     return normalizeMeetingResponse(apiMeeting);
-// }
 
 export async function fetchMeetingDetail(group_id : number) {
     try {

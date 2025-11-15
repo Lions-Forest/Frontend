@@ -26,13 +26,13 @@ export interface Member {
 export interface Meeting {
     id: number,
     title: string,
-    // detail: string,
     date: Date,
     type: string,
-    // startTime: string, // 타입 변경 가능 
-    // endTime: string, // 타입 변경 가능
     location: string,
-    owner: Member,
+    owner?: Member,
+    ownerId?: number,
+    ownerName?: string,
+    ownerNickname?: string,
     memberLimit: number,
     memberNumber: number, // 그냥 전달받을 떄 계산해서 넣을까,,? :)
     memberDetail?: Participant,
@@ -54,9 +54,10 @@ export interface Reply {
     groupId: number,
     userId: number,
     userName: string,
-    content: string,
-    likeCount: number,
+    detail: string,
+    likes: number,
     createdAt: Date,
+    photoUrl?: string,
 }
 
 export interface Review {
@@ -69,6 +70,8 @@ export interface Review {
     starNumber: number,
     date: Date,
     photo: Array<T>,
+    meetingTitle: string,
+    meetingDate: Date,
     // meeting: Meeting,
     // writer: Member,
     // photoUrl: string,

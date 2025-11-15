@@ -7,7 +7,7 @@ interface ReplyInputProps {
 }
 
 function ReplyInput({ meetingDate, onSubmit }: ReplyInputProps) {
-  const [text, setText] = React.useState("");
+  const [text, setText] = useState("");
   const isPast = new Date() > new Date(meetingDate);
 
   function handleSubmit(e: React.FormEvent) {
@@ -19,21 +19,27 @@ function ReplyInput({ meetingDate, onSubmit }: ReplyInputProps) {
   }
 
   return (
-    <InputLayout>
-      <StyledInput
-        value={text}
-        onChange={e => setText(e.target.value)}
-        disabled={isPast}
-        placeholder={isPast ? "마감된 모임에는 댓글을 작성할 수 없습니다." : "텍스트를 입력해주세요"}
-      />
-      <SubmitBtn disabled={isPast || !text.trim()} onSubmit={handleSubmit}>
-        게시
-      </SubmitBtn>
-    </InputLayout>
+    <Form onSubmit={handleSubmit}>
+      <InputLayout>
+        <StyledInput
+          value={text}
+          onChange={e => setText(e.target.value)}
+          disabled={isPast}
+          placeholder={isPast ? "마감된 모임에는 댓글을 작성할 수 없습니다." : "텍스트를 입력해주세요"}
+        />
+        <SubmitBtn type="submit" disabled={isPast || !text.trim()}>
+          게시
+        </SubmitBtn>
+      </InputLayout>
+    </Form>
   );
 }
 
 export default ReplyInput;
+
+const Form = styled.form`
+    width: 100%;
+`;
 
 const InputLayout = styled.div`
     width: 100%;

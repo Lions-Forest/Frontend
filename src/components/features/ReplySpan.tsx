@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { MdFavorite as FilledLike} from "react-icons/md";
 import { MdFavoriteBorder as EmptyLike } from "react-icons/md";
 import type { Reply } from "@/types";
+import { fetchLikeState } from "@/api/meeting/replyApi";
 
 interface ReplyProps {
     reply: Reply;
@@ -10,14 +11,25 @@ interface ReplyProps {
     onLikeClick?: () => void;
 }
 
-function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
+function ReplySpan({ reply, onLikeClick }: ReplyProps){
+  const [pressedLike, setPressedLike] = useState(false);
+
+  useEffect (() => {
+    const checkPressedLike = async (id : number) => {
+      const result = await fetchLikeState(id);
+      console.log("좋아요 눌렀음??: ", result);
+      setPressedLike(result.liked);
+    }
+    checkPressedLike(reply.id);
+  }, [reply]);
+
     return(
         <ReplyLayout>
           <ReplySection>
-            <ProfileImg src={""} />
+            <ProfileImg src={reply.photoUrl} />
             <DetailSection>
               <ProfileName>{reply.userName}</ProfileName>
-              <ReplyDetail>{reply.content}</ReplyDetail>
+              <ReplyDetail>{reply.detail}</ReplyDetail>
             </DetailSection>
           </ReplySection>
           <LikeSection>
@@ -27,7 +39,7 @@ function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
                 : <EmptyLike size={18} color="#B5B5B5" />
               }
             </LikeIcon>
-            <LikeNum pressed={pressedLike}>{reply.likeCount}</LikeNum>
+            <LikeNum pressed={pressedLike}>{reply.likes}</LikeNum>
           </LikeSection>
       </ReplyLayout>
     )
@@ -55,6 +67,7 @@ const ProfileImg = styled.img`
     height: 32px;
     border-radius: 4px;
     background: #848484;
+    object-fit: scale-down;
 `;
 
 const DetailSection = styled.div`

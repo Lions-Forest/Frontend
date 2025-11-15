@@ -1,16 +1,7 @@
-import type { Review } from "@/types";
+import type { Meeting } from "@/types";
+import { mapApiResponseToMeeting, type ApiMeetingResponse } from "./meetingListApi";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.lions-forest.p-e.kr';
-
-interface ApiReviewResponse{
-    id: number,
-    groupId: number,
-    userId: number,
-    userName: string,
-    userNickname: string,
-    profilePhotoUrl: string,
-    createdAt: Date,
-}
 
 export async function joinMeeting(group_id: number) {
     try {
@@ -67,23 +58,6 @@ export async function cancelJoinMeeting(group_id: number) {
     }
 }
 
-interface ApiMyMeetingResponse {
-    id: number;
-    leaderId: number;
-    leaderNickname: string;
-    leaderName?: string;
-    title: string;
-    category: string;
-    capacity: number;
-    meetingAt: Date; // ISO date string
-    location: string;
-    state: string; // "OPEN" | "CLOSED" 또는 boolean
-    // participation?: number;
-    participantCount: number;
-    photos?: Array<{ photoUrl: string; order: number }>;
-    // leaderPhotoUrl?: string;
-}
-
 export async function fetchMyMeetingList() {
     try {
       const token = localStorage.getItem('accessToken');
@@ -98,7 +72,7 @@ export async function fetchMyMeetingList() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const url = `${BASE_URL}/api/groups/`;
+      const url = `${BASE_URL}/api/participation/my/`;
       console.log("요청 URL:", url);
       console.log("BASE_URL:", BASE_URL);
       
@@ -139,9 +113,39 @@ export async function fetchMyMeetingList() {
         return [];
       }
       
-      return data;
+      // Meeting 타입으로 변환
+      return data.map((item) => mapApiResponseToMeeting(item as ApiMeetingResponse)) as Meeting[];
     } catch (err) {
       console.error("유저 데이터 불러오기 에러:", err);
       return [];
     }
+}
+
+export async function deleteMeeting(group_id: number) {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${BASE_URL}/api/groups/${group_id}/`, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 에러: ${response.status}`);
+    }
+
+    const responseText = await response.text();
+    console.log("API Data:", responseText);
+
+    return null;
+  } catch (e) {
+    console.error('모임 취소 실패:', e);
+    return null;
+  }
 }

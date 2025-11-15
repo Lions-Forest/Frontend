@@ -1,7 +1,7 @@
 // TODO: Reply에 likesPressed 방법 고안 및 구현하기
 
 import Layout from "@/components/layout/Layout";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import type { Meeting, Participant, Reply } from "@/types";
 import { MdToday as DateIcon} from "react-icons/md";
@@ -19,7 +19,9 @@ import { fetchReplyList, submitReply, toggleReplyLikes } from "@/api/meeting/rep
 import { fetchParticipantList } from "@/api/meeting/meetingMemberApi";
 import MemberModal from "@/components/features/MemberModal";
 import { fetchMeetingDetail } from "@/api/meeting/meetingListApi";
-import { cancelJoinMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
+import { cancelJoinMeeting, deleteMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
+import defaultProfile from '../../assets/images/LoadingLion.svg'
+import CheckingModal from "@/components/features/CheckingModal";
 
 function formatMeetingDate(date: Date | string) {
     const d: Date = date instanceof Date ? date : new Date(date as string);
@@ -48,8 +50,11 @@ function index() {
     const location = useLocation();
     const initialMeeting = location.state?.meeting as Meeting | undefined;
     const remainingTime = location.state?.remainingTime as string;
+    const timeText = location.state?.timeText as string;
     const [meeting, setMeeting] = useState<Meeting | undefined>(initialMeeting);
     const [currentIdx, setCurrentIdx] = useState(0);
+    const [showModal, setShowModal] = useState(false);
+
     const now = new Date();
   
     // const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
@@ -66,6 +71,22 @@ function index() {
     const [ participantList, setParticipantList ] = useState<Participant[]>([]);
     const [ selectedParticipant, setSelectedParticipant ] = useState<Participant | null>(null);
     const [ joinState, setJoinState ] = useState<'join' | 'cancel'>('join');
+
+    const navigate = useNavigate();
+    const userId = localStorage.getItem("userId");
+    const isOwner = Number(userId) === meeting?.owner.id ? true : false;
+
+    const handleDelete = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await deleteMeeting(meeting.id);
+            setJoinState('cancel');
+            navigate('/home');
+        } catch(e) {
+            console.log("handleDelete 함수 실패: ", e);
+        }
+    }
 
     const handleJoin = async () => {
         if (!meeting?.id) return;
@@ -178,14 +199,15 @@ function index() {
         setReplyList(replies);
     };
 
+    // 익명 처리 함수
     const isAnonymous = (date: Date | string) => {
         const d = date instanceof Date ? date : new Date(date);
         // date가 now보다 과거면 false, 아니면 true
         return d.getTime() >= now.getTime();
-      }      
+    };
 
     return (
-        <Layout showBackNavBar={true} backNavBarText="소모임" remainingTime={remainingTime}>
+        <Layout showBackNavBar={true} backNavBarText="소모임" remainingTime={remainingTime || timeText}>
             <DetailLayout>
                 {meeting ? (
                     <>
@@ -224,7 +246,11 @@ function index() {
                                 <Detail>
                                     <OwnerIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
                                     <DetailText> 
-                                        <Profile src={isAnonymous(meeting.date) ? '' : meeting.owner.photoUrl} /> 
+                                        <Profile 
+                                            src={isAnonymous(meeting.date) ? defaultProfile : meeting.owner?.photoUrl}
+                                            $clickable={!!participantList}
+                                            onClick={() => handleMemberClick(participantList[0])}
+                                        /> 
                                         {isAnonymous(meeting.date) ? meeting.owner.nickname : meeting.owner.name}
                                     </DetailText>
                                 </Detail>
@@ -235,7 +261,7 @@ function index() {
                                             {memberSlots.map((participant, index) => (
                                                 <Profile
                                                     key={index}
-                                                    src={isAnonymous(meeting.date) ? '' : participant?.photoUrl}
+                                                    src={!participant ? '' : (isAnonymous(meeting.date) ? defaultProfile : participant?.photoUrl)}
                                                     $clickable={!!participant}
                                                     onClick={() => handleMemberClick(participant)}
                                                 />
@@ -262,7 +288,11 @@ function index() {
                                     <InfoButton onClose={true} />
                                 ) : (
                                     joinState === 'join' ? (
-                                        <InfoButton onJoin={true} onClick={handleJoin} />
+                                        isOwner === true ? (
+                                            <InfoButton onMakeCancel={true} onClick={() => setShowModal(true)} />
+                                        ) : (
+                                            <InfoButton onJoin={true} onClick={handleJoin}/>
+                                        )
                                     ) : (
                                         <InfoButton onJoinCancel={true} onClick={handleJoinCancel} />
                                     )
@@ -281,6 +311,9 @@ function index() {
             </DetailLayout>
             {selectedParticipant && meeting && (
                 <MemberModal participant={selectedParticipant} onClose={handleCloseMemberModal} anonymous={isAnonymous(meeting.date)} />
+            )}
+            {showModal && (
+                <CheckingModal onClick={handleDelete} onClose={() => setShowModal(false)} />
             )}
         </Layout>
     )
@@ -318,6 +351,7 @@ const Picture = styled.img`
     height: 100%;
     aspect-ratio: 110/70;
     padding: 14px 16px;
+    object-fit: scale-down;
 `;
 
 const PicHeader = styled.div`
@@ -427,7 +461,7 @@ const Profile = styled.img<{ $clickable?: boolean }>`
     height: 24px;
     flex-shrink: 0;
     border-radius: 4px;
-    background: ${({ $clickable }) => ($clickable ? '#848484' : '#D9D9D9')};
+    background: ${({ $clickable }) => ($clickable ? '#fff' : '#D9D9D9')};
     object-fit: cover;
     border: 1px solid ${props => props.src ? 'transparent' : '#E2E2E2'};
     cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};

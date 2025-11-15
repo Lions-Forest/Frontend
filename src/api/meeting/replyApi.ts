@@ -12,6 +12,7 @@ interface ApiReplyResponse {
     content: string,
     likeCount: number,
     createdAt: Date,
+    profilePhotoUrl?: string,
 }
 
 export async function fetchReplyList(group_id : number) {
@@ -69,27 +70,28 @@ export async function fetchReplyList(group_id : number) {
         return [];
       }
       
-      return data;
+      return data.map((item) => mapApiResponseToReply(item as ApiReplyResponse));
     } catch (err) {
       console.error("유저 데이터 불러오기 에러:", err);
       return [];
     }
 }
 
-// export function mapApiResponseToReply(apiReply: ApiReplyResponse): Reply {
-//     // date를 Date 객체로 변환
-//     const meetingDate = new Date(apiReply.createdAt);
+export function mapApiResponseToReply(apiReply: ApiReplyResponse): Reply {
+    // date를 Date 객체로 변환
+    const meetingDate = new Date(apiReply.createdAt);
 
-//     return {
-//         id: apiReply.id,
-//         groupId: apiReply.groupId,
-//         userId: apiReply.userId,
-//         userName: apiReply.userName,
-//         detail: apiReply.content,
-//         likes: apiReply.likeCount,
-//         createdAt: meetingDate,
-//     };
-// }
+    return {
+        id: apiReply.id,
+        groupId: apiReply.groupId,
+        userId: apiReply.userId,
+        userName: apiReply.userName,
+        detail: apiReply.content,
+        likes: apiReply.likeCount,
+        createdAt: meetingDate,
+        photoUrl: apiReply.profilePhotoUrl || '',
+    };
+}
 
 export async function toggleReplyLikes(comment_id: number) {
     try {
@@ -134,7 +136,7 @@ export async function submitReply(group_id: number, content: string) {
       const response = await fetch(url, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ content }),  // <=== 반드시 body에 JSON으로!
+        body: JSON.stringify({ content }),
       });
   
       if (!response.ok) {
@@ -148,3 +150,58 @@ export async function submitReply(group_id: number, content: string) {
     }
   }
   
+
+  export async function fetchLikeState(comment_id : number) {
+    try {
+      const token = localStorage.getItem('accessToken');
+      
+      // 헤더 설정
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      
+      // 토큰이 있으면 Authorization 헤더 추가
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const url = `${BASE_URL}/api/comments/${comment_id}/like/status`;
+      console.log("요청 URL:", url);
+      console.log("BASE_URL:", BASE_URL);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
+
+      console.log("API Response Status:", response.status);
+      console.log("API Response URL:", response.url);
+
+      const responseText = await response.text();
+      
+      // 응답이 JSON인지 확인
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error("응답이 JSON이 아닙니다. 응답 내용:", responseText.substring(0, 500));
+        throw new Error(`서버가 JSON이 아닌 응답을 반환했습니다. (${response.status})`);
+      }
+
+      if (!response.ok) {
+        try {
+          const errorData = JSON.parse(responseText);
+          throw new Error(`서버 에러: ${response.status} - ${JSON.stringify(errorData)}`);
+        } catch {
+          throw new Error(`서버 에러: ${response.status} - ${responseText.substring(0, 200)}`);
+        }
+      }
+
+      // JSON 파싱
+      const data = JSON.parse(responseText);
+      console.log("API Data:", data);
+      
+      return data
+    } catch (err) {
+      console.error("좋아요 상태 확인 에러:", err);
+      return { liked: false };
+    }
+}

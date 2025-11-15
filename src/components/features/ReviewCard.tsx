@@ -3,10 +3,16 @@ import styled from "styled-components";
 import { HiOutlineStar as FullStar} from "react-icons/hi";
 import { HiStar as EmptyStar} from "react-icons/hi";
 import ScoreNav from "../common/ScoreNav";
-
-const MAX_STARS = 5;
+import zoomIcon from "../../assets/icons/pan_zoom.svg";
+import { useNavigate } from "react-router-dom";
 
 function ReviewCard({ review }: { review: Review }){
+
+    const navigate = useNavigate();
+    const handleCardClick = () => {
+        navigate('/home/meeting-collection');
+    };
+
     return(
         <CardLayout>
             <Header>
@@ -16,6 +22,7 @@ function ReviewCard({ review }: { review: Review }){
             <CardPhoto src={(review.photo && (review.photo.find(p => p.order === 0)?.photoUrl || review.photo[0]?.photoUrl)) || ''}/>
             <DetailSection>
                 <ScoreNav review={review} />
+                <ZoomIcon src={zoomIcon} onClick={handleCardClick}/>
             </DetailSection>
             <CardDetail>{review.detail}</CardDetail>
         </CardLayout>
@@ -81,11 +88,17 @@ const DetailSection = styled.div`
     display: flex;
     width: 100%;
     padding: 3px;
+    align-items: center;
+    justify-content: space-between;
+    // gap: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
 `;
 
 const CardDetail = styled.div`
     display: -webkit-box;
-    width: 73px;
+    // width: 73px;
+    width: 100%;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     overflow: hidden;
@@ -97,4 +110,11 @@ const CardDetail = styled.div`
     font-style: normal;
     font-weight: 500;
     line-height: normal;
+`;
+
+const ZoomIcon = styled.img`
+    // width: 14px;
+    // height: 14px;
+    aspect-ratio: 1/1;
+    color: #515151;
 `;

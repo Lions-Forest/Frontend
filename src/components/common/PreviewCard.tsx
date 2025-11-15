@@ -203,9 +203,9 @@ const Body = styled.div`
 const ImagePlaceholder = styled.img`
   width: 48%;
   height: 85px;
-  background: #c4c4c4;
+  background: #fff;
   border-radius: 7px;
-  object-fit: cover;
+  object-fit: scale-down; // TODO: 이게 낫나,,? 아님 그냥 cover로 바꿔??
 `;
 
 const Info = styled.div`
