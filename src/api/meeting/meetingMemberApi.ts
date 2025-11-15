@@ -1,6 +1,6 @@
 import type { Member, Participant } from "@/types";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.lions-forest.p-e.kr';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // API 응답 타입 정의 (실제 API 응답 구조에 맞게 수정 필요)
 interface ApiParticipantResponse {
