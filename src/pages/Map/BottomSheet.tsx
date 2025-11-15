@@ -26,7 +26,7 @@ const footerHeight = 75;
 const peekHeight = 59;
 const sheetHeight = 580;
 
-export default function BottomSheet({
+function BottomSheet({
   isOpen,
   onOpen,
   onClose,
@@ -37,121 +37,86 @@ export default function BottomSheet({
   message,
   setMessage,
 }: BottomSheetProps) {
-  // 렌더링 추적
-  const renderCount = useRef(0);
-  renderCount.current += 1;
-  console.log(`[BottomSheet] 렌더링 #${renderCount.current}`, {
-    isOpen,
-    shareLocation,
-    status,
-    messageLength: message.length,
-  });
-
   const { closedY, openY } = useMemo(() => {
     const height = window.innerHeight;
-    const values = {
+    return {
       closedY: height - footerHeight - peekHeight,
       openY: height - sheetHeight,
     };
-    console.log(`[BottomSheet] useMemo 실행 - closedY, openY 계산:`, {
-      height,
-      closedY: values.closedY,
-      openY: values.openY,
-      windowInnerHeight: window.innerHeight,
-    });
-    return values;
-  }, []); // 초기 렌더링 시에만 계산
-
-  const springInitialY = isOpen ? openY : closedY;
-  console.log(`[BottomSheet] useSpring 초기값 설정:`, {
-    isOpen,
-    springInitialY,
-    openY,
-    closedY,
-  });
+  }, []);
 
   const [{ y }, api] = useSpring(() => ({
-    y: springInitialY,
+    y: isOpen ? openY : closedY,
     config: { tension: 250, friction: 30 },
   }));
 
-  // 현재 y 값 주기적 추적 (디버깅용)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const currentY = y.get();
-      const targetY = isOpen ? openY : closedY;
-      const difference = Math.abs(currentY - targetY);
-      
-      // 차이가 크면 로그 출력 (의도하지 않은 이동 감지)
-      if (difference > 5) {
-        console.log(`[BottomSheet] ⚠️ y 값이 목표와 다름:`, {
-          currentY,
-          targetY,
-          difference,
-          isOpen,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    }, 100); // 100ms마다 체크
+  // 컨텐츠 영역 터치 여부 추적
+  const isContentAreaTouched = useRef(false);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
-    return () => clearInterval(interval);
-  }, [y, isOpen, openY, closedY]);
+  useEffect(() => {
+    api.start({ y: isOpen ? openY : closedY });
+  }, [isOpen, api, openY, closedY]);
+
+  // 컨텐츠 영역 터치 감지
+  const handleContentTouchStart = () => {
+    isContentAreaTouched.current = true;
+    // 이벤트 전파는 막지 않음 (내부 컴포넌트 클릭은 정상 동작)
+  };
+
+  const handleContentTouchEnd = () => {
+    // 약간의 지연 후 리셋 (드래그와 구분)
+    setTimeout(() => {
+      isContentAreaTouched.current = false;
+    }, 100);
+  };
 
   const bindHandle = useDrag(
-    ({ last, movement: [, my], memo = y.get() }) => {
+    ({ last, movement: [, my], memo = y.get(), first }) => {
+      // 컨텐츠 영역을 터치한 경우 드래그 무시
+      if (isContentAreaTouched.current) {
+        return memo;
+      }
+
+      // 첫 터치 시 컨텐츠 영역인지 확인
+      if (first && event?.target) {
+        const target = event.target as HTMLElement;
+        if (contentWrapperRef.current?.contains(target)) {
+          isContentAreaTouched.current = true;
+          return memo;
+        }
+      }
+
       let newY = memo + my;
       if (newY < openY) newY = openY;
       if (newY > closedY) newY = closedY;
 
       if (last) {
-        // 드래그 끝났을 때 위치 결정
-        console.log(`[BottomSheet] 드래그 종료:`, {
-          newY,
-          threshold: (openY + closedY) / 2,
-          willClose: newY > (openY + closedY) / 2,
-        });
-        
         if (newY > (openY + closedY) / 2) {
-          // 닫기
-          console.log(`[BottomSheet] 드래그로 닫기 실행`);
           api.start({ y: closedY });
           onClose();
         } else {
-          // 열기
-          console.log(`[BottomSheet] 드래그로 열기 실행`);
           api.start({ y: openY });
           onOpen();
         }
+        isContentAreaTouched.current = false;
       } else {
-        // 드래그 중
         api.start({ y: newY, immediate: true });
       }
       return memo;
     },
-    { from: () => [0, y.get()], filterTaps: true }
-  );
-
-  useEffect(() => {
-    const targetY = isOpen ? openY : closedY;
-    const currentY = y.get();
-    
-    console.log(`[BottomSheet] useEffect 실행 (isOpen 변경 감지):`, {
-      isOpen,
-      targetY,
-      currentY,
-      difference: Math.abs(currentY - targetY),
-      willMove: currentY !== targetY,
-      timestamp: new Date().toISOString(),
-    });
-
-    if (isOpen) {
-      console.log(`[BottomSheet] api.start 호출 - 열기:`, { y: openY });
-      api.start({ y: openY });
-    } else {
-      console.log(`[BottomSheet] api.start 호출 - 닫기:`, { y: closedY });
-      api.start({ y: closedY });
+    { 
+      from: () => [0, y.get()], 
+      filterTaps: true,
+      // 컨텐츠 영역에서는 드래그 필터링
+      filter: ({ target }: { target: EventTarget | null }) => {
+        if (target && contentWrapperRef.current?.contains(target as Node)) {
+          return false; // 드래그 차단
+        }
+        return true; // 핸들바 영역은 드래그 허용
+      }
     }
-  }, [isOpen, api, openY, closedY, y]); // 의존성 추가하여 추적
+  );
 
   return (
     <>
@@ -170,22 +135,30 @@ export default function BottomSheet({
             <HandleBar />
           </HandleBarWrapper>
 
-          <ShareLocationToggle
-            shareLocation={shareLocation}
-            onToggle={onToggleShare}
-          />
+          <ContentWrapper
+            ref={contentWrapperRef}
+            onPointerDown={handleContentTouchStart}
+            onTouchStart={handleContentTouchStart}
+            onPointerUp={handleContentTouchEnd}
+            onTouchEnd={handleContentTouchEnd}
+          >
+            <ShareLocationToggle
+              shareLocation={shareLocation}
+              onToggle={onToggleShare}
+            />
 
-          <StatusSelector
-            selectedStatus={status}
-            onChange={setStatus}
-            shareLocation={shareLocation}
-          />
+            <StatusSelector
+              selectedStatus={status}
+              onChange={setStatus}
+              shareLocation={shareLocation}
+            />
 
-          <StatusMessageInput
-            message={message}
-            onChange={setMessage}
-            shareLocation={shareLocation}
-          />
+            <StatusMessageInput
+              message={message}
+              onChange={setMessage}
+              shareLocation={shareLocation}
+            />
+          </ContentWrapper>
         </SheetContainer>
       </animated.div>
     </>
@@ -220,3 +193,11 @@ const HandleBar = styled.div`
   margin-top: 20px;
   margin-bottom: 38px;
 `;
+
+const ContentWrapper = styled.div`
+  /* 내부 컨텐츠 영역: 드래그 이벤트가 전파되지 않도록 설정 */
+  pointer-events: auto;
+  touch-action: auto;
+`;
+
+export default BottomSheet;
