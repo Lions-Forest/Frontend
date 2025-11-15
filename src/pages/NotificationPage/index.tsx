@@ -82,7 +82,7 @@ function index() {
 
     return(
         <Wrapper>
-            <BackToNavBar text="알림" />
+            <BackToNavBar text="알림" isNotificationPage={true} />
             <Contents $isEmpty={showEmptyState}>
                 {loading && <LoadingText>알림을 불러오는 중...</LoadingText>}
                 {showEmptyState && (
