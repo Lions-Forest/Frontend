@@ -5,7 +5,7 @@ import ShareLocationToggle from "./ShareLocationToggle";
 import StatusSelector from "./StatusSelector";
 import StatusMessageInput from "./StatusMessageInput";
 import type { UserLocation } from "@/api/UserLocation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -37,8 +37,13 @@ export default function BottomSheet({
   message,
   setMessage,
 }: BottomSheetProps) {
-  const closedY = window.innerHeight - footerHeight - peekHeight;
-  const openY = window.innerHeight - sheetHeight;
+  const { closedY, openY } = useMemo(() => {
+    const height = window.innerHeight;
+    return {
+      closedY: height - footerHeight - peekHeight,
+      openY: height - sheetHeight,
+    };
+  }, []); // 초기 렌더링 시에만 계산
 
   const [{ y }, api] = useSpring(() => ({
     y: isOpen ? openY : closedY,
@@ -70,13 +75,13 @@ export default function BottomSheet({
     { from: () => [0, y.get()], filterTaps: true }
   );
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     api.start({ y: openY });
-  //   } else {
-  //     api.start({ y: closedY });
-  //   }
-  // }, [isOpen, api, openY, closedY]);
+  useEffect(() => {
+    if (isOpen) {
+      api.start({ y: openY });
+    } else {
+      api.start({ y: closedY });
+    }
+  }, [isOpen]); // isOpen만 의존성으로 사용
 
   return (
     <>
