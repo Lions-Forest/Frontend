@@ -1,7 +1,3 @@
-// TODO
-// 1. BtnSection 디자인 수정하기
-// 2. background 반응형 적용 방안 구상하기 (위아래 적절히 잘리도록?)
-
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
@@ -137,12 +133,11 @@ export default Index;
 const Background = styled.img`
   width: 100%;
   height: 100%;
-  // background-position: center;
-  // position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  object-fit: scale-up;
 `;
 
 const OverlayText = styled.div`
@@ -181,8 +176,7 @@ const BtnSection = styled.div<BtnSectionProps>`
 `;
 
 const LoginBtn = styled.button`
-  width: 244px;
-  height: 58px;
+  padding: 15px 20px;
   border-width: 1px;
   border: 1px solid rgba(255, 255, 255, 1);
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.25);
