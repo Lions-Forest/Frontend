@@ -5,7 +5,7 @@ import ShareLocationToggle from "./ShareLocationToggle";
 import StatusSelector from "./StatusSelector";
 import StatusMessageInput from "./StatusMessageInput";
 import type { UserLocation } from "@/api/UserLocation";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, memo } from "react";
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -26,7 +26,7 @@ const footerHeight = 75;
 const peekHeight = 59;
 const sheetHeight = 580;
 
-export default function BottomSheet({
+function BottomSheet({
   isOpen,
   onOpen,
   onClose,
@@ -62,18 +62,55 @@ export default function BottomSheet({
     return values;
   }, []); // 초기 렌더링 시에만 계산
 
-  const springInitialY = isOpen ? openY : closedY;
-  console.log(`[BottomSheet] useSpring 초기값 설정:`, {
-    isOpen,
-    springInitialY,
-    openY,
-    closedY,
-  });
+  // 현재 y 위치를 추적하는 ref (리렌더링 시에도 유지)
+  const currentYRef = useRef<number | null>(null);
+  const isInitializedRef = useRef(false);
+  
+  // 초기값: 첫 렌더링이면 isOpen에 따라, 아니면 현재 위치 유지
+  const springInitialY = useMemo(() => {
+    if (!isInitializedRef.current) {
+      const initialY = isOpen ? openY : closedY;
+      currentYRef.current = initialY;
+      isInitializedRef.current = true;
+      console.log(`[BottomSheet] useSpring 초기값 설정 (첫 렌더링):`, {
+        isOpen,
+        springInitialY: initialY,
+        openY,
+        closedY,
+      });
+      return initialY;
+    }
+    // 재생성 시에도 현재 위치 유지
+    const preservedY = currentYRef.current ?? (isOpen ? openY : closedY);
+    console.log(`[BottomSheet] useSpring 재생성 - 현재 위치 유지:`, {
+      isOpen,
+      preservedY,
+      currentYRef: currentYRef.current,
+    });
+    return preservedY;
+  }, []); // 빈 의존성 배열 - 한 번만 계산
 
   const [{ y }, api] = useSpring(() => ({
     y: springInitialY,
     config: { tension: 250, friction: 30 },
   }));
+
+  // y 값이 변경될 때마다 ref 업데이트
+  useEffect(() => {
+    const updateRef = () => {
+      const currentY = y.get();
+      if (currentYRef.current !== currentY) {
+        currentYRef.current = currentY;
+      }
+    };
+    
+    // 즉시 한 번 업데이트
+    updateRef();
+    
+    // 애니메이션 중에도 주기적으로 업데이트
+    const interval = setInterval(updateRef, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, [y]);
 
   // 현재 y 값 주기적 추적 (디버깅용)
   useEffect(() => {
@@ -139,6 +176,7 @@ export default function BottomSheet({
       isOpen,
       targetY,
       currentY,
+      currentYRef: currentYRef.current,
       difference: Math.abs(currentY - targetY),
       willMove: currentY !== targetY,
       timestamp: new Date().toISOString(),
@@ -146,12 +184,14 @@ export default function BottomSheet({
 
     if (isOpen) {
       console.log(`[BottomSheet] api.start 호출 - 열기:`, { y: openY });
+      currentYRef.current = openY;
       api.start({ y: openY });
     } else {
       console.log(`[BottomSheet] api.start 호출 - 닫기:`, { y: closedY });
+      currentYRef.current = closedY;
       api.start({ y: closedY });
     }
-  }, [isOpen, api, openY, closedY, y]); // 의존성 추가하여 추적
+  }, [isOpen]); // isOpen만 의존성으로 사용
 
   return (
     <>
@@ -220,3 +260,10 @@ const HandleBar = styled.div`
   margin-top: 20px;
   margin-bottom: 38px;
 `;
+
+// React.memo로 메모이제이션하여 불필요한 리렌더링 방지
+// shareLocation, status, message 변경 시에도 isOpen이 같으면 리렌더링 방지
+export default memo(BottomSheet, (prevProps, nextProps) => {
+  // isOpen이 변경되지 않으면 리렌더링 방지
+  return prevProps.isOpen === nextProps.isOpen;
+});
