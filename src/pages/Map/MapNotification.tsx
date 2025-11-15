@@ -25,8 +25,6 @@ const statusToKorean: Record<string, string> = {
   hungry: "배고파",
 };
 
-const navigate = useNavigate();
-
 export default function MapNotification({
   myPosition,
   userId,
@@ -35,6 +33,7 @@ export default function MapNotification({
   selectedStatus,
   radiusMeters = 1500,
 }: MapNotificationProps) {
+  const navigate = useNavigate();
   const nearbyCount = useMemo(() => {
     if (!myPosition) return 0;
 
