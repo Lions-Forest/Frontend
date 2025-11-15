@@ -75,7 +75,9 @@ interface BtnLayoutProps {
 
 const BtnLayout = styled.div<BtnLayoutProps>`
   display: flex;
-  width: 162px;
+  width: 100%;
+  max-width: 162px;
+  height: 100%;
   padding: 8px 10px;
   justify-content: center;
   align-items: center;

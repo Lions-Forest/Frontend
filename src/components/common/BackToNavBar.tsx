@@ -5,19 +5,26 @@ import arrowBackIcon from '../../assets/icons/arrowBack.svg'; // Correct path re
 interface BackToNavBarProps {
   text: string;
   isNotificationPage?: boolean; // 알림 페이지 여부 (기본값: false)
+  remainingTime?: string;
 }
 
-const BackToNavBar: React.FC<BackToNavBarProps> = ({ text, isNotificationPage = false }) => {
+const BackToNavBar: React.FC<BackToNavBarProps> = ({ text, isNotificationPage = false, remainingTime }) => {
   const handleGoBack = () => {
     window.history.back();
   };
 
+  const showTimeBar = text === '소모임' && !!remainingTime;
+  console.log()
+
   return (
     <NavBarWrapper $isNotificationPage={isNotificationPage}>
-      <BackButton onClick={handleGoBack}>
-        <ArrowIcon src={arrowBackIcon} alt="Back" />
-      </BackButton>
-      <NavText>{text}</NavText>
+      <NavLeft>
+        <BackButton onClick={handleGoBack}>
+          <ArrowIcon src={arrowBackIcon} alt="Back" />
+        </BackButton>
+        <NavText>{text}</NavText>
+      </NavLeft>
+      {showTimeBar && <TimeBar>{remainingTime}</TimeBar>}
     </NavBarWrapper>
   );
 };
@@ -31,6 +38,12 @@ const NavBarWrapper = styled.nav<{ $isNotificationPage: boolean }>`
   padding: 11px 16px;
   background-color: ${props => props.$isNotificationPage ? '#ffffff' : '#E2EDE7'};
   color: black;
+  justify-content: space-between;
+`;
+
+const NavLeft = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const BackButton = styled.button`
@@ -53,4 +66,22 @@ const NavText = styled.span`
   font-family: dongleRegular;
   font-weight: 400;
   font-size: 32px;
+`;
+
+const TimeBar = styled.div`
+  display: flex;
+  padding: 4px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 7px;
+  background: #43D687;
+
+  color: #FFF;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.6px;
 `;

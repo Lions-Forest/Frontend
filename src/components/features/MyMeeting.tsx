@@ -6,7 +6,14 @@ import arrow from "../../assets/images/arrow.png";
 import type { Meeting } from "@/types";
 
 function formatMeetingDate(date: Date | string) {
-  const d = new Date(date);
+  const d: Date = date instanceof Date ? date : new Date(date as string);
+  
+  // 유효한 날짜인지 확인
+  if (isNaN(d.getTime())) {
+    console.error('Invalid date:', date);
+    return '';
+  }
+  
   const month = d.getMonth() + 1;
   const day = d.getDate();
   const hour = d.getHours();
@@ -26,7 +33,7 @@ interface MyMeetingProps {
 function MyMeeting({ meetings = [] }: MyMeetingProps) {
   const [current, setCurrent] = useState(0);
 
-  const showArrows = meetings.length > 1;
+  // const showArrows = meetings.length > 1;
   const meeting = meetings[current];
 
   return (
@@ -39,26 +46,29 @@ function MyMeeting({ meetings = [] }: MyMeetingProps) {
             {meetings.length ? formatMeetingDate(meeting.date) : ""}
           </DateInfo>
           {meetings.length ? (
-            <SubTitle>{meeting.title}</SubTitle>
+            meetings.length > 1 ? (
+                <SubTitleSpan>
+                  <ArrowLeft
+                    src={arrow}
+                    onClick={() =>
+                      setCurrent((current - 1 + meetings.length) % meetings.length)
+                    }
+                  />
+                  <SubTitle>{meeting.title}</SubTitle>
+                  <ArrowRight
+                    src={arrow}
+                    onClick={() => setCurrent((current + 1) % meetings.length)}
+                  />
+                </SubTitleSpan>
+              ) : (
+                <SubTitle>{meeting.title}</SubTitle>
+              )
           ) : (
             <NoneTitle>신청한 모임이 없어요</NoneTitle>
           )}
         </Info>
         <LionImage src={lionWatching} />
-        {showArrows && (
-          <>
-            <ArrowLeft
-              src={arrow}
-              onClick={() =>
-                setCurrent((current - 1 + meetings.length) % meetings.length)
-              }
-            />
-            <ArrowRight
-              src={arrow}
-              onClick={() => setCurrent((current + 1) % meetings.length)}
-            />
-          </>
-        )}
+        
       </MeetingInfo>
     </Layout>
   );
@@ -91,7 +101,7 @@ const Layout = styled.div`
 
 const Title = styled.div`
   color: #000;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-weight: 700;
   font-size: 45px;
   align-self: stretch;
@@ -122,16 +132,30 @@ const MeetingInfo = styled.div`
 `;
 
 const Info = styled.div`
+  // position: relative;
+  // left: -10%;
+  // bottom: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: 50%;
-  left: 25%;
+  left: -10%;
   transform: translateY(-50%);
   z-index: 2;
 `;
 
+const SubTitleSpan = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 18px;
+`;
+
 const DateInfo = styled.div`
   color: #848484;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 22px;
   font-style: normal;
   font-weight: 700;
@@ -139,11 +163,11 @@ const DateInfo = styled.div`
 `;
 
 const ArrowLeft = styled.img`
-  width: 17px;
+  width: 10px;
 `;
 
 const ArrowRight = styled.img`
-  width: 17px;
+  width: 10px;
   transform: rotate(180deg);
 `;
 
@@ -155,6 +179,9 @@ const Background = styled.img`
 `;
 
 const LionImage = styled.img`
+  // position: relative;
+  // left: 60%;
+  // bottom: 20%;
   position: absolute;
   right: 0%; // 박스 바깥으로
   top: -60%;

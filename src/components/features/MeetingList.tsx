@@ -76,7 +76,7 @@ function MeetingList({ meetings }: MeetingListProps) {
   const filteredMeetings = Array.isArray(meetings)
     ? meetings
         .filter((m) =>
-          recruitState === "모집 중" ? !m.complete : !!m.complete
+          recruitState === "모집 완료" ? m.complete : !m.complete
         )
         .filter((m) =>
           selectedType === "전체" ? true : m.type === selectedType
@@ -180,7 +180,7 @@ const OptionInfo = styled.div`
 
 const OptionTitle = styled.div`
   color: #000;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 30px;
   font-weight: 700;
   line-height: normal;
@@ -212,21 +212,21 @@ const TypeBtn = styled.div<{ selected?: boolean }>`
 `;
 
 const MoreBtn = styled.div`
-  display: flex;
-  width: 78px;
-  height: 30px;
-  //padding: 5px 10px 2px 15px;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-shrink: 0;
-  border-radius: 50px;
-  background: #fff;
-  box-shadow: 0px 0px 10px #00000040;
-  cursor: pointer;
+    display: flex;
+    width: 78px;
+    height: 30px;
+    //padding: 5px 10px 2px 15px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    // flex-shrink: 0;
+    border-radius: 50px;
+    background: #FFF;
+    box-shadow: 0px 0px 10px  #00000040;
+    cursor: pointer;
 
   color: #000;
-  font-family: dongleRegular;
+  font-family: dongleLight;
   font-size: 20px;
   font-weight: 700;
   line-height: normal;

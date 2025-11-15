@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { IoMdMap as Map } from "react-icons/io";
 import { MdDiversity3 as Home } from "react-icons/md";
 import { MdAccountCircle as My } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+
+const path = window.location.pathname;
 
 function Footer() {
   // 홈/지도/마이페이지 라우팅을 위한 네비게이션 훅 정의_p.s. 정건(시작) //

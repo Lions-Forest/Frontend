@@ -3,6 +3,7 @@ import styled from "styled-components";
 import ReplySpan from "./ReplySpan";
 import ReplyInput from "./ReplyInput";
 import type { Reply } from "@/types";
+import { fetchLikeState } from "@/api/meeting/replyApi";
 
 interface ReplyListProps {
     replies: Reply[];
@@ -18,7 +19,7 @@ function ReplyList({
     likesPressed,
     onLikeToggle,
     onReplySubmit
-  }: ReplyListProps) {
+  }: ReplyListProps) {  
     return (
       <ReplyLayout>
         <Title>댓글</Title>
@@ -26,12 +27,11 @@ function ReplyList({
           {replies.length === 0 ? (
             <EmptyText>아직 댓글이 없습니다.</EmptyText>
           ) : (
-            replies.map((reply, idx) => (
+            replies.map((reply) => (
               <ReplySpan
-                key={reply.writer.id + reply.detail} // 고유키로 조합
+                key={reply.id}
                 reply={reply}
-                pressedLike={likesPressed[idx]}
-                onLikeClick={() => onLikeToggle(idx)}
+                onLikeClick={() => onLikeToggle(reply.id)}
               />
             ))
           )}
@@ -53,6 +53,7 @@ const ReplyLayout = styled.div`
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    width: 100%;
 `;
 
 const Title = styled.div`
@@ -80,7 +81,12 @@ const EmptyText = styled.div`
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    padding: 10px 20px;
+
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 0px;
 `;
 
 const ReplyInputWrapper = styled.div`
