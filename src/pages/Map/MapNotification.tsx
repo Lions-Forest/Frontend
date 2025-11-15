@@ -75,7 +75,7 @@ export default function MapNotification({
       <strong style={{ fontWeight: 600 }}>
         {statusToKorean[selectedStatus]}
       </strong>
-      "인 모인원이 {nearbyCount}명 있어요!
+      "인 모임원이 {nearbyCount}명 있어요!
     </>
   ) : (
     <>내 주변 모임원 {nearbyCount}명</>
