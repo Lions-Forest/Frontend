@@ -70,13 +70,13 @@ export default function BottomSheet({
     { from: () => [0, y.get()], filterTaps: true }
   );
 
-  useEffect(() => {
-    if (isOpen) {
-      api.start({ y: openY });
-    } else {
-      api.start({ y: closedY });
-    }
-  }, [isOpen, api, openY, closedY]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     api.start({ y: openY });
+  //   } else {
+  //     api.start({ y: closedY });
+  //   }
+  // }, [isOpen, api, openY, closedY]);
 
   return (
     <>

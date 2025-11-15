@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import LoadingPage from "@/pages/Map/LoadingPage";
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
@@ -138,23 +138,33 @@ export default function BaseMap({
               getMarkerImage(user.status, false) || nothingMarker;
 
             return (
-              <MapMarker
-                key={user.userId}
-                position={{ lat: user.latitude, lng: user.longitude }}
-                image={{
-                  src: markerImg,
-                  size: { width: 93, height: 102 },
-                  options: { offset: { x: 25, y: 50 } },
-                }}
-                onClick={() => {
-                  setSelectedUser((prev) => {
-                    if (prev?.userId === user.userId) return null;
-                    return user;
-                  });
-                }}
-              />
+              <React.Fragment key={user.userId}>
+                <MapMarker
+                  position={{ lat: user.latitude, lng: user.longitude }}
+                  image={{
+                    src: markerImg,
+                    size: { width: 93, height: 102 },
+                    options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
+                  }}
+                  onClick={() => {
+                    setSelectedUser((prev) => {
+                      if (prev?.userId === user.userId) return null;
+                      return user;
+                    });
+                  }}
+                />
+
+                <CustomOverlayMap
+                  position={{ lat: user.latitude, lng: user.longitude }}
+                  yAnchor={1}
+                  xAnchor={0.5}
+                >
+                  <NameLabel>{user.name}</NameLabel>
+                </CustomOverlayMap>
+              </React.Fragment>
             );
           })}
+
           {/* 상태메세지 말풍선 */}
           {selectedUser && (
             <StatusMessage
@@ -233,4 +243,14 @@ const FooterWrap = styled.div`
   left: 0;
   right: 0;
   z-index: 200;
+`;
+
+const NameLabel = styled.div`
+  transform: translateY(-35px);
+  pointer-events: none;
+  background: none;
+  font-family: Pretendard;
+  font-size: 10px;
+  font-weight: 600;
+  color: #ffffff;
 `;
