@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import { CustomOverlayMap, Map, MapMarker } from "react-kakao-maps-sdk";
 import { useAllLocations } from "@/hooks/useAllLocations";
 import { useMyLocation } from "@/hooks/useMyLocation";
@@ -8,9 +9,8 @@ import { getMarkerImage } from "@/constants/markerImages";
 import defaultLion from "@/assets/lion/defaultLion.svg";
 import nothingMarker from "@/assets/marker/nothingMarker.svg";
 import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.svg";
-import styled from "styled-components";
 import Footer from "@/components/layout/Footer";
-import BottomSheet from "./BottomSheeet";
+import BottomSheet from "./BottomSheet";
 import StatusSelector from "./StatusSelector";
 import MapNotification from "./MapNotification";
 import StatusMessage from "./StatusMessage";
