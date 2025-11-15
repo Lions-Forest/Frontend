@@ -21,8 +21,8 @@ const statusToKorean: Record<string, string> = {
   relaxing: "쉬는 중",
   eating: "식사 중",
   playing: "노는 중",
-  boring: "심심한",
-  hungry: "배고픈",
+  boring: "심심해",
+  hungry: "배고파",
 };
 
 const navigate = useNavigate();
