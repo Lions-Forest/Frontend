@@ -12,11 +12,11 @@ interface StepFourDateProps {
 const StepFourDate: React.FC<StepFourDateProps> = ({ onDataChange, initialCapacity = 0 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string>(
-    initialCapacity > 0 ? String(initialCapacity).padStart(2, '0') : '01'
+    initialCapacity > 0 ? String(initialCapacity).padStart(2, '0') : '02'
   );
-  
-  const memberOptions = Array.from({ length: 10 }, (_, i) => 
-    String(i + 1).padStart(2, '0')
+
+  const memberOptions = Array.from({ length: 49 }, (_, i) => 
+    String(i + 2).padStart(2, '0')
   );
 
   // 초기값이 변경되면 로컬 상태 업데이트 (뒤로 가기 시 복원)
@@ -25,7 +25,7 @@ const StepFourDate: React.FC<StepFourDateProps> = ({ onDataChange, initialCapaci
       const memberStr = String(initialCapacity).padStart(2, '0');
       setSelectedMember(memberStr);
     } else if (initialCapacity === 0) {
-      setSelectedMember('01');
+      setSelectedMember('02');
     }
   }, [initialCapacity]);
 
