@@ -74,9 +74,10 @@ export const transformNotifications = (
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     })
     .map((notification) => ({
-      meetingDate: formatDate(notification.createdAt),
-      meetingName: extractMeetingName(notification.content),
+      id: notification.id,
+      content: notification.content,
       imageUrl: notification.photo || undefined, // 빈 문자열인 경우 undefined
+      read: notification.read,
     }));
 };
 
