@@ -11,6 +11,7 @@ import styled from "styled-components";
 import Footer from "@/components/layout/Footer";
 import BottomSheet from "./BottomSheeet";
 import StatusSelector from "./StatusSelector";
+import MapNotification from "./MapNotification";
 
 export default function BaseMap({
   userId,
@@ -61,6 +62,15 @@ export default function BaseMap({
   return (
     <MapContainer>
       <MapWrapper>
+        <MapNotification
+          myPosition={myPosition}
+          userId={userId}
+          locations={locations}
+          shareLocation={shareLocation}
+          selectedStatus={selectedStatus}
+          radiusMeters={1500}
+        />
+
         <Map
           center={center}
           level={mapLevel}

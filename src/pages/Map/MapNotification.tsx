@@ -72,7 +72,9 @@ export default function MapNotification({
   const message = shareLocation ? (
     <>
       👀 지금 내 주변에 "
-      <strong style={{ fontWeight: 600 }}>{selectedStatus}</strong>
+      <strong style={{ fontWeight: 600 }}>
+        {statusToKorean[selectedStatus]}
+      </strong>
       "인 모인원이 {nearbyCount}명 있어요!
     </>
   ) : (
@@ -80,8 +82,6 @@ export default function MapNotification({
   );
 
   return shareLocation ? (
-    <Banner>{message}</Banner>
-  ) : (
     <StatusBanner>
       <Message>{message}</Message>
       <BannerButton onClick={() => navigate("/home/create-meeting")}>
@@ -89,6 +89,8 @@ export default function MapNotification({
         <img src={Arrow} width={7} height={5} />
       </BannerButton>
     </StatusBanner>
+  ) : (
+    <Banner>{message}</Banner>
   );
 }
 
