@@ -3,12 +3,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import HomePage from "./pages/Home";
 import MeetingDetailPage from "./pages/MeetingDetail/index";
+import ReviewCollectionPage from "./pages/ReviewCollection/index"
 import CreateMeetingPage from "./pages/CreateMeeting";
 import MyPage from "./pages/Mypage";
 import NotificationPage from "./pages/NotificationPage";
 import { GlobalStyle } from "./styles/global";
 import "./App.css";
 import MapPage from "./pages/Map/MapPage";
+import ReviewPage from "./pages/Mypage/ReviewPage";
+import ReviewRevisePage from "./pages/Mypage/ReviewRevisePage";
 
 function App() {
   return (
@@ -22,6 +25,10 @@ function App() {
             <Route path="/notification" element={<NotificationPage />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/mypage" element={<MyPage />} />
+            <Route path="/home/meeting-detail/:id" element={<MeetingDetailPage />} />
+            <Route path="/home/meeting-collection" element={<ReviewCollectionPage />} />
+            <Route path="/mypage/review" element={<ReviewPage />} />
+            <Route path="/mypage/review/revise" element={<ReviewRevisePage />} />
             <Route
               path="/home/meeting-detail"
               element={<MeetingDetailPage />}

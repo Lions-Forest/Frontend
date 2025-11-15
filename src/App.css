@@ -21,7 +21,7 @@
     position: relative;
     display: flex;
     justify-content: center;
-    align-item: center;
+    /* align-item: center; */
   }
 
   /* 2. 데스크탑, 태블릿 대응 - 화면 넓을 때

@@ -1,7 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { getMyClassList, type MyClassListResponse } from "@/api/class/myClassListAPI";
 import { getMyOpenList } from "@/api/class/myOpenListAPI";
+import { getMyReviewList, type MyReviewListResponse } from "@/api/user/myReviewListAPI";
 import starOnIcon from "@/assets/icons/starOn.svg";
 import starOffIcon from "@/assets/icons/starOff.svg";
 import pencilIcon from "@/assets/icons/pencil.svg";
@@ -42,131 +44,11 @@ interface ReviewHistory {
   content: string;
   score: number;
   createdAt: string;
-  meetingAt: string;
+  meetingAt: string; // createdAt을 meetingAt으로 사용
+  groupTitle: string;
   photos: { photoUrl: string; order: number }[];
 }
 
-const applicationDummy: ApplicationHistory[] = [
-  {
-    id: 1,
-    groupId: 101,
-    userId: 10,
-    userName: "홍길동",
-    userNickname: "맛집탐험가",
-    createdAt: "2025-11-10T09:03:11.553Z",
-  },
-  {
-    id: 2,
-    groupId: 205,
-    userId: 10,
-    userName: "홍길동",
-    userNickname: "맛집탐험가",
-    createdAt: "2025-11-11T11:23:45.553Z",
-  },
-  {
-    id: 3,
-    groupId: 301,
-    userId: 10,
-    userName: "홍길동",
-    userNickname: "맛집탐험가",
-    createdAt: "2025-11-12T09:03:11.553Z",
-  },
-  {
-    id: 4,
-    groupId: 405,
-    userId: 10,
-    userName: "홍길동",
-    userNickname: "맛집탐험가",
-    createdAt: "2025-11-12T15:45:23.553Z",
-  },
-  {
-    id: 5,
-    groupId: 509,
-    userId: 10,
-    userName: "홍길동",
-    userNickname: "맛집탐험가",
-    createdAt: "2025-11-13T08:12:41.553Z",
-  },
-];
-
-const creationDummy: CreationHistory[] = [
-  {
-    id: 1,
-    leaderId: 10,
-    leaderNickname: "편집장",
-    leaderName: "박지성",
-    title: "세션 전 식사하실 분~",
-    category: "MEAL",
-    capacity: 5,
-    meetingAt: "2025-11-06T18:00:00.000Z",
-    location: "정문 양쉐프",
-    state: "OPEN",
-    participantCount: 2,
-    photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
-  },
-  {
-    id: 2,
-    leaderId: 10,
-    leaderNickname: "편집장",
-    leaderName: "박지성",
-    title: "퇴근 후 모각작",
-    category: "STUDY",
-    capacity: 4,
-    meetingAt: "2025-11-15T20:00:00.000Z",
-    location: "도서관 스터디룸",
-    state: "OPEN",
-    participantCount: 3,
-    photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
-  },
-];
-
-const reviewDummy: ReviewHistory[] = [
-  {
-    id: 1,
-    groupId: 301,
-    userId: 10,
-    content: "분위기가 너무 좋아서 다음에도 꼭 참여하고 싶어요!",
-    score: 5,
-    createdAt: "2025-11-12T09:14:01.611Z",
-    meetingAt: "2025-11-10T18:00:00",
-    photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
-  },
-  {
-    id: 2,
-    groupId: 401,
-    userId: 10,
-    content: "음식도 맛있고 사람들도 친절했어요.",
-    score: 4,
-    createdAt: "2025-11-01T13:22:48.611Z",
-    meetingAt: "2025-11-05T19:00:00",
-    photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
-  },
-  {
-    id: 3,
-    groupId: 502,
-    userId: 10,
-    content: "정말 즐거운 시간이었습니다. 다음에도 또 참여하고 싶어요!",
-    score: 5,
-    createdAt: "2025-11-15T10:30:00.611Z",
-    meetingAt: "2025-11-12T20:00:00",
-    photos: [{ photoUrl: "https://via.placeholder.com/150", order: 0 }],
-  },
-];
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const period = hours >= 12 ? "PM" : "AM";
-  let hour12 = hours % 12;
-  if (hour12 === 0) hour12 = 12;
-
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}(${hour12}${minutes !== "00" ? `:${minutes}` : ""}${period})`;
-}
-
-/**
- * meetingAt을 "2025.11.06(6PM)" 형식으로 변환합니다.
- */
 function formatMeetingDate(dateString: string): string {
   const date = new Date(dateString);
   const year = date.getFullYear();
@@ -181,9 +63,11 @@ function formatMeetingDate(dateString: string): string {
 }
 
 function MyActivities() {
+  const location = useLocation();
   const [selectedTab, setSelectedTab] = useState<TabType>("신청 내역");
   const [myClassList, setMyClassList] = useState<MyClassListResponse[]>([]);
   const [myOpenList, setMyOpenList] = useState<MyClassListResponse[]>([]);
+  const [myReviewList, setMyReviewList] = useState<ReviewHistory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -211,18 +95,61 @@ function MyActivities() {
       }
     };
 
+    const fetchMyReviewList = async () => {
+      setIsLoading(true);
+      try {
+        // localStorage에서 userId 가져오기
+        let userId = localStorage.getItem("userId");
+        
+        // test2 토큰 사용 중인지 확인
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken || !userId) {
+          userId = "2"; // test2 계정 사용 중
+        }
+        
+        if (!userId) {
+          console.error("사용자 ID를 찾을 수 없습니다.");
+          setMyReviewList([]);
+          return;
+        }
+
+        const data = await getMyReviewList(Number(userId));
+        // API 응답을 ReviewHistory 형식으로 변환
+        const transformedData: ReviewHistory[] = data.map((review) => ({
+          id: review.id,
+          groupId: review.groupId,
+          userId: review.userId,
+          content: review.content,
+          score: review.score,
+          createdAt: review.createdAt,
+          meetingAt: review.createdAt, // createdAt을 meetingAt으로 사용
+          groupTitle: review.groupTitle,
+          photos: review.photos,
+        }));
+        setMyReviewList(transformedData);
+      } catch (error) {
+        console.error("Failed to fetch my review list:", error);
+        setMyReviewList([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (selectedTab === "신청 내역") {
       fetchMyClassList();
     } else if (selectedTab === "개설 내역") {
       fetchMyOpenList();
+    } else if (selectedTab === "모임 후기 관리") {
+      fetchMyReviewList();
     }
-  }, [selectedTab]);
+  }, [selectedTab, location.pathname]); // location.pathname을 dependency에 추가하여 페이지 진입 시마다 API 호출
 
   const tabData = useMemo(() => {
     if (selectedTab === "신청 내역") return myClassList;
     if (selectedTab === "개설 내역") return myOpenList;
-    return reviewDummy;
-  }, [selectedTab, myClassList, myOpenList]);
+    if (selectedTab === "모임 후기 관리") return myReviewList;
+    return [];
+  }, [selectedTab, myClassList, myOpenList, myReviewList]);
 
   return (
     <Layout>
@@ -272,11 +199,14 @@ interface ActivityCardProps {
 }
 
 function ActivityCard({ tab, data, background }: ActivityCardProps) {
+  const navigate = useNavigate();
+  
   const cardContent = useMemo(() => {
     if (tab === "신청 내역") {
       const item = data as MyClassListResponse;
       const statusText = item.state === "OPEN" ? "모집중" : "모임완료";
       return {
+        id: item.id,
         statusText,
         title: item.title,
         meetingDate: formatMeetingDate(item.meetingAt),
@@ -292,6 +222,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
       const item = data as MyClassListResponse;
       const statusText = item.state === "OPEN" ? "모집중" : "모임완료";
       return {
+        id: item.id,
         statusText,
         title: item.title,
         meetingDate: formatMeetingDate(item.meetingAt),
@@ -307,6 +238,16 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
     return null;
   }, [tab, data]);
 
+  const handleReviewClick = () => {
+    if (cardContent?.id) {
+      navigate("/mypage/review", { state: { groupId: cardContent.id } });
+    }
+  };
+
+  const handleEditClick = (reviewId: number) => {
+    navigate("/mypage/review/revise", { state: { reviewId } });
+  };
+
   // 리뷰 내역인 경우 새로운 형식으로 표시
   if (tab === "모임 후기 관리") {
     const item = data as ReviewHistory;
@@ -315,7 +256,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
     return (
       <ReviewCardLayout backgroundColor={background}>
         <ReviewCardHeader>
-          <ReviewCardTitle>모임 후기</ReviewCardTitle>
+          <ReviewCardTitle>{item.groupTitle}</ReviewCardTitle>
           <ReviewMeetingDate>{formatMeetingDate(item.meetingAt)}</ReviewMeetingDate>
         </ReviewCardHeader>
         <ReviewCardBody>
@@ -331,7 +272,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
               ))}
             </StarRating>
             <ReviewText>{item.content}</ReviewText>
-            <EditButton>
+            <EditButton onClick={() => handleEditClick(item.id)}>
               <EditIcon src={pencilIcon} alt="수정" />
             </EditButton>
           </ReviewContentWrapper>
@@ -381,7 +322,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
               모임 정보 확인
             </InfoButton>
             {cardContent.state !== "OPEN" && (
-              <ReviewButton>후기 작성하기</ReviewButton>
+              <ReviewButton onClick={handleReviewClick}>후기 작성하기</ReviewButton>
             )}
           </ButtonRow>
         </CardBodyContent>

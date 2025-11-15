@@ -4,11 +4,12 @@ import styled from "styled-components";
 
 interface CircleArrowProps {
     direction?: 'left' | 'right';
+    onClick?: () => void;
 }
-
-function CircleArrow({ direction = 'left' }: CircleArrowProps) {
+  
+function CircleArrow({ direction = 'left', onClick }: CircleArrowProps) {
     return(
-        <Circle>
+        <Circle onClick={onClick}>
             <ArrowIcon src={Arrow} direction={direction}/>
         </Circle>
     )
@@ -17,16 +18,20 @@ function CircleArrow({ direction = 'left' }: CircleArrowProps) {
 export default CircleArrow;
 
 const Circle = styled.div`
-width: 24.000001907348725;
-height: 23.999998092651456;
-angle: 180 deg;
-opacity: 1;
-drop-shadow: 0px 0px 4px  #00000040;
+    width: 24px;
+    height: 24px;
+    drop-shadow: 0px 0px 4px  #00000040;
+    background: #FFF371;
+    border-radius: 100%;
+
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
 `;
 
 const ArrowIcon = styled.img<{ direction?: string }>`
-  width: 14px;
-  height: 8px;
+  width: 8px;
+  height: 14px;
   transition: transform 0.2s;
   transform: ${({ direction }) => direction === 'right' ? 'rotate(180deg)' : 'none'};
 `;

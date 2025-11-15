@@ -1,8 +1,13 @@
+// TODO: width px -> %로 바꾸기
+
 import { useNavigate } from "react-router-dom";
 import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
 import CardButton from "./CardButton";
 import type { Meeting } from "@/types";
+import { cancelJoinMeeting, deleteMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
+import { useState } from "react";
+import CheckingModal from "../features/CheckingModal";
 
 interface ColorTheme {
   body: string;
@@ -52,17 +57,60 @@ function calculateRemaining(meetingDate: Date) {
 function PreviewCard({ meeting }: { meeting: Meeting }) {
   const navigate = useNavigate();
   const remaining = calculateRemaining(meeting.date);
+  const remainingTime = `${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`;
   const progress = meeting.memberNumber / meeting.memberLimit;
+
+  const [ joinState, setJoinState ] = useState<'join' | 'cancel'>('join');
+  const [showModal, setShowModal] = useState(false);
+
+  const userId = localStorage.getItem("userId");
+  const isOwner = Number(userId) === meeting?.owner.id ? true : false;
+
   let theme: ColorTheme;
 
-  if (meeting.id % 4 === 0) theme = greenTheme;
-  else if (meeting.id % 4 === 1) theme = blueTheme;
-  else if (meeting.id % 4 === 2) theme = yellowTheme;
+  if (meeting.id % 4 === 1) theme = greenTheme;
+  else if (meeting.id % 4 === 2) theme = blueTheme;
+  else if (meeting.id % 4 === 3) theme = yellowTheme;
   else theme = pinkTheme;
 
   const handleCardClick = () => {
-    navigate('/home/meeting-detail', { state: { meeting } });
+    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting, remainingTime } });
   };
+
+    const handleDelete = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await deleteMeeting(meeting.id);
+            setJoinState('cancel');
+            navigate('/home');
+        } catch(e) {
+            console.log("handleDelete 함수 실패: ", e);
+        }
+    }
+
+    const handleJoin = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await joinMeeting(meeting.id);
+            setJoinState('cancel');
+        } catch(e) {
+            console.log("handleJoin 함수 실패: ", e);
+        }
+    }
+
+    const handleJoinCancel = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await cancelJoinMeeting(meeting.id);
+            setJoinState('join');
+        } catch(e) {
+            console.log("handleJoin 함수 실패: ", e);
+        }
+    }
+
 
   return (
     <PreviewCardLayout backgroundColor={theme.body}>
@@ -74,10 +122,17 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
                 <ProgressBarInner width={progress * 100} color={theme.loading}/>
                 <ProgressBarLion src={lionHead} left={180 * progress}/>
             </ProgressOuter>
-            <Time>{`${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`}</Time>
+            <Time>{remainingTime}</Time>
         </Progress>
             <Body>
-                <ImagePlaceholder src="https://via.placeholder.com/"/>
+                <ImagePlaceholder 
+                    src={
+                        meeting.photo && meeting.photo.length > 0
+                            ? meeting.photo.find(p => p.order === 0)?.photoUrl || meeting.photo[0].photoUrl
+                            : ''
+                    } 
+                    alt={meeting.title}
+                />
                 <Info>
                     <InfoTitle>
                         <div>모임 종류</div>
@@ -87,16 +142,37 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
                     </InfoTitle>
                     <InfoDetail>
                         <div>{meeting.type}</div>
-                        <div>{meeting.owner.name}</div>
+                        <div>{meeting.complete ? meeting.owner.name : meeting.owner?.nickname}</div>
                         <div>{meeting.memberNumber}/{meeting.memberLimit}</div>
                         <div>{meeting.location}</div>
                     </InfoDetail>
                 </Info>
             </Body>
             <Buttons onClick={(e) => e.stopPropagation()}>
-                <CardButton onInfo={true} onClick={handleCardClick} />
-                <CardButton onJoin={true} color={theme.button}/>
+              <CardButton onInfo={true} onClick={handleCardClick} />
+            { !meeting.complete ? (
+                meeting.memberNumber === meeting.memberLimit ? (
+                  <CardButton onClose={true} />
+                ) : (
+                  joinState === 'join' ? (
+                    isOwner === true ? (
+                      <CardButton onMakeCancel={true} onClick={() => setShowModal(true)} color={theme.button}/>
+                    ) : (
+                      <CardButton onJoin={true} onClick={handleJoin} color={theme.button}/>
+                    )
+                  ) : (
+                    <CardButton onJoinCancel={true} onClick={handleJoinCancel} color={theme.button}/>
+                  )
+                )
+              ) : (
+                <>
+                  <CardButton onClose={true} />
+                </>
+              )}
             </Buttons>
+            {showModal && (
+                <CheckingModal onClick={handleDelete} onClose={() => setShowModal(false)} />
+            )}
     </PreviewCardLayout>
   );
 }
@@ -104,19 +180,21 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
 export default PreviewCard;
 
 const PreviewCardLayout = styled.div<{ backgroundColor: string }>`
-  width: 361px;
-  height: 216px;
-  border-radius: 7px;
-  background: ${({ backgroundColor }) => backgroundColor};
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    // width: 361px;
+    width: 100%;
+    height: 216px;
+    border-radius: 7px;
+    background: ${({ backgroundColor }) => backgroundColor};
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.10);
 `;
 
 const TitleLayout = styled.div`
-  width: 361px;
-  height: 43px;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
-  background: #ffffff;
+    // width: 361px;
+    width: 100%;
+    height: 43px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    background: #FFFFFF;
 
   display: flex;
   align-items: center;
@@ -133,9 +211,11 @@ const Title = styled.div`
 
 const Progress = styled.div`
   display: flex;
-  margin-left: 16px;
+  // margin-left: 16px;
+  margin: 0px 16px;
   gap: 16px;
   align-items: center;
+  width: 100%;
 `;
 
 const ProgressOuter = styled.div`
@@ -177,7 +257,8 @@ const Time = styled.div`
 `;
 
 const Body = styled.div`
-  width: 340px;
+  // width: 100%;
+  // width: 340px;
   height: 85px;
   border-radius: 7px;
   background: #fff;
@@ -186,10 +267,11 @@ const Body = styled.div`
 `;
 
 const ImagePlaceholder = styled.img`
-  width: 161.845px;
+  width: 48%;
   height: 85px;
-  background: #c4c4c4;
+  background: #fff;
   border-radius: 7px;
+  object-fit: scale-down; // TODO: 이게 낫나,,? 아님 그냥 cover로 바꿔??
 `;
 
 const Info = styled.div`

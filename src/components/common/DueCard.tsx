@@ -1,5 +1,6 @@
 import type { Meeting } from "@/types";
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 interface DueCardProps {
@@ -38,8 +39,11 @@ function formatTime(diffMs: number) {
     if (hours > 0 || days > 0) {
       result += `${String(hours).padStart(2, "0")}H:`;
     }
-    // minutes, seconds는 무조건 표기
-    result += `${String(minutes).padStart(2, "0")}M:${String(seconds).padStart(2, "0")}S`;
+    if (minutes > 0) {
+      result += `${String(minutes).padStart(2, "0")}M`;
+    }
+    if (days < 0 )
+    result += `:${String(seconds).padStart(2, "0")}S`;
   
     return result;
 }
@@ -52,35 +56,68 @@ function DueCard({ meeting }: DueCardProps) {
   // Calculate member progress
   const progress = meeting.memberNumber / meeting.memberLimit;
 
+  const navigate = useNavigate();
+  const handleCardClick = () => {
+    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting, timeText } });
+  };
+
   return (
-    <CardLayout>
+    <CardLayout onClick={handleCardClick}>
       <Header>
         <Time>{timeText}</Time>
       </Header>
       <Body>
         <CircleOutline>
-          <svg viewBox="0 0 65 65">
-            <circle
-              cx="30"
-              cy="30"
-              r="25"
-              stroke="#C4C4C4"
-              strokeWidth="5"
-              fill="#DBDBDB"
+          { meeting.photo && meeting.photo.length > 0 && meeting.photo[0]?.photoUrl ? (
+          <svg width="65" height="65" viewBox="0 0 65 65" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="circleView">
+                <circle cx="30" cy="30" r="25"/>
+              </clipPath>
+            </defs> 
+            <image
+              href={meeting.photo[0].photoUrl}
+              x="5" y="5" width="50" height="50"
+              clipPath="url(#circleView)"
+              preserveAspectRatio="xMidYMid slice"
             />
             <circle
-              cx="30"
-              cy="30"
-              r="25"
-              stroke="#FF4081"
-              strokeWidth="5"
-              fill="transparent"
-              strokeDasharray={2 * Math.PI * 25}
-              strokeDashoffset={2 * Math.PI * 25 * (1 - progress)}
-              strokeLinecap="round"
-              transform="rotate(-90 30 30)"
-            />
+                cx="30"
+                cy="30"
+                r="25"
+                stroke="#FF4081"
+                strokeWidth="5"
+                fill="transparent"
+                strokeDasharray={2 * Math.PI * 25}
+                strokeDashoffset={2 * Math.PI * 25 * (1 - progress)}
+                strokeLinecap="round"
+                transform="rotate(-90 30 30)"
+              />
           </svg>
+          ) : (
+            <svg viewBox="0 0 65 65">
+              <circle
+                cx="30"
+                cy="30"
+                r="25"
+                stroke="#C4C4C4"
+                strokeWidth="5"
+                fill="#DBDBDB"
+              />
+              <circle
+                cx="30"
+                cy="30"
+                r="25"
+                stroke="#FF4081"
+                strokeWidth="5"
+                fill="transparent"
+                strokeDasharray={2 * Math.PI * 25}
+                strokeDashoffset={2 * Math.PI * 25 * (1 - progress)}
+                strokeLinecap="round"
+                transform="rotate(-90 30 30)"
+              />
+            </svg>
+          ) }
         </CircleOutline>
         <MemberNumber>
           <ColoredCount>{meeting.memberNumber}</ColoredCount>/

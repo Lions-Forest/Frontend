@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { MdFavorite as FilledLike} from "react-icons/md";
 import { MdFavoriteBorder as EmptyLike } from "react-icons/md";
 import type { Reply } from "@/types";
+import { fetchLikeState } from "@/api/meeting/replyApi";
 
 interface ReplyProps {
     reply: Reply;
@@ -10,15 +11,27 @@ interface ReplyProps {
     onLikeClick?: () => void;
 }
 
-function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
+function ReplySpan({ reply, onLikeClick }: ReplyProps){
+  const [pressedLike, setPressedLike] = useState(false);
+
+  useEffect (() => {
+    const checkPressedLike = async (id : number) => {
+      const result = await fetchLikeState(id);
+      console.log("좋아요 눌렀음??: ", result);
+      setPressedLike(result.liked);
+    }
+    checkPressedLike(reply.id);
+  }, [reply]);
+
     return(
         <ReplyLayout>
-        <ReplySection>
-          <ProfileImg src={reply.writer.photoUrl || ""} />
-          <DetailSection>
-            <ProfileName>{reply.writer.nickname || reply.writer.name}</ProfileName>
-            <ReplyDetail>{reply.detail}</ReplyDetail>
-          </DetailSection>
+          <ReplySection>
+            <ProfileImg src={reply.photoUrl} />
+            <DetailSection>
+              <ProfileName>{reply.userName}</ProfileName>
+              <ReplyDetail>{reply.detail}</ReplyDetail>
+            </DetailSection>
+          </ReplySection>
           <LikeSection>
             <LikeIcon onClick={onLikeClick} pressed={pressedLike}>
               {pressedLike
@@ -28,7 +41,6 @@ function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
             </LikeIcon>
             <LikeNum pressed={pressedLike}>{reply.likes}</LikeNum>
           </LikeSection>
-        </ReplySection>
       </ReplyLayout>
     )
 }
@@ -36,10 +48,12 @@ function ReplySpan({ reply, pressedLike, onLikeClick }: ReplyProps){
 export default ReplySpan;
 
 const ReplyLayout = styled.div`
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     align-self: stretch;
+    padding: 15px 0px;
 `;
 
 const ReplySection = styled.div`
@@ -53,6 +67,7 @@ const ProfileImg = styled.img`
     height: 32px;
     border-radius: 4px;
     background: #848484;
+    object-fit: scale-down;
 `;
 
 const DetailSection = styled.div`
