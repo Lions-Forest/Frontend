@@ -10,7 +10,7 @@ function ReviewCard({ review }: { review: Review }){
 
     const navigate = useNavigate();
     const handleCardClick = () => {
-        navigate('/home/meeting-collection');
+        navigate('/home/review-collection');
     };
 
     return(

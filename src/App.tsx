@@ -26,7 +26,7 @@ function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/home/meeting-detail/:id" element={<MeetingDetailPage />} />
-            <Route path="/home/meeting-collection" element={<ReviewCollectionPage />} />
+            <Route path="/home/review-collection" element={<ReviewCollectionPage />} />
             <Route path="/mypage/review" element={<ReviewPage />} />
             <Route path="/mypage/review/revise" element={<ReviewRevisePage />} />
             <Route
