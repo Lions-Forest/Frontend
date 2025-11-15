@@ -19,7 +19,9 @@ export default function StatusMessageInput({
         <Input
           type="text"
           value={message}
-          placeholder="내용을 입력해주세요."
+          placeholder={
+            shareLocation ? "내용을 입력해주세요." : "레이더를 켜주세요."
+          }
           onChange={(e) => onChange(e.target.value)}
           maxLength={30}
           disabled={!shareLocation}
@@ -75,6 +77,10 @@ const Input = styled.input`
 
   &:disabled {
     cursor: not-allowed;
+    background: #c4c4c4;
+    &::placeholder {
+      color: #747474;
+    }
   }
 `;
 
