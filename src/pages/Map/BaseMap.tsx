@@ -12,6 +12,7 @@ import Footer from "@/components/layout/Footer";
 import BottomSheet from "./BottomSheeet";
 import StatusSelector from "./StatusSelector";
 import MapNotification from "./MapNotification";
+import StatusMessage from "./StatusMessage";
 
 export default function BaseMap({
   userId,
@@ -145,31 +146,14 @@ export default function BaseMap({
           })}
           {/* 상태메세지 말풍선 */}
           {selectedUser && (
-            <CustomOverlayMap
-              position={{
-                lat: selectedUser.latitude,
-                lng: selectedUser.longitude,
+            <StatusMessage
+              user={{
+                ...selectedUser,
+                message: selectedUser.message || "",
               }}
-              yAnchor={1.2}
-            >
-              <div
-                style={{
-                  height: "19px",
-                  background: "#ffffff",
-                  padding: "0 4px",
-                  borderRadius: 4,
-                  color: "#00B353",
-                  textAlign: "center",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                  maxWidth: 120,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {selectedUser.message}
-              </div>
-            </CustomOverlayMap>
+              likeCount={0}
+              onLike={(userId) => console.log("좋아요 클릭: ", userId)}
+            />
           )}
         </Map>
 
