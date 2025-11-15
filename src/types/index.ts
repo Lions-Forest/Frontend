@@ -54,6 +54,7 @@ export interface Reply {
     groupId: number,
     userId: number,
     userName: string,
+    userNickname: string,
     detail: string,
     likes: number,
     createdAt: Date,

@@ -28,7 +28,7 @@ function ReplySpan({ reply, onLikeClick }: ReplyProps){
           <ReplySection>
             <ProfileImg src={reply.photoUrl} />
             <DetailSection>
-              <ProfileName>{reply.userName}</ProfileName>
+              <ProfileName>{reply.userNickname}</ProfileName>
               <ReplyDetail>{reply.detail}</ReplyDetail>
             </DetailSection>
           </ReplySection>
