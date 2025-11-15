@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import toggleArrowIcon from '@/assets/icons/toggleArrow.svg';
 
-interface StepFourDateProps {
+interface StepFourMembersProps {
   onNextStep?: () => void;
   onPrevStep?: () => void;
   onDataChange?: (capacity: number) => void;
   initialCapacity?: number;
 }
 
-const StepFourDate: React.FC<StepFourDateProps> = ({ onDataChange, initialCapacity = 0 }) => {
+const StepFourMembers: React.FC<StepFourMembersProps> = ({ onDataChange, initialCapacity = 0 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string>(
     initialCapacity > 0 ? String(initialCapacity).padStart(2, '0') : '02'
@@ -75,7 +75,7 @@ const StepFourDate: React.FC<StepFourDateProps> = ({ onDataChange, initialCapaci
   );
 };
 
-export default StepFourDate;
+export default StepFourMembers;
 
 const Container = styled.div`
   display: flex;
@@ -216,3 +216,4 @@ const DropdownItem = styled.div<{ $isSelected: boolean }>`
     border-radius: 0 0 8px 8px;
   }
 `;
+

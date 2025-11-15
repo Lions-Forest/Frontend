@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import toggleArrowIcon from '@/assets/icons/toggleArrow.svg';
 
-interface StepFiveMembersProps {
+interface StepFiveDateProps {
   onNextStep?: () => void;
   onPrevStep?: () => void;
   onDataChange?: (meetingAt: string) => void;
@@ -71,7 +71,7 @@ const parseISO8601 = (isoString: string): { year: string; month: string; day: st
   }
 };
 
-const StepFiveMembers: React.FC<StepFiveMembersProps> = ({ onDataChange, initialMeetingAt = "" }) => {
+const StepFiveDate: React.FC<StepFiveDateProps> = ({ onDataChange, initialMeetingAt = "" }) => {
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
@@ -359,7 +359,7 @@ const StepFiveMembers: React.FC<StepFiveMembersProps> = ({ onDataChange, initial
   );
 };
 
-export default StepFiveMembers;
+export default StepFiveDate;
 
 const Container = styled.div`
   display: flex;
@@ -532,3 +532,4 @@ const TimeContainer = styled.div`
   gap: 36px;
   position: relative;
 `;
+

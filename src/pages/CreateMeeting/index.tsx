@@ -5,8 +5,8 @@ import styled from "styled-components";
 import StepOneInfo from "./StepOneInfo";
 import StepTwoName from "./StepTwoName";
 import StepThreeType from "./StepThreeType";
-import StepFourDate from "./StepFourDate";
-import StepFiveMembers from "./StepFiveMembers";
+import StepFourMembers from "./StepFourMembers";
+import StepFiveDate from "./StepFiveDate";
 import StepSixLocation from "./StepSixLocation";
 import ResultPage from "./ResultPage";
 import InfoButton from "@/components/common/InfoButton";
@@ -156,7 +156,7 @@ function index() {
                         />
                     )}
                     {step === 4 && (
-                        <StepFourDate 
+                        <StepFourMembers 
                             onNextStep={() => navigate('/home/create-meeting/step5')} 
                             onPrevStep={() => handlePrevStep(3)}
                             onDataChange={(capacity) => {
@@ -166,7 +166,7 @@ function index() {
                         />
                     )}
                     {step === 5 && (
-                        <StepFiveMembers 
+                        <StepFiveDate 
                             onNextStep={() => navigate('/home/create-meeting/step6')} 
                             onPrevStep={() => handlePrevStep(4)}
                             onDataChange={(meetingAt) => {
