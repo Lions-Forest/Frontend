@@ -82,22 +82,15 @@ function ReviewRevisePage() {
         setOriginalContent(review.content);
 
         // 기존 사진 설정
-        console.log("후기 데이터의 photos:", review.photos);
-        // ID가 없어도 사진을 표시할 수 있도록 수정
-        // 삭제를 위해서는 photoUrl이나 order를 사용
         const existingPhotosData = review.photos
           .sort((a, b) => a.order - b.order)
-          .map((photo) => {
-            console.log("사진 정보:", photo);
-            return {
-              type: 'existing' as const,
-              id: photo.id, // id가 없을 수도 있음 (undefined 가능)
-              url: photo.photoUrl,
-              order: photo.order, // order를 식별자로 사용
-              photoUrl: photo.photoUrl, // photoUrl도 저장 (삭제 시 사용)
-            };
-          });
-        console.log("기존 사진 데이터:", existingPhotosData);
+          .map((photo) => ({
+            type: 'existing' as const,
+            id: photo.id,
+            url: photo.photoUrl,
+            order: photo.order,
+            photoUrl: photo.photoUrl,
+          }));
         setImages(existingPhotosData);
 
         // 모임 정보 조회
@@ -205,45 +198,23 @@ function ReviewRevisePage() {
       }
 
       // 삭제된 기존 사진 ID 수집
-      // ID가 있는 경우 ID로, 없는 경우 photoUrl로 비교
-      const originalPhotos = reviewData.photos
-        .sort((a, b) => a.order - b.order);
+      const originalPhotoIds = reviewData.photos
+        .sort((a, b) => a.order - b.order)
+        .map((photo) => photo.id);
       
-      console.log("원본 사진들 (전체):", originalPhotos);
-      console.log("현재 images 상태:", images);
+      // 현재 남아있는 기존 사진 ID들
+      const remainingPhotoIds = images
+        .filter((img) => img.type === 'existing')
+        .map((img) => img.id!);
       
-      // 현재 남아있는 기존 사진들 (photoUrl로 식별)
-      const remainingPhotoUrls = images
-        .filter((img) => img.type === 'existing' && img.photoUrl)
-        .map((img) => img.photoUrl!);
-      
-      console.log("남아있는 사진 URL들:", remainingPhotoUrls);
-      
-      // 삭제된 사진들 = 원본에 있던 사진 중 현재 남아있지 않은 사진들
-      const deletedPhotos = originalPhotos.filter(
-        (photo) => !remainingPhotoUrls.includes(photo.photoUrl)
+      // 삭제된 사진 ID = 원본에 있던 ID 중 현재 남아있지 않은 ID들
+      const deletedPhotoIds = originalPhotoIds.filter(
+        (id) => !remainingPhotoIds.includes(id)
       );
-      
-      console.log("삭제된 사진들 (photoUrl 기준):", deletedPhotos);
-      
-      // 삭제할 사진 ID 수집 (ID가 있는 경우만)
-      const deletedPhotoIds = deletedPhotos
-        .map((photo) => photo.id)
-        .filter((id): id is number => id !== undefined);
-      
-      console.log("삭제할 사진 ID들:", deletedPhotoIds);
-      console.log("삭제된 사진 중 ID가 없는 것들:", deletedPhotos.filter(p => !p.id));
       
       if (deletedPhotoIds.length > 0) {
         requestData.deletePhotoIds = deletedPhotoIds;
-        console.log("deletePhotoIds가 requestData에 추가됨:", requestData.deletePhotoIds);
-      } else if (deletedPhotos.length > 0) {
-        // ID가 없지만 삭제할 사진이 있는 경우 경고
-        console.warn("삭제할 사진이 있지만 ID가 없습니다:", deletedPhotos);
-        alert("일부 사진은 ID가 없어 삭제할 수 없습니다. 백엔드에서 사진 ID를 제공해야 합니다.");
       }
-      
-      console.log("최종 requestData:", requestData);
 
       // 새로 추가한 파일이 있는지 확인 (images에서 type이 'new'인 것들)
       const newPhotoFiles = images
@@ -373,7 +344,7 @@ function ReviewRevisePage() {
               <PhotoList>
                 {images.map((image, index) => (
                   <PhotoItem key={image.type === 'existing' 
-                    ? `existing-${image.id ?? image.order ?? image.photoUrl ?? index}` 
+                    ? `existing-${image.id}` 
                     : `new-${index}`}>
                     <PhotoImage src={image.url} alt={`Photo ${index + 1}`} />
                     <RemoveButton onClick={() => handleRemoveImage(index)}>

@@ -13,7 +13,7 @@ export interface SingleReviewResponse {
   score: number;
   createdAt: string;
   photos: {
-    id?: number; // 사진 ID (삭제 시 필요)
+    id: number; // 사진 ID (삭제 시 필요)
     photoUrl: string;
     order: number;
   }[];
