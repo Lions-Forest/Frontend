@@ -10,6 +10,7 @@ import { GlobalStyle } from "./styles/global";
 import "./App.css";
 import MapPage from "./pages/Map/MapPage";
 import ReviewPage from "./pages/Mypage/ReviewPage";
+import ReviewRevisePage from "./pages/Mypage/ReviewRevisePage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/mypage/review" element={<ReviewPage />} />
+            <Route path="/mypage/review/revise" element={<ReviewRevisePage />} />
             <Route
               path="/home/meeting-detail"
               element={<MeetingDetailPage />}
