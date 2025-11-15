@@ -106,6 +106,7 @@ const Banner = styled.div`
   height: 30px;
   top: 50px;
   left: 50%;
+  gap: 11px;
   transform: translateX(-50%);
   background: #00a057;
   font-family: Pretendard;
@@ -121,7 +122,7 @@ const StatusBanner = styled.div`
   position: absolute;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   width: 354px;
   height: 95px;
@@ -133,6 +134,7 @@ const StatusBanner = styled.div`
   border: 0.1px solid #000;
   border-radius: 8px;
   z-index: 100;
+  box-sizing: border-box;
 `;
 
 const Message = styled.p`
@@ -144,12 +146,17 @@ const Message = styled.p`
 
 const BannerButton = styled.button`
   display: flex;
-  aling-items: center;
+  align-items: center;
+  align-self: flex-end;
   gap: 9px;
   width: 139px;
   height: 30px;
   background: #ffffff;
   padding: 5px 0 2px 20px;
+  font-family: dongleRegular;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
   border: 1px solid #848484;
   border-radius: 50px;
   cursor: pointer;
