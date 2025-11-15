@@ -1,22 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 interface StepThreeTypeProps {
   onNextStep?: () => void;
   onPrevStep?: () => void;
+  onDataChange?: (category: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC" | null) => void;
+  initialCategory?: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC" | null;
 }
 
-const StepThreeType: React.FC<StepThreeTypeProps> = () => {
-  const meetingTypes = ['식사', '모각작', '소모임', '문화예술', '기타'];
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+// 한글 카테고리를 영문으로 변환하는 함수
+const convertCategoryToEnglish = (koreanCategory: string): "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC" | null => {
+  const categoryMap: Record<string, "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC"> = {
+    '식사': 'MEAL',
+    '모각작': 'WORK',
+    '카페': 'CAFE',
+    '소모임': 'SOCIAL',
+    '문화예술': 'CULTURE',
+    '기타': 'ETC',
+  };
+  return categoryMap[koreanCategory] || null;
+};
+
+// 영문 카테고리를 한글로 변환하는 함수
+const convertCategoryToKorean = (englishCategory: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC" | null): string | null => {
+  const categoryMap: Record<string, string> = {
+    'MEAL': '식사',
+    'WORK': '모각작',
+    'CAFE': '카페',
+    'SOCIAL': '소모임',
+    'CULTURE': '문화예술',
+    'ETC': '기타',
+  };
+  return englishCategory ? categoryMap[englishCategory] || null : null;
+};
+
+const StepThreeType: React.FC<StepThreeTypeProps> = ({ onDataChange, initialCategory = null }) => {
+  const meetingTypes = ['식사', '모각작', '카페', '소모임', '문화예술', '기타'];
+  const [selectedType, setSelectedType] = useState<string | null>(initialCategory ? convertCategoryToKorean(initialCategory) : null);
+
+  // 초기값이 변경되면 로컬 상태 업데이트 (뒤로 가기 시 복원)
+  useEffect(() => {
+    const koreanType = initialCategory ? convertCategoryToKorean(initialCategory) : null;
+    setSelectedType(koreanType);
+  }, [initialCategory]);
 
   const handleTypeClick = (type: string) => {
     if (selectedType === type) {
       // 이미 선택된 타입을 다시 클릭하면 선택 해제
       setSelectedType(null);
+      if (onDataChange) {
+        onDataChange(null);
+      }
     } else {
       // 다른 타입을 선택
       setSelectedType(type);
+      const englishCategory = convertCategoryToEnglish(type);
+      if (onDataChange) {
+        onDataChange(englishCategory);
+      }
     }
   };
 

@@ -1,20 +1,56 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import photoIcon from '@/assets/icons/photo.svg';
 import xIcon from '@/assets/icons/x.svg';
 
 interface StepOneInfoProps {
   onNextStep?: () => void;
+  onDataChange?: (title: string, photos: File[]) => void;
+  initialTitle?: string;
+  initialPhotos?: File[];
 }
 
-const StepOneInfo: React.FC<StepOneInfoProps> = () => {
+const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = "", initialPhotos = [] }) => {
   const [images, setImages] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>(initialPhotos);
+  const [title, setTitle] = useState<string>(initialTitle);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 초기값이 변경되면 로컬 상태 업데이트 (뒤로 가기 시 복원)
+  useEffect(() => {
+    if (initialTitle && initialTitle !== title) {
+      setTitle(initialTitle);
+    }
+  }, [initialTitle]);
+
+  useEffect(() => {
+    // initialPhotos가 변경되면 파일과 이미지 복원
+    if (initialPhotos.length > 0) {
+      // 파일이 있으면 미리보기 이미지 생성
+      const promises = initialPhotos.map((file) => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+      Promise.all(promises).then((newImages) => {
+        setImages(newImages);
+        setFiles(initialPhotos);
+      });
+    } else if (initialPhotos.length === 0) {
+      // 초기값이 비어있으면 초기화
+      setImages([]);
+      setFiles([]);
+    }
+  }, [initialPhotos]);
+
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const fileArray = Array.from(files);
+    const selectedFiles = event.target.files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      const fileArray = Array.from(selectedFiles);
       const promises = fileArray.map((file) => {
         return new Promise<string>((resolve) => {
           const reader = new FileReader();
@@ -27,6 +63,14 @@ const StepOneInfo: React.FC<StepOneInfoProps> = () => {
 
       Promise.all(promises).then((newImages) => {
         setImages((prev) => [...prev, ...newImages]);
+        setFiles((prev) => {
+          const updatedFiles = [...prev, ...fileArray];
+          // 데이터 변경 시 콜백 호출
+          if (onDataChange) {
+            onDataChange(title, updatedFiles);
+          }
+          return updatedFiles;
+        });
       });
     }
     // 같은 파일을 다시 선택할 수 있도록 value 초기화
@@ -41,13 +85,35 @@ const StepOneInfo: React.FC<StepOneInfoProps> = () => {
 
   const handleRemoveImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
+    setFiles((prev) => {
+      const updatedFiles = prev.filter((_, i) => i !== index);
+      // 데이터 변경 시 콜백 호출
+      if (onDataChange) {
+        onDataChange(title, updatedFiles);
+      }
+      return updatedFiles;
+    });
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    // 데이터 변경 시 콜백 호출
+    if (onDataChange) {
+      onDataChange(newTitle, files);
+    }
   };
 
   return (
     <Container>
       <TitleSection>
         <Title>모임 제목</Title>
-        <TitleInput type="text" placeholder="제목을 입력해주세요." />
+        <TitleInput 
+          type="text" 
+          placeholder="제목을 입력해주세요." 
+          value={title}
+          onChange={handleTitleChange}
+        />
       </TitleSection>
       <PhotoSection>
         <Title>대표 사진(선택)</Title>

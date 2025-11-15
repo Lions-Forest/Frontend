@@ -11,6 +11,8 @@ export interface UserLocation {
     | "eating"
     | "playing"
     | "boring"
-    | "hungry";
+    | "hungry"
+    | "";
   shareLocation: boolean;
+  message?: string;
 }

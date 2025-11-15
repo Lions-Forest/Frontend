@@ -1,9 +1,17 @@
 import { HiMiniPencil as Pen } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 function WriteButton() {
+  // 모임 생성 페이지 라우팅을 위한 네비게이션 훅 정의_p.s. 정건(시작) //
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/home/create-meeting/step1');
+  };
+  //// 모임 생성 페이지 라우팅을 위한 네비게이션 훅 정의_p.s. 정건(끝) //
   return (
-    <BtnLayout>
+    <BtnLayout onClick={handleClick}>  {/*핸들러 추가 p.s. 정건(시작)*/}
       <Pen fill="#FFF371" width="24.8px" />
     </BtnLayout>
   );

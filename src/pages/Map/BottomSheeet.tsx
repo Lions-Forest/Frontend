@@ -1,14 +1,15 @@
 import { useSpring, animated } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
-import { useEffect } from "react";
 import styled from "styled-components";
 import ShareLocationToggle from "./ShareLocationToggle";
 import StatusSelector from "./StatusSelector";
 import StatusMessageInput from "./StatusMessageInput";
 import type { UserLocation } from "@/api/UserLocation";
+import { useEffect } from "react";
 
 interface BottomSheetProps {
   isOpen: boolean;
+  onOpen: () => void;
   onClose: () => void;
   shareLocation: boolean;
   onToggleShare: (newValue: boolean) => void;
@@ -23,10 +24,11 @@ interface BottomSheetProps {
 
 const footerHeight = 75;
 const peekHeight = 59;
-const sheetHeight = 532;
+const sheetHeight = 580;
 
 export default function BottomSheet({
   isOpen,
+  onOpen,
   onClose,
   shareLocation,
   onToggleShare,
@@ -39,7 +41,8 @@ export default function BottomSheet({
   const openY = window.innerHeight - sheetHeight;
 
   const [{ y }, api] = useSpring(() => ({
-    y: closedY,
+    y: isOpen ? openY : closedY,
+    config: { tension: 250, friction: 30 },
   }));
 
   const bind = useDrag(
@@ -55,37 +58,39 @@ export default function BottomSheet({
           onClose();
         } else {
           api.start({ y: openY });
+          onOpen();
         }
       } else {
-        api.start({ y: newY });
+        api.start({ y: newY, immediate: true });
       }
       return memo;
     },
-    { from: () => [0, y.get()] }
+    { from: () => [0, y.get()], filterTaps: true }
   );
 
-  // isOpen 상태가 변하면 시트 위치 조정
   useEffect(() => {
-    if (isOpen) api.start({ y: openY });
-    else api.start({ y: closedY });
-  }, [isOpen]);
+    if (isOpen) {
+      api.start({ y: openY });
+    } else {
+      api.start({ y: closedY });
+    }
+  }, [isOpen, api, openY, closedY]);
 
   return (
     <>
       <animated.div
-        {...bind()}
         style={{
           transform: y.to((val) => `translateY(${val}px)`),
           position: "fixed",
           left: 0,
           right: 0,
           zIndex: 100,
-          touchAction: "none",
+          //   touchAction: "none",
           willChange: "transform",
         }}
       >
         <SheetContainer>
-          <HandleBarWrapper>
+          <HandleBarWrapper {...bind()}>
             <HandleBar />
           </HandleBarWrapper>
 
@@ -94,9 +99,17 @@ export default function BottomSheet({
             onToggle={onToggleShare}
           />
 
-          <StatusSelector selectedStatus={status} onChange={setStatus} />
+          <StatusSelector
+            selectedStatus={status}
+            onChange={setStatus}
+            shareLocation={shareLocation}
+          />
 
-          <StatusMessageInput message={message} onChange={setMessage} />
+          <StatusMessageInput
+            message={message}
+            onChange={setMessage}
+            shareLocation={shareLocation}
+          />
         </SheetContainer>
       </animated.div>
     </>
@@ -109,18 +122,19 @@ const SheetContainer = styled.div`
   flex-direction: column;
   left: 0;
   right: 0;
-  weight: 100%;
-  height: 532px;
+  width: 100%;
   padding: 0 17px;
   background: #ffffff;
   border-radius: 4px 4px 0 0;
   z-index: 50;
-  touch-action: none;
+  //   touch-action: none;
 `;
 
 const HandleBarWrapper = styled.div`
   display: flex;
   justify-content: center;
+  touch-action: none;
+  cursor: grab;
 `;
 
 const HandleBar = styled.div`
@@ -128,6 +142,6 @@ const HandleBar = styled.div`
   height: 1.5px;
   background: #000000;
   border-radius: 3px;
-  margin-top: 15px;
-  margin-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 38px;
 `;

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styled from "styled-components";
 
 interface ShareLocationToggleProps {
@@ -70,7 +69,7 @@ const ToggleContainer = styled.div`
 `;
 
 const ToggleLabel = styled.p`
-  font-family: Dongle;
+  font-family: dongleRegular;
   font-size: 20px;
   font-weight: 400;
   color: #ffffff;
@@ -96,7 +95,7 @@ const ToggleSwitch = styled.div<{ $active: boolean }>`
 `;
 
 const SwitchLabel = styled.p`
-  font-family: Dongle;
+  font-family: dongleRegular;
   font-size: 20px;
   font-weight: 400;
   color: #000000;
