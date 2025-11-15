@@ -76,7 +76,7 @@ function MeetingList({ meetings }: MeetingListProps) {
   const filteredMeetings = Array.isArray(meetings)
     ? meetings
         .filter((m) =>
-          recruitState === "모집 중" ? !m.complete : !!m.complete
+          recruitState === "모집 완료" ? m.complete : !m.complete
         )
         .filter((m) =>
           selectedType === "전체" ? true : m.type === selectedType

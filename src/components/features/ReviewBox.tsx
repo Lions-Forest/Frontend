@@ -5,6 +5,36 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ReviewBoxContent from './ReviewBoxContent';
 
+interface ColorTheme {
+  header: string;
+  subheader: string;
+  button: string;
+}
+
+const greenTheme: ColorTheme = {
+  header: "#43D687",
+  subheader: "#F3FEF8",
+  button: "#2A6D49",
+};
+
+const pinkTheme: ColorTheme = {
+  header: "#FF2370",
+  subheader: "#FFF0F5",
+  button: "#9A1947",
+};
+
+const blueTheme: ColorTheme = {
+  header: "#59B6F8",
+  subheader: "#F0F9FF",
+  button: "#0074C6",
+};
+
+const yellowTheme: ColorTheme = {
+  header: "#FBBC04",
+  subheader: "#FFF9E9",
+  button: "#B18400",
+};
+
 function getRelativeTime(date: Date | string): string {
   const now = new Date();
   const d = date instanceof Date ? date : new Date(date);
@@ -19,36 +49,66 @@ function getRelativeTime(date: Date | string): string {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function ReviewBox({ reviews }: { reviews : Review[] }){
-  const [meeting, setMeeting] = useState<Meeting>([])
+type ColorThemeName = 'green' | 'blue' | 'yellow' | 'pink';
+
+interface ReviewBoxProps {
+  reviews: Review[];
+  color?: ColorThemeName;
+}
+
+function ReviewBox({ reviews, color = 'green' }: ReviewBoxProps){
+  const [meeting, setMeeting] = useState<Meeting | null>(null);
   const navigate = useNavigate();
-  const remainingTime = getRelativeTime(meeting.date);
+  
+  const getTheme = (colorName: ColorThemeName): ColorTheme => {
+    switch (colorName) {
+      case 'green':
+        return greenTheme;
+      case 'blue':
+        return blueTheme;
+      case 'yellow':
+        return yellowTheme;
+      case 'pink':
+        return pinkTheme;
+      default:
+        return greenTheme;
+    }
+  };
+
+  const theme = getTheme(color);
 
   useEffect(() => {
     const fetchData = async() => {
       try {
-        const meeting = await fetchMeetingDetail(reviews[0].meetingId);
-        console.log('해당 meeting 데이터: ', meeting);
-        setMeeting(meeting);
+        const meetingData = await fetchMeetingDetail(reviews[0].meetingId);
+        console.log('해당 meeting 데이터: ', meetingData);
+        setMeeting(meetingData);
       } catch (error) {
         console.error("데이터 로딩 실패: ", error);
-        setMeeting([]);
+        setMeeting(null);
       }
     };
     fetchData();
-  }, []);
+  }, [reviews]);
 
   const handleBtnClick = () => {
-    navigate(`/home/meeting-detail/${meeting?.id}`, { state: { meeting, remainingTime } });
+    if (!meeting) return;
+    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting, remainingTime } });
   };
+
+  if (!meeting) {
+    return null;
+  }
+
+  const remainingTime = getRelativeTime(meeting.date);
 
   return (
     <BoxLayout>
-        <Header>
+        <Header $header={theme.header}>
           <Title>{meeting.title}</Title>
-          <HeaderBtn onClick={handleBtnClick}>모임 정보 확인</HeaderBtn>
+          <HeaderBtn $button={theme.button} onClick={handleBtnClick}>모임 정보 확인</HeaderBtn>
         </Header>
-        <SubHeader>
+        <SubHeader $subheader={theme.subheader}>
           <Row>
             <Category>일시</Category>
             <Info>{remainingTime}</Info>
@@ -61,7 +121,7 @@ function ReviewBox({ reviews }: { reviews : Review[] }){
           <div>|</div>
           <Row>
             <Category>모임장</Category>
-            <Info>김중앙</Info>
+            <Info>{meeting.owner?.name || meeting.ownerName || ''}</Info>
           </Row>
         </SubHeader>
         <ReviewSection>
@@ -85,12 +145,12 @@ const BoxLayout = styled.div`
     gap: 15px;
 `;
 
-const Header = styled.div`
+const Header = styled.div<{ $header: string }>`
     width: 100%;
     height: 43px;
     flex-shrink: 0;
     border-radius: 8px 8px 0 0;
-    background: #43D687;
+    background: ${({ $header }) => $header};
 
     display: flex;
     align-items: center;
@@ -107,14 +167,14 @@ const Title = styled.div`
     line-height: normal;
 `;
 
-const HeaderBtn = styled.div`
+const HeaderBtn = styled.div<{ $button: string }>`
   display: inline-flex;
   padding: 4px 8px;
   justify-content: center;
   align-items: center;
   gap: 10px;
   border-radius: 7px;
-  background: #2A6D49;
+  background: ${({ $button }) => $button};
 
   color: #FFF;
   font-family: Pretendard;
@@ -122,18 +182,18 @@ const HeaderBtn = styled.div`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  cursor: pointer;
 `;
 
-const SubHeader = styled.div`
+const SubHeader = styled.div<{ $subheader: string }>`
   width: 100%;
   flex-shrink: 0;
-  background: #F3FEF8;
+  background: ${({ $subheader }) => $subheader};
   gap: 16px;
   align-items: center;
   justify-content: center;
   display: flex;
-  padding: 15px 0px;
-  color: #D9D9D9;
+  padding: 15px 20px;
 
   box-sizing: border-box;
   overflow: hidden;
@@ -142,6 +202,10 @@ const SubHeader = styled.div`
 const Row = styled.div`
   display: flex;
   gap: 8px;
+  align-items: center;
+  min-width: 0;
+  // flex: 1;
+  max-width: 100%;
 `;
 
 const Category = styled.div`
@@ -151,6 +215,7 @@ const Category = styled.div`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  flex-shrink: 0;
 `;
 
 const Info = styled.div`
@@ -161,6 +226,12 @@ const Info = styled.div`
   font-weight: 500;
   line-height: normal;
   letter-spacing: 0.24px;
+  
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
 `;
 
 const ReviewSection = styled.div`

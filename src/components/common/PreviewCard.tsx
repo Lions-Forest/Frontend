@@ -5,6 +5,9 @@ import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
 import CardButton from "./CardButton";
 import type { Meeting } from "@/types";
+import { cancelJoinMeeting, deleteMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
+import { useState } from "react";
+import CheckingModal from "../features/CheckingModal";
 
 interface ColorTheme {
   body: string;
@@ -56,6 +59,13 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
   const remaining = calculateRemaining(meeting.date);
   const remainingTime = `${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`;
   const progress = meeting.memberNumber / meeting.memberLimit;
+
+  const [ joinState, setJoinState ] = useState<'join' | 'cancel'>('join');
+  const [showModal, setShowModal] = useState(false);
+
+  const userId = localStorage.getItem("userId");
+  const isOwner = Number(userId) === meeting?.owner.id ? true : false;
+
   let theme: ColorTheme;
 
   if (meeting.id % 4 === 1) theme = greenTheme;
@@ -66,6 +76,41 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
   const handleCardClick = () => {
     navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting, remainingTime } });
   };
+
+    const handleDelete = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await deleteMeeting(meeting.id);
+            setJoinState('cancel');
+            navigate('/home');
+        } catch(e) {
+            console.log("handleDelete 함수 실패: ", e);
+        }
+    }
+
+    const handleJoin = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await joinMeeting(meeting.id);
+            setJoinState('cancel');
+        } catch(e) {
+            console.log("handleJoin 함수 실패: ", e);
+        }
+    }
+
+    const handleJoinCancel = async () => {
+        if (!meeting?.id) return;
+
+        try {
+            await cancelJoinMeeting(meeting.id);
+            setJoinState('join');
+        } catch(e) {
+            console.log("handleJoin 함수 실패: ", e);
+        }
+    }
+
 
   return (
     <PreviewCardLayout backgroundColor={theme.body}>
@@ -97,16 +142,37 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
                     </InfoTitle>
                     <InfoDetail>
                         <div>{meeting.type}</div>
-                        <div>{meeting.owner.name}</div>
+                        <div>{meeting.complete ? meeting.owner.name : meeting.owner?.nickname}</div>
                         <div>{meeting.memberNumber}/{meeting.memberLimit}</div>
                         <div>{meeting.location}</div>
                     </InfoDetail>
                 </Info>
             </Body>
             <Buttons onClick={(e) => e.stopPropagation()}>
-                <CardButton onInfo={true} onClick={handleCardClick} />
-                <CardButton onJoin={true} color={theme.button}/>
+              <CardButton onInfo={true} onClick={handleCardClick} />
+            { !meeting.complete ? (
+                meeting.memberNumber === meeting.memberLimit ? (
+                  <CardButton onClose={true} />
+                ) : (
+                  joinState === 'join' ? (
+                    isOwner === true ? (
+                      <CardButton onMakeCancel={true} onClick={() => setShowModal(true)} color={theme.button}/>
+                    ) : (
+                      <CardButton onJoin={true} onClick={handleJoin} color={theme.button}/>
+                    )
+                  ) : (
+                    <CardButton onJoinCancel={true} onClick={handleJoinCancel} color={theme.button}/>
+                  )
+                )
+              ) : (
+                <>
+                  <CardButton onClose={true} />
+                </>
+              )}
             </Buttons>
+            {showModal && (
+                <CheckingModal onClick={handleDelete} onClose={() => setShowModal(false)} />
+            )}
     </PreviewCardLayout>
   );
 }

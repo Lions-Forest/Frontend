@@ -74,7 +74,7 @@ function index() {
 
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
-    const isOwner = Number(userId) === meeting?.owner.id ? true : false;
+    const isOwner = (meeting?.owner && Number(userId) === meeting.owner.id) || (meeting?.ownerId && Number(userId) === meeting.ownerId) ? true : false;
 
     const handleDelete = async () => {
         if (!meeting?.id) return;
@@ -231,7 +231,7 @@ function index() {
                     </PicInfo>
                         <DetailInfoContainer>
                             <BackgroundImage src={background} alt="background" />
-                            <StatusBadge>모집중</StatusBadge>
+                            <StatusBadge $isComplete={meeting.complete}>{meeting.complete ? '모집 완료' : '모집중'}</StatusBadge>
                             <DetailInfo>
                                 <Detail>
                                     <DateIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
@@ -247,11 +247,11 @@ function index() {
                                     <OwnerIconStyled width='24px' fill="#2D2D2DC9" opacity='79%'/>
                                     <DetailText> 
                                         <Profile 
-                                            src={isAnonymous(meeting.date) ? defaultProfile : meeting.owner?.photoUrl}
-                                            $clickable={!!participantList}
-                                            onClick={() => handleMemberClick(participantList[0])}
+                                            src={isAnonymous(meeting.date) ? defaultProfile : (participantList[0]?.photoUrl || '')}
+                                            $clickable={!!participantList && participantList.length > 0}
+                                            onClick={() => participantList[0] && handleMemberClick(participantList[0])}
                                         /> 
-                                        {isAnonymous(meeting.date) ? meeting.owner.nickname : meeting.owner.name}
+                                        {isAnonymous(meeting.date) ? (meeting.owner?.nickname || meeting.ownerNickname || '') : (meeting.owner?.name || meeting.ownerName || '')}
                                     </DetailText>
                                 </Detail>
                                 <Detail>
@@ -395,17 +395,17 @@ const BackgroundImage = styled.img`
     z-index: 1;
 `;
 
-const StatusBadge = styled.div`
+const StatusBadge = styled.div<{ $isComplete: boolean }>`
     position: absolute;
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
     
-    background: #FBBC04;
+    background: ${({ $isComplete }) => ($isComplete ? '#848484' : '#FBBC04')};
     color: #FFF;
-    font-family: Pretendard;
-    font-size: 14px;
+    font-family: dongleLight;
+    font-size: 20px;
     font-weight: 600;
     padding: 6px 16px;
     border-radius: 20px;

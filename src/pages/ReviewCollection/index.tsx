@@ -14,6 +14,13 @@ function groupBy<T>(array: T[], keyFn: (item: T) => number): {[key: number]: T[]
     }, {});
 }
 
+type ColorTheme = 'green' | 'blue' | 'yellow' | 'pink';
+
+function getColorByIndex(index: number): ColorTheme {
+  const colors: ColorTheme[] = ['green', 'blue', 'yellow', 'pink'];
+  return colors[index % 4];
+}
+
 function index() {
     const [groupedReviews, setGroupedReviews] = useState<{[key: number]: Review[]}>({});
     const [sortedGroupIds, setSortedGroupIds] = useState<number[]>([]);
@@ -45,10 +52,11 @@ function index() {
         <Layout showBackNavBar={true} backNavBarText="모임후기">
             <CollectionLayout>
             {sortedGroupIds.length > 0 ? (
-                sortedGroupIds.map((groupId) => {
+                sortedGroupIds.map((groupId, index) => {
                   const reviews = groupedReviews[groupId] || [];
+                  const color = getColorByIndex(index);
                   return reviews.length > 0 ? (
-                    <ReviewBox key={groupId} reviews={reviews} />
+                    <ReviewBox key={groupId} reviews={reviews} color={color}/>
                   ) : null;
                 })
             ) : (
