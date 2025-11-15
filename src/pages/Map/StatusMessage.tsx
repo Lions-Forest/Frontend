@@ -25,7 +25,8 @@ export default function StatusMessage({ user, likeCount, onLike }: Props) {
         lat: user.latitude,
         lng: user.longitude,
       }}
-      yAnchor={1.2}
+      xAnchor={-1.5}
+      yAnchor={1.1}
     >
       <MessageWrapper>
         <LikeButton onClick={handleLike}>
@@ -49,9 +50,9 @@ const MessageWrapper = styled.div`
 `;
 
 const Message = styled.div`
-  height: 19px;
+  min-height: 19px;
   background: #ffffff;
-  padding: 0 4px;
+  padding: 2px 4px;
   border-radius: 4px;
   color: #00b353;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -63,7 +64,7 @@ const Message = styled.div`
 
 const LikeButton = styled.button`
   position: relative;
-  //   transform: translate(-50%, -50%);
+  transform: translate(50%, 40%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +73,7 @@ const LikeButton = styled.button`
   width: 35px;
   height: 35px;
   cursor: pointer;
-  //   z-index: 10;
+  z-index: 10;
 `;
 
 const LikeCount = styled.span`
