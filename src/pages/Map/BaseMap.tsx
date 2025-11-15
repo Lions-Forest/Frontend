@@ -246,7 +246,7 @@ const FooterWrap = styled.div`
 `;
 
 const NameLabel = styled.div`
-  transform: translateY(-35px);
+  transform: translate(-1px, -35px);
   pointer-events: none;
   background: none;
   font-family: Pretendard;
