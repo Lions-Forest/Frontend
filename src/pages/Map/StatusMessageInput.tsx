@@ -21,6 +21,7 @@ export default function StatusMessageInput({
           value={message}
           placeholder="내용을 입력해주세요."
           onChange={(e) => onChange(e.target.value)}
+          maxLength={30}
           disabled={!shareLocation}
         />
         <Icon src={PencilIcon} />
