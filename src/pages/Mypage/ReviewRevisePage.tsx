@@ -24,9 +24,6 @@ function formatMeetingDate(dateString: string): string {
   return `${year}.${month}.${day}(${hour12}${period})`;
 }
 
-/**
- * 카테고리를 한글로 변환합니다.
- */
 function formatCategory(category: string): string {
   const categoryMap: Record<string, string> = {
     MEAL: "식사",

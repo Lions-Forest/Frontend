@@ -10,9 +10,6 @@ import Footer from "@/components/layout/Footer";
 import { getGroupSimple, type GroupSimpleResponse } from "@/api/class/reveiwClassInfoAPI";
 import { makeReview } from "@/api/user/makeReviewAPI";
 
-/**
- * meetingAt을 "2025.11.06(6PM)" 형식으로 변환합니다.
- */
 function formatMeetingDate(dateString: string): string {
   const date = new Date(dateString);
   const year = date.getFullYear();
@@ -26,9 +23,6 @@ function formatMeetingDate(dateString: string): string {
   return `${year}.${month}.${day}(${hour12}${period})`;
 }
 
-/**
- * 카테고리를 한글로 변환합니다.
- */
 function formatCategory(category: string): string {
   const categoryMap: Record<string, string> = {
     MEAL: "식사",
