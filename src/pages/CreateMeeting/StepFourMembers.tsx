@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import toggleArrowIcon from '@/assets/icons/toggleArrow.svg';
 
-interface StepFourDateProps {
+interface StepFourMembersProps {
   onNextStep?: () => void;
   onPrevStep?: () => void;
+  onDataChange?: (capacity: number) => void;
+  initialCapacity?: number;
 }
 
-const StepFourDate: React.FC<StepFourDateProps> = () => {
+const StepFourMembers: React.FC<StepFourMembersProps> = ({ onDataChange, initialCapacity = 0 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<string>('01');
-  
-  const memberOptions = Array.from({ length: 10 }, (_, i) => 
-    String(i + 1).padStart(2, '0')
+  const [selectedMember, setSelectedMember] = useState<string>(
+    initialCapacity > 0 ? String(initialCapacity).padStart(2, '0') : '02'
   );
+
+  const memberOptions = Array.from({ length: 49 }, (_, i) => 
+    String(i + 2).padStart(2, '0')
+  );
+
+  // 초기값이 변경되면 로컬 상태 업데이트 (뒤로 가기 시 복원)
+  useEffect(() => {
+    if (initialCapacity > 0) {
+      const memberStr = String(initialCapacity).padStart(2, '0');
+      setSelectedMember(memberStr);
+    } else if (initialCapacity === 0) {
+      setSelectedMember('02');
+    }
+  }, [initialCapacity]);
 
   const handleToggleClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -22,6 +36,11 @@ const StepFourDate: React.FC<StepFourDateProps> = () => {
   const handleMemberSelect = (member: string) => {
     setSelectedMember(member);
     setIsDropdownOpen(false);
+    // 선택된 인원 수를 숫자로 변환하여 전달
+    const capacity = parseInt(member, 10);
+    if (onDataChange) {
+      onDataChange(capacity);
+    }
   };
 
   return (
@@ -56,7 +75,7 @@ const StepFourDate: React.FC<StepFourDateProps> = () => {
   );
 };
 
-export default StepFourDate;
+export default StepFourMembers;
 
 const Container = styled.div`
   display: flex;
@@ -197,3 +216,4 @@ const DropdownItem = styled.div<{ $isSelected: boolean }>`
     border-radius: 0 0 8px 8px;
   }
 `;
+

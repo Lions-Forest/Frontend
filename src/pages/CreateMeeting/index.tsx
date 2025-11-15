@@ -1,21 +1,41 @@
 import Layout from "@/components/layout/Layout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import StepOneInfo from "./StepOneInfo";
 import StepTwoName from "./StepTwoName";
 import StepThreeType from "./StepThreeType";
-import StepFourDate from "./StepFourDate";
-import StepFiveMembers from "./StepFiveMembers";
+import StepFourMembers from "./StepFourMembers";
+import StepFiveDate from "./StepFiveDate";
 import StepSixLocation from "./StepSixLocation";
 import ResultPage from "./ResultPage";
 import InfoButton from "@/components/common/InfoButton";
 
 const TOTAL_STEPS = 7;
 
+// 모임 생성 데이터 타입
+interface MeetingFormData {
+    title: string;
+    photos: File[];
+    category: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC" | null;
+    meetingAt: string;
+    capacity: number;
+    location: string;
+}
+
 function index() {
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // 모든 Step의 데이터를 관리하는 상태
+    const [formData, setFormData] = useState<MeetingFormData>({
+        title: "",
+        photos: [],
+        category: null,
+        meetingAt: "",
+        capacity: 0,
+        location: "",
+    });
 
     // URL에서 현재 step 추출
     const getStepFromPath = (pathname: string): number => {
@@ -37,7 +57,12 @@ function index() {
         }
     }, [location.pathname, navigate]);
 
-    const handleNextStep = () => {
+    const handleNextStep = async () => {
+        if (step === 6) {
+            // Step 6일 때는 API 호출을 위해 StepSixLocation의 handleComplete를 호출
+            // 하지만 여기서는 직접 API를 호출하는 것이 더 간단함
+            return;
+        }
         if (step < TOTAL_STEPS) {
             const nextStep = step + 1;
             if (nextStep === 7) {
@@ -45,6 +70,41 @@ function index() {
             } else {
                 navigate(`/home/create-meeting/step${nextStep}`);
             }
+        }
+    };
+
+    // Step 6에서 확인 버튼 클릭 시 API 호출
+    const handleStepSixComplete = async () => {
+        const { makeClass } = await import('@/api/class/makeClassAPI');
+        
+        // 필수 필드 검증
+        if (!formData.title || !formData.category || !formData.meetingAt || !formData.capacity || !formData.location) {
+            alert('모든 필수 항목을 입력해주세요.');
+            return;
+        }
+
+        // capacity 검증 (2~50)
+        if (formData.capacity < 2 || formData.capacity > 50) {
+            alert('인원은 2명 이상 50명 이하여야 합니다.');
+            return;
+        }
+
+        try {
+            const requestData = {
+                title: formData.title,
+                category: formData.category,
+                capacity: formData.capacity,
+                meetingAt: formData.meetingAt,
+                location: formData.location,
+                photos: formData.photos,
+            };
+
+            await makeClass(requestData);
+            
+            // 성공 시 다음 단계로 이동
+            navigate('/home/create-meeting/result');
+        } catch (error: any) {
+            alert('모임 생성에 실패했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -69,18 +129,68 @@ function index() {
                     </ProgressBarWrapper>
                 </ProgressBarContainer>
                 <StepLayout>
-                    {step === 1 && <StepOneInfo onNextStep={() => navigate('/home/create-meeting/step2')} />}
-                    {step === 2 && <StepTwoName onNextStep={() => navigate('/home/create-meeting/step3')} onPrevStep={() => handlePrevStep(1)} />}
-                    {step === 3 && <StepThreeType onNextStep={() => navigate('/home/create-meeting/step4')} onPrevStep={() => handlePrevStep(2)} />}
-                    {step === 4 && <StepFourDate onNextStep={() => navigate('/home/create-meeting/step5')} onPrevStep={() => handlePrevStep(3)} />}
-                    {step === 5 && <StepFiveMembers onNextStep={() => navigate('/home/create-meeting/step6')} onPrevStep={() => handlePrevStep(4)} />}
-                    {step === 6 && <StepSixLocation onNextStep={() => navigate('/home/create-meeting/result')} onPrevStep={() => handlePrevStep(5)} />}
+                    {step === 1 && (
+                        <StepOneInfo 
+                            onNextStep={() => navigate('/home/create-meeting/step2')}
+                            onDataChange={(title, photos) => {
+                                setFormData(prev => ({ ...prev, title, photos }));
+                            }}
+                            initialTitle={formData.title}
+                            initialPhotos={formData.photos}
+                        />
+                    )}
+                    {step === 2 && (
+                        <StepTwoName 
+                            onNextStep={() => navigate('/home/create-meeting/step3')} 
+                            onPrevStep={() => handlePrevStep(1)} 
+                        />
+                    )}
+                    {step === 3 && (
+                        <StepThreeType 
+                            onNextStep={() => navigate('/home/create-meeting/step4')} 
+                            onPrevStep={() => handlePrevStep(2)}
+                            onDataChange={(category) => {
+                                setFormData(prev => ({ ...prev, category }));
+                            }}
+                            initialCategory={formData.category}
+                        />
+                    )}
+                    {step === 4 && (
+                        <StepFourMembers 
+                            onNextStep={() => navigate('/home/create-meeting/step5')} 
+                            onPrevStep={() => handlePrevStep(3)}
+                            onDataChange={(capacity) => {
+                                setFormData(prev => ({ ...prev, capacity }));
+                            }}
+                            initialCapacity={formData.capacity}
+                        />
+                    )}
+                    {step === 5 && (
+                        <StepFiveDate 
+                            onNextStep={() => navigate('/home/create-meeting/step6')} 
+                            onPrevStep={() => handlePrevStep(4)}
+                            onDataChange={(meetingAt) => {
+                                setFormData(prev => ({ ...prev, meetingAt }));
+                            }}
+                            initialMeetingAt={formData.meetingAt}
+                        />
+                    )}
+                    {step === 6 && (
+                        <StepSixLocation 
+                            onNextStep={() => navigate('/home/create-meeting/result')} 
+                            onPrevStep={() => handlePrevStep(5)}
+                            onDataChange={(location) => {
+                                setFormData(prev => ({ ...prev, location }));
+                            }}
+                            initialLocation={formData.location}
+                        />
+                    )}
                 </StepLayout>
                 <ButtonWrapper>
                     <InfoButton 
                         onNext={step !== 6} 
                         onComplete={step === 6} 
-                        onClick={handleNextStep} 
+                        onClick={step === 6 ? handleStepSixComplete : handleNextStep} 
                     />
                 </ButtonWrapper>
             </CreateMeetingLayout>
