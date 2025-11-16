@@ -35,7 +35,7 @@ export default function StatusMessageInput({
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   position: relative;
   margin-bottom: 35px;
 `;
