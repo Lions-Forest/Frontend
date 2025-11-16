@@ -33,7 +33,8 @@ function index() {
         photos: [],
         category: null,
         meetingAt: "",
-        capacity: 0,
+        // 인원 선택을 하지 않아도 기본값 2명이 되도록 초기값 설정
+        capacity: 2,
         location: "",
     });
 
