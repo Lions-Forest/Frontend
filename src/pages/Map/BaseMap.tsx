@@ -123,7 +123,7 @@ export default function BaseMap({
               position={myPosition}
               zIndex={-1}
               xAnchor={0.5}
-              yAnchor={1}
+              yAnchor={0.5}
             >
               <div
                 style={{
@@ -132,7 +132,6 @@ export default function BaseMap({
                   borderRadius: "50%",
                   background:
                     "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
-                  transform: "translateY(30%)",
                   pointerEvents: "none",
                 }}
               />
