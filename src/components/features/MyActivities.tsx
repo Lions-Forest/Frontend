@@ -434,8 +434,10 @@ const CardHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 35px;
+  padding: 12px 20px;
   background: #ffffff;
+  flex-wrap: wrap;
+  gap: 8px;
 `;
 
 const StatusText = styled.div`
@@ -477,11 +479,11 @@ const CardSubInfo = styled.div`
 `;
 
 const CardBody = styled.div`
-  padding: 0 27px;
+  padding: 0 20px;
 `;
 
 const CardBodyContent = styled.div`
-  width: 307px;
+  width: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -492,24 +494,27 @@ const CardBodyContent = styled.div`
 const FirstRow = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 64px;
+  gap: 16px;
   width: 100%;
+  flex-wrap: wrap;
 `;
 
 const SecondRow = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 64px;
+  gap: 16px;
   width: 100%;
   margin-top: 7px;
+  flex-wrap: wrap;
 `;
 
 const InfoItem = styled.div<{ isFirst?: boolean }>`
   display: flex;
   align-items: flex-start;
+  flex: 1;
+  min-width: 0;
   ${({ isFirst }) => isFirst && `
-    width: 120px;
-    flex-shrink: 0;
+    min-width: 100px;
   `}
 `;
 
@@ -525,7 +530,7 @@ const Separator = styled.div`
 const ButtonRow = styled.div<{ isOpen?: boolean }>`
   display: flex;
   flex-direction: ${({ isOpen }) => (isOpen ? "column" : "row")};
-  gap: ${({ isOpen }) => (isOpen ? "0" : "23px")};
+  gap: ${({ isOpen }) => (isOpen ? "0" : "8px")};
   width: 100%;
   margin-top: 15px;
 `;
@@ -558,7 +563,17 @@ const InfoValue = styled.div`
 `;
 
 const InfoButton = styled.button<{ isOpen?: boolean }>`
-  width: ${({ isOpen }) => (isOpen ? "287px" : "132px")};
+  ${({ isOpen }) => 
+    isOpen 
+      ? `
+        width: 100%;
+        min-width: 0;
+      `
+      : `
+        flex: 1;
+        min-width: 0;
+      `
+  }
   height: 24px;
   flex-shrink: 0;
   border-radius: 8px;
@@ -569,10 +584,14 @@ const InfoButton = styled.button<{ isOpen?: boolean }>`
   font-size: 12px;
   font-weight: 600;
   color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ReviewButton = styled.button`
-  width: 132px;
+  flex: 1;
+  min-width: 0;
   height: 24px;
   flex-shrink: 0;
   border-radius: 8px;
@@ -583,6 +602,9 @@ const ReviewButton = styled.button`
   font-size: 12px;
   font-weight: 600;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ReviewCardLayout = styled.div<{ backgroundColor: string }>`
