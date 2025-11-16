@@ -176,8 +176,9 @@ export default function BaseMap({
                 ...selectedUser,
                 message: selectedUser.message || "",
               }}
-              likeCount={selectedUser.likeCount || 0}
-              onLike={likeUser}
+              likedBy={selectedUser.likedBy || []}
+              currentUserId={userId}
+              onLike={() => likeUser(selectedUser.userId, userId)}
             />
           )}
         </Map>

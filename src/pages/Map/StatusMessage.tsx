@@ -10,13 +10,22 @@ interface Props {
     message: string;
     userId: string;
   };
-  likeCount: number;
-  onLike: (userId: string) => void;
+  likedBy: string[];
+  currentUserId: string;
+  onLike: () => void;
 }
 
-export default function StatusMessage({ user, likeCount, onLike }: Props) {
+export default function StatusMessage({
+  user,
+  likedBy,
+  currentUserId,
+  onLike,
+}: Props) {
+  const totalLikes = likedBy.length;
+  const iLiked = likedBy.includes(currentUserId);
+
   const handleLike = () => {
-    onLike(user.userId);
+    onLike();
   };
 
   return (
@@ -31,12 +40,12 @@ export default function StatusMessage({ user, likeCount, onLike }: Props) {
       <MessageWrapper>
         <LikeButton onClick={handleLike}>
           <img
-            src={likeCount > 0 ? Heart : EmptyHeart}
+            src={iLiked ? Heart : EmptyHeart}
             alt="좋아요"
             width={35}
             height={35}
           />
-          {likeCount > 0 && <LikeCount>{likeCount}</LikeCount>}
+          {totalLikes > 0 && <LikeCount>{totalLikes}</LikeCount>}
         </LikeButton>
         <Message>{user.message}</Message>
       </MessageWrapper>
