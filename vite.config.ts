@@ -10,7 +10,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["src/assets/lions-forest.ico", "src/assets/icons/favicon.png"],
+      // public/icons 에 있는 정적 아이콘들을 그대로 복사
+      includeAssets: ["icons/icon-192x192.png", "icons/icon-512x512.png"],
       manifest: {
         name: "모여봐요 사자의숲",
         short_name: "사자의숲",
@@ -21,13 +22,13 @@ export default defineConfig({
         theme_color: "#E4F2EA",
         icons: [
           {
-            src: "/assets/icons/favicon.png",
+            src: "/icons/icon-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "/assets/icons/favicon.png",
+            src: "/icons/icon-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any",
