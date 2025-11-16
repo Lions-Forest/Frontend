@@ -14,7 +14,7 @@ export default function StatusMessageInput({
 }: StatusMessageInputProps) {
   return (
     <Wrapper>
-      <Title>상태 메시지(선택)</Title>
+      <Title>상태 메시지</Title>
       <InputWrapper>
         <Input
           type="text"
