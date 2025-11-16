@@ -55,8 +55,6 @@ function index() {
 
     const now = new Date();
   
-    // const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
-    // const goNext = () => setCurrentIdx(i => Math.min(meeting?.photo.length - 1, i + 1));
     const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
     const goNext = () => {
         setCurrentIdx(i => {
@@ -129,6 +127,11 @@ function index() {
             console.log("handleJoin 함수 실패: ", e);
         }
     }
+
+    const handleReviewClick = () => {
+        if (!meeting?.id) return;
+        navigate(`/mypage/review`, { state: { groupId: meeting.id } });
+    };
   
     // 해당 모임 댓글 정보 불러오기
     useEffect (() => {
@@ -298,7 +301,7 @@ function index() {
                             ) : (
                             <>
                                 <InfoButton onClose={true} />
-                                <InfoButton onReview={true} />
+                                <InfoButton onReview={true} onClick={handleReviewClick}/>
                             </>
                             )}
                         </Buttons>
