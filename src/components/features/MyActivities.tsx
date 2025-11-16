@@ -63,6 +63,17 @@ function formatMeetingDate(dateInput: string | Date): string {
   return `${year}.${month}.${day}(${hour12}${period})`;
 }
 
+function formatCategory(category: string): string {
+  const categoryMap: Record<string, string> = {
+    'MEAL': '식사',
+    'WORK': '모각작',
+    'SOCIAL': '소모임',
+    'CULTURE': '문화예술',
+    'ETC': '기타',
+  };
+  return categoryMap[category] || category;
+}
+
 function MyActivities() {
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState<TabType>("신청 내역");
@@ -335,7 +346,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
             <InfoItem>
               <InfoLabel>모임종류</InfoLabel>
               <Separator>|</Separator>
-              <InfoValue>{cardContent.category}</InfoValue>
+              <InfoValue>{formatCategory(cardContent.category)}</InfoValue>
             </InfoItem>
           </SecondRow>
           <ButtonRow isOpen={cardContent.state === "OPEN"}>
