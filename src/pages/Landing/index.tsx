@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {
   GoogleAuthProvider,
   getAuth,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
 } from "firebase/auth";
@@ -19,6 +20,11 @@ type ColorSpanProps = {
 type BtnSectionProps = {
   opacity: number;
 };
+
+const isInStandaloneMode = () =>
+  window.matchMedia?.("(display-mode: standalone)").matches ||
+  // iOS PWA
+  (window.navigator as any).standalone === true;
 
 function Index() {
   const [colorStep, setColorStep] = useState(false);
@@ -37,12 +43,31 @@ function Index() {
     return () => clearTimeout(showTimer);
   }, []);
 
-  // Google 리다이렉트 로그인 결과 처리
+  // 이미 백엔드 로그인 토큰이 있다면 바로 홈으로 이동
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      navigate("/home");
+    }
+  }, [navigate]);
+
+  // Firebase 리다이렉트 로그인 결과 처리 (PWA/standalone 등에서 사용)
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
         const auth = getAuth(db.app);
+        const redirectPending = localStorage.getItem("googleRedirectPending");
         const result = await getRedirectResult(auth);
+
+        // 리다이렉트 로그인 시도 후 돌아왔는데, 결과/유저가 없으면
+        // 시크릿 모드 또는 스토리지 제약 등으로 인해 실패한 것으로 간주
+        if (redirectPending === "1" && !result && !auth.currentUser) {
+          localStorage.removeItem("googleRedirectPending");
+          setError(
+            "시크릿 모드 또는 쿠키/스토리지 제한 환경에서는\n구글 로그인이 제한될 수 있습니다.\n일반 브라우저 모드에서 다시 시도해 주세요.",
+          );
+          return;
+        }
 
         // 리다이렉트 로그인 결과가 없는 첫 방문 등의 경우
         // 단, 이미 로그인된 사용자가 있다면 currentUser로 처리
@@ -54,6 +79,8 @@ function Index() {
         const firebaseUser = result?.user ?? auth.currentUser;
         if (!firebaseUser) return;
 
+        localStorage.removeItem("googleRedirectPending");
+
         const idToken = await firebaseUser.getIdToken();
         const loginResponse = await loginWithGoogle({ idToken });
 
@@ -63,10 +90,11 @@ function Index() {
         localStorage.setItem("nickname", loginResponse.nickname);
         localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
 
-        navigate('/home');
+        navigate("/home");
       } catch (err: any) {
         console.error("Google redirect login failed", err);
 
+        // Firebase가 세션스토리지/쿠키 제약으로 state를 잃어버린 경우 안내 문구 표시
         // Axios 에러인 경우 서버 응답 메시지 확인
         if (err.response) {
           const status = err.response.status;
@@ -105,13 +133,31 @@ function Index() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
 
-      // PWA 환경에서 팝업 대신 리다이렉트 방식 사용
-      await signInWithRedirect(auth, provider);
+      if (isInStandaloneMode()) {
+        // PWA/설치 앱 환경: 리다이렉트 방식 사용
+        localStorage.setItem("googleRedirectPending", "1");
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+
+      // 일반 브라우저: 팝업 방식 사용
+      const result = await signInWithPopup(auth, provider);
+
+      const firebaseUser = result.user;
+      const idToken = await firebaseUser.getIdToken();
+      const loginResponse = await loginWithGoogle({ idToken });
+
+      localStorage.setItem("accessToken", loginResponse.accessToken);
+      localStorage.setItem("refreshToken", loginResponse.refreshToken);
+      localStorage.setItem("userId", String(loginResponse.id));
+      localStorage.setItem("nickname", loginResponse.nickname);
+      localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
+
+      navigate("/home");
     } catch (err: any) {
       console.error("Google login failed", err);
-      // 리다이렉트 트리거 자체가 실패한 경우만 여기서 처리
       setError(
-        err.message || "로그인을 시작할 수 없습니다.\n잠시 후 다시 시도해주세요.",
+        err.message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.",
       );
     } finally {
       setIsLoading(false);
