@@ -129,13 +129,10 @@ function BottomSheet({
     e.nativeEvent.stopImmediatePropagation();
   };
 
-  // 터치 시작 핸들러
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
+  // 드래그 시작 핸들러 (터치/마우스 공통)
+  const handleDragStart = useCallback(
+    (clientY: number, clientX: number) => {
       if (!top || !bottomSheetRef.current) return;
-
-      const touch = e.touches[0];
-      const { clientX, clientY } = touch;
 
       // 실제 DOM의 현재 위치를 읽어서 initialTopRef 설정
       // 이렇게 하면 상태 업데이트가 완료되지 않았어도 실제 위치를 정확히 반영
@@ -153,18 +150,25 @@ function BottomSheet({
     [top]
   );
 
-  // 터치 이동 핸들러
-  const handleTouchMove = useCallback(
+  // 터치 시작 핸들러
+  const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (!top || !bottomSheetRef.current) return;
-
       const touch = e.touches[0];
       const { clientX, clientY } = touch;
+      handleDragStart(clientY, clientX);
+    },
+    [handleDragStart]
+  );
 
-      // offset 계산: 터치 시작점과 바텀시트 초기 top 값의 차이
+  // 드래그 이동 핸들러 (터치/마우스 공통)
+  const handleDragMove = useCallback(
+    (clientY: number, clientX: number) => {
+      if (!top || !bottomSheetRef.current) return;
+
+      // offset 계산: 드래그 시작점과 바텀시트 초기 top 값의 차이
       const offset = initialTopRef.current - startYRef.current;
 
-      // 현재 터치 Y 좌표에 offset을 더해 바텀시트의 새로운 top 위치 계산
+      // 현재 Y 좌표에 offset을 더해 바텀시트의 새로운 top 위치 계산
       let newTopPosition = clientY + offset;
 
       // 최대/최소 높이 제한만 적용 (드래그 중에는 자유롭게 이동)
@@ -192,7 +196,7 @@ function BottomSheet({
         lastVelocityRef.current = velocity;
       }
 
-      // 다음 touchMove 이벤트를 위해 현재 값 저장
+      // 다음 move 이벤트를 위해 현재 값 저장
       lastXRef.current = clientX;
       lastYRef.current = clientY;
       lastTimestampRef.current = now;
@@ -207,9 +211,18 @@ function BottomSheet({
     [top, openTop, closedTop, draw]
   );
 
-  // 터치 종료 핸들러
-  const handleTouchEnd = useCallback(
-    (_e: React.TouchEvent) => {
+  // 터치 이동 핸들러
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const touch = e.touches[0];
+      const { clientX, clientY } = touch;
+      handleDragMove(clientY, clientX);
+    },
+    [handleDragMove]
+  );
+
+  // 드래그 종료 핸들러 (터치/마우스 공통)
+  const handleDragEnd = useCallback(() => {
       if (!top || !bottomSheetRef.current) return;
 
       const { lastVelocity, currentY, initialTop } = {
@@ -264,6 +277,14 @@ function BottomSheet({
       }
     },
     [top, openTop, closedTop, sheetHeight, onClose, onOpen]
+  );
+
+  // 터치 종료 핸들러
+  const handleTouchEnd = useCallback(
+    (_e: React.TouchEvent) => {
+      handleDragEnd();
+    },
+    [handleDragEnd]
   );
 
   // 핸들바 터치 이벤트 핸들러
@@ -323,6 +344,39 @@ function BottomSheet({
       document.addEventListener("touchcancel", handleTouchEndGlobal);
     },
     [handleTouchStart, handleTouchMove, handleTouchEnd]
+  );
+
+  // 핸들바 마우스 이벤트 핸들러
+  const handleHandleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      // 핸들바 영역이 아니면 무시
+      if (
+        !handleBarRef.current ||
+        !handleBarRef.current.contains(e.target as HTMLElement)
+      ) {
+        return;
+      }
+
+      e.stopPropagation();
+      e.preventDefault();
+      const { clientX, clientY } = e;
+      handleDragStart(clientY, clientX);
+
+      const handleMouseMoveGlobal = (moveEvent: MouseEvent) => {
+        moveEvent.preventDefault();
+        handleDragMove(moveEvent.clientY, moveEvent.clientX);
+      };
+
+      const handleMouseUpGlobal = (_upEvent: MouseEvent) => {
+        handleDragEnd();
+        document.removeEventListener("mousemove", handleMouseMoveGlobal);
+        document.removeEventListener("mouseup", handleMouseUpGlobal);
+      };
+
+      document.addEventListener("mousemove", handleMouseMoveGlobal);
+      document.addEventListener("mouseup", handleMouseUpGlobal);
+    },
+    [handleDragStart, handleDragMove, handleDragEnd]
   );
 
   // top 값이 변경될 때 transform 업데이트 (애니메이션용)
@@ -395,6 +449,7 @@ function BottomSheet({
             ref={handleBarRef}
             data-handle-bar
             onTouchStart={handleHandleTouchStart}
+            onMouseDown={handleHandleMouseDown}
           >
             <HandleBar />
           </HandleBarWrapper>
@@ -457,6 +512,12 @@ const HandleBarWrapper = styled.div`
   justify-content: center;
   touch-action: none;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  
+  &:active {
+    cursor: grabbing;
+  }
 `;
 
 const HandleBar = styled.div`
