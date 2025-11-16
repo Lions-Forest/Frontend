@@ -23,7 +23,7 @@ const MyPageLayout = styled.div`
     height: 100vh;
     // overflow: auto;
     display: flex;
-    padding: 16px 0px 14px 0px;
+    padding: 0px 0px 14px 0px;
     flex-direction: column;
     align-items: center;
     gap: 16px;

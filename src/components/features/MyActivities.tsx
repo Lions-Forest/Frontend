@@ -361,7 +361,7 @@ const Layout = styled.div`
   flex-direction: column;
   align-items: start;
   gap: 16px;
-  padding: 16px;
+  padding: 0px 16px;
   position: relative;
 `;
 

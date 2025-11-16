@@ -262,7 +262,7 @@ const Layout = styled.div`
     flex-direction: column;
     align-items: start;
     gap: 8px;
-    padding: 16px 8px;
+    padding: 16px;
     position: relative;
 `;
 
@@ -310,6 +310,7 @@ const BodyWrapper = styled.div`
 const UserImageWrapper = styled.div`
   position: relative;
   flex-shrink: 0;
+  margin-right: 40px;
 `;
 
 const UserImage = styled.div<{ hasImage?: boolean; isEditMode?: boolean }>`
