@@ -12,8 +12,8 @@
 
   /* 컨테이너 공통 스타일, 모든 페이지 공통 적용 */
   .container {
-    width: 100dvw;
-    height: 100dvh;
+    width: 100vw;
+    height: 100vh;
     max-width: 600px;
     /* max-width: 402px;  아이폰16 가로 크기 */
     margin: 0 auto;    /* 가로 중앙 정렬 */
@@ -47,7 +47,8 @@
   } */
 
   #root {
-    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
   }
 
 
