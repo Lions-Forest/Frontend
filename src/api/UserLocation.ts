@@ -15,4 +15,5 @@ export interface UserLocation {
     | "";
   shareLocation: boolean;
   message?: string;
+  likeCount?: number;
 }

@@ -14,6 +14,7 @@ import BottomSheet from "./BottomSheet";
 import StatusSelector from "./StatusSelector";
 import MapNotification from "./MapNotification";
 import StatusMessage from "./StatusMessage";
+import { useLocationActions } from "@/hooks/useLocationActions";
 
 export default function BaseMap({
   userId,
@@ -29,8 +30,8 @@ export default function BaseMap({
   const [mapLevel, setMapLevel] = useState(3);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [followMe, setFollowMe] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<UserLocation | null>(null);
-  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const { likeUser } = useLocationActions();
 
   // GPS 기반 실시간 내 위치
   const { myPosition, geoError } = useMyLocation({
@@ -55,13 +56,6 @@ export default function BaseMap({
     }
   };
 
-  const handleLike = (likedUserId: string) => {
-    setLikeCounts((prevCounts) => ({
-      ...prevCounts,
-      [likedUserId]: (prevCounts[likedUserId] || 0) + 1,
-    }));
-  };
-
   // GPS 기반으로 내 화면 중심 계속 이동
   useEffect(() => {
     if (followMe && myPosition) {
@@ -79,6 +73,7 @@ export default function BaseMap({
   }
 
   if (!myPosition) return <LoadingPage />;
+  const selectedUser = selectedUserId ? locations[selectedUserId] : null;
 
   return (
     <MapContainer>
@@ -145,6 +140,12 @@ export default function BaseMap({
             const markerImg =
               getMarkerImage(user.status, false) || nothingMarker;
 
+            const handleMarkerClick = () => {
+              setSelectedUserId((prevId) =>
+                prevId === user.userId ? null : user.userId
+              );
+            };
+
             return (
               <React.Fragment key={user.userId}>
                 <MapMarker
@@ -154,12 +155,7 @@ export default function BaseMap({
                     size: { width: 93, height: 102 },
                     options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
                   }}
-                  onClick={() => {
-                    setSelectedUser((prev) => {
-                      if (prev?.userId === user.userId) return null;
-                      return user;
-                    });
-                  }}
+                  onClick={handleMarkerClick}
                 />
 
                 <CustomOverlayMap
@@ -180,8 +176,8 @@ export default function BaseMap({
                 ...selectedUser,
                 message: selectedUser.message || "",
               }}
-              likeCount={likeCounts[selectedUser.userId] || 0}
-              onLike={handleLike}
+              likeCount={selectedUser.likeCount || 0}
+              onLike={likeUser}
             />
           )}
         </Map>
@@ -254,6 +250,7 @@ const FooterWrap = styled.div`
 `;
 
 const NameLabel = styled.div`
+  display: inline-block;
   transform: translate(-1px, -35px);
   pointer-events: none;
   background: none;
