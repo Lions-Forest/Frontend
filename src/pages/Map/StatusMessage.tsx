@@ -13,6 +13,7 @@ interface Props {
   likedBy: string[];
   currentUserId: string;
   onLike: () => void;
+  isMe: boolean;
 }
 
 export default function StatusMessage({
@@ -20,9 +21,14 @@ export default function StatusMessage({
   likedBy,
   currentUserId,
   onLike,
+  isMe,
 }: Props) {
   const totalLikes = likedBy.length;
   const iLiked = likedBy.includes(currentUserId);
+  const anchor = { x: 0, y: 1 };
+  const transform = isMe
+    ? "translateX(35px) translateY(-130px)"
+    : "translateX(65px) translateY(0px)";
 
   const handleLike = () => {
     onLike();
@@ -34,10 +40,10 @@ export default function StatusMessage({
         lat: user.latitude,
         lng: user.longitude,
       }}
-      xAnchor={-1.5}
-      yAnchor={1.1}
+      xAnchor={anchor.x}
+      yAnchor={anchor.y}
     >
-      <MessageWrapper>
+      <MessageWrapper style={{ transform: transform }}>
         <LikeButton onClick={handleLike}>
           <img
             src={iLiked ? Heart : EmptyHeart}
@@ -59,9 +65,9 @@ const MessageWrapper = styled.div`
 `;
 
 const Message = styled.div`
-  min-height: 19px;
+  min-height: 24px;
   background: #ffffff;
-  padding: 2px 4px;
+  padding: 4px 8px;
   border-radius: 4px;
   color: #00b353;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -72,8 +78,10 @@ const Message = styled.div`
 `;
 
 const LikeButton = styled.button`
-  position: relative;
-  transform: translate(50%, 40%);
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(60%, -50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
