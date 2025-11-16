@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  getAuth,
+  signInWithRedirect,
+  getRedirectResult,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import landingImage from "../../assets/images/landingImage.png";
 import { db } from "@/firebase/firebase";
@@ -32,6 +37,61 @@ function Index() {
     return () => clearTimeout(showTimer);
   }, []);
 
+  // Google 리다이렉트 로그인 결과 처리
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const auth = getAuth(db.app);
+        const result = await getRedirectResult(auth);
+
+        // 리다이렉트 로그인 결과가 없는 첫 방문 등의 경우
+        if (!result) return;
+
+        setIsLoading(true);
+        setError(null);
+
+        const idToken = await result.user.getIdToken();
+        const loginResponse = await loginWithGoogle({ idToken });
+
+        localStorage.setItem("accessToken", loginResponse.accessToken);
+        localStorage.setItem("refreshToken", loginResponse.refreshToken);
+        localStorage.setItem("userId", String(loginResponse.id));
+        localStorage.setItem("nickname", loginResponse.nickname);
+        localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
+
+        navigate("/home");
+      } catch (err: any) {
+        console.error("Google redirect login failed", err);
+
+        // Axios 에러인 경우 서버 응답 메시지 확인
+        if (err.response) {
+          const status = err.response.status;
+          const message =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            err.message;
+          console.error("서버 응답:", err.response.data);
+
+          if (status === 500) {
+            setError("서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.");
+          } else {
+            setError(
+              message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.",
+            );
+          }
+        } else {
+          setError(
+            err.message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.",
+          );
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void handleRedirectResult();
+  }, [navigate]);
+
   const handleGoogleLogin = async () => {
     setError(null);
     setIsLoading(true);
@@ -41,38 +101,14 @@ function Index() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
 
-      const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
-      console.log("Firebase idToken:", idToken);
-
-      const loginResponse = await loginWithGoogle({ idToken });
-
-      localStorage.setItem("accessToken", loginResponse.accessToken);
-      localStorage.setItem("refreshToken", loginResponse.refreshToken);
-      localStorage.setItem("userId", String(loginResponse.id));
-      localStorage.setItem("nickname", loginResponse.nickname);
-      localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
-
-      navigate("/home");
+      // PWA 환경에서 팝업 대신 리다이렉트 방식 사용
+      await signInWithRedirect(auth, provider);
     } catch (err: any) {
       console.error("Google login failed", err);
-      
-      // Axios 에러인 경우 서버 응답 메시지 확인
-      if (err.response) {
-        const status = err.response.status;
-        const message = err.response.data?.message || err.response.data?.error || err.message;
-        console.error("서버 응답:", err.response.data);
-        
-        if (status === 500) {
-          setError("서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.");
-        } else {
-          setError(message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.");
-        }
-      } else if (err.code === "auth/popup-closed-by-user") {
-        setError("로그인이 취소되었습니다.");
-      } else {
-        setError(err.message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.");
-      }
+      // 리다이렉트 트리거 자체가 실패한 경우만 여기서 처리
+      setError(
+        err.message || "로그인을 시작할 수 없습니다.\n잠시 후 다시 시도해주세요.",
+      );
     } finally {
       setIsLoading(false);
     }
