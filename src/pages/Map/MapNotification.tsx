@@ -104,7 +104,7 @@ const Banner = styled.div`
   align-items: center;
   width: 109px;
   height: 30px;
-  top: 50px;
+  top: 35px;
   left: 50%;
   gap: 11px;
   transform: translateX(-50%);
@@ -126,12 +126,11 @@ const StatusBanner = styled.div`
   align-items: center;
   width: 354px;
   height: 95px;
-  top: 50px;
+  top: 35px;
   left: 50%;
-  margin-top: 21px;
   transform: translateX(-50%);
   background: #ffffff;
-  padding: 8px 10px;
+  padding: 21px 10px 10px;
   border: 0.1px solid #000;
   border-radius: 8px;
   z-index: 100;
