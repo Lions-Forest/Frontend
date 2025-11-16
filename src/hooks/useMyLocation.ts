@@ -20,15 +20,11 @@ export function useMyLocation({
     lat: number;
     lng: number;
   } | null>(null);
-  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
-  // 위치 공유 X -> Firestore에서 삭제
-  //   useEffect(() => {
-  //     if (!shareLocation) {
-  //       deleteDoc(doc(db, "locations", userId));
-  //       return;
-  //     }
-  //   }, [shareLocation, userId]);
+  const [geoError, setGeoError] = useState<GeolocationPositionError | null>(
+    null
+  );
+  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   // 위치 추적
   useEffect(() => {
@@ -38,6 +34,7 @@ export function useMyLocation({
         const newPosition = { lat: latitude, lng: longitude };
 
         setMyPosition(newPosition);
+        setGeoError(null);
 
         if (!shareLocation) {
           deleteDoc(doc(db, "locations", userId));
@@ -80,7 +77,11 @@ export function useMyLocation({
           updatedAt: Date.now(),
         });
       },
-      (error) => console.error(error),
+      (error) => {
+        console.error("Geolocation Error: ", error);
+        setGeoError(error);
+        setMyPosition(null);
+      },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );
 
@@ -91,5 +92,5 @@ export function useMyLocation({
     };
   }, [userId, name, shareLocation, status, message]);
 
-  return myPosition;
+  return { myPosition, geoError };
 }

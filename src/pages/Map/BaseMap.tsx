@@ -33,7 +33,7 @@ export default function BaseMap({
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
 
   // GPS 기반 실시간 내 위치
-  const myPosition = useMyLocation({
+  const { myPosition, geoError } = useMyLocation({
     userId,
     name,
     shareLocation,
@@ -68,6 +68,15 @@ export default function BaseMap({
       setCenter(myPosition);
     }
   }, [myPosition, followMe]);
+
+  if (geoError) {
+    return (
+      <GeolocationErrorBanner>
+        <span>위치를 불러올 수 없습니다.</span>
+        <span>GPS 신호가 약하거나 권한을 확인해주세요.</span>
+      </GeolocationErrorBanner>
+    );
+  }
 
   if (!myPosition) return <LoadingPage />;
 
@@ -253,4 +262,28 @@ const NameLabel = styled.div`
   font-size: 10px;
   font-weight: 600;
   color: #ffffff;
+`;
+
+const GeolocationErrorBanner = styled.div`
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 280px;
+  max-width: 500px;
+  padding: 12px 10px;
+  border-radius: 12px;
+  background: rgba(255, 77, 79, 0.9);
+  color: #fff;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  white-space: pre-line;
 `;
