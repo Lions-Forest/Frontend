@@ -89,7 +89,17 @@ export default function BaseMap({
         shareLocation: shareLocation,
         likedBy: locations[userId]?.likedBy || [],
       };
-      selectedUser = locations[selectedUserId];
+      // selectedUser = locations[selectedUserId];
+    } else {
+      const target = locations[selectedUserId];
+      if (target) {
+        selectedUser = {
+          ...target,
+          latitude: target.latitude,
+          longitude: target.longitude,
+          likedBy: target.likedBy || [],
+        };
+      }
     }
   }
 
@@ -202,6 +212,7 @@ export default function BaseMap({
               likedBy={selectedUser.likedBy || []}
               currentUserId={userId}
               onLike={() => likeUser(selectedUser.userId, userId)}
+              isMe={selectedUser.userId === userId}
             />
           )}
         </Map>
