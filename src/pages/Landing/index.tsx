@@ -209,6 +209,11 @@ function Index() {
           </LoginText>
         </LoginBtn>
       </BtnSection>
+        <HelperText>
+          기등록된 멋사 회원만 이용 가능합니다.
+          <br />
+          멋사에 등록된 구글 계정으로 로그인해 주세요.
+        </HelperText>
     </div>
   );
 }
@@ -256,6 +261,7 @@ const BtnSection = styled.div<BtnSectionProps>`
   width: 100%;
   display: flex;
   justify-content: center;
+//  align-items: center;
   // opacity: 0%;
   opacity: ${({ opacity }) => opacity}; // 0 또는 1
   transition: opacity 2s;
@@ -311,10 +317,29 @@ const ErrorBanner = styled.div`
   background: rgba(255, 77, 79, 0.9);
   color: #fff;
   font-family: Pretendard;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
+  line-height: 1.5;
+  word-break: keep-all;
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
   z-index: 10;
   white-space: pre-line;
+`;
+
+const HelperText = styled.div`
+  margin-top: 12px;
+  color: rgba(250, 20, 24, 0.9);
+
+  font-family: Pretendard;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.35);
+  line-height: 1.5;
+  white-space: pre-line;
+  position: fixed;
+  top: 90%;
+  left: 30%;
+  
 `;
