@@ -73,7 +73,25 @@ export default function BaseMap({
   }
 
   if (!myPosition) return <LoadingPage />;
-  const selectedUser = selectedUserId ? locations[selectedUserId] : null;
+  let selectedUser:
+    | (UserLocation & { latitude: number; longitude: number })
+    | null = null;
+
+  if (selectedUserId) {
+    if (selectedUserId === userId) {
+      selectedUser = {
+        userId: userId,
+        name: name,
+        latitude: myPosition.lat,
+        longitude: myPosition.lng,
+        status: selectedStatus,
+        message: statusMessage,
+        shareLocation: shareLocation,
+        likedBy: locations[userId]?.likedBy || [],
+      };
+      selectedUser = locations[selectedUserId];
+    }
+  }
 
   return (
     <MapContainer>
@@ -111,6 +129,11 @@ export default function BaseMap({
               options: { offset: { x: 39, y: 145 } },
             }}
             title={`${name} (나)`}
+            onClick={() => {
+              setSelectedUserId((prevId) =>
+                prevId === userId ? null : userId
+              );
+            }}
           />
           {/* shareLocation 켜졌을 때만 그라데이션 원 표시 */}
           {shareLocation && (
