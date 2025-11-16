@@ -33,7 +33,8 @@ function index() {
         photos: [],
         category: null,
         meetingAt: "",
-        capacity: 0,
+        // 인원 선택을 하지 않아도 기본값 2명이 되도록 초기값 설정
+        capacity: 2,
         location: "",
     });
 
@@ -206,7 +207,7 @@ const CreateMeetingLayout = styled.div`
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background-color: #E2EDE7;
+    background-color: #E4F2EA;
     overflow: hidden;
 `;
 
@@ -214,7 +215,7 @@ const ProgressBarContainer = styled.div`
     width: 100%;
     padding: 0 16px;
     flex-shrink: 0;
-    background-color: #E2EDE7;
+    background-color: #E4F2EA;
 `;
 
 const ProgressBarWrapper = styled.div`

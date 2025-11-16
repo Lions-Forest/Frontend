@@ -10,13 +10,28 @@ interface Props {
     message: string;
     userId: string;
   };
-  likeCount: number;
-  onLike: (userId: string) => void;
+  likedBy: string[];
+  currentUserId: string;
+  onLike: () => void;
+  isMe: boolean;
 }
 
-export default function StatusMessage({ user, likeCount, onLike }: Props) {
+export default function StatusMessage({
+  user,
+  likedBy,
+  currentUserId,
+  onLike,
+  isMe,
+}: Props) {
+  const totalLikes = likedBy.length;
+  const iLiked = likedBy.includes(currentUserId);
+  const anchor = { x: 0, y: 1 };
+  const transform = isMe
+    ? "translateX(35px) translateY(-130px)"
+    : "translateX(65px) translateY(0px)";
+
   const handleLike = () => {
-    onLike(user.userId);
+    onLike();
   };
 
   return (
@@ -25,18 +40,18 @@ export default function StatusMessage({ user, likeCount, onLike }: Props) {
         lat: user.latitude,
         lng: user.longitude,
       }}
-      xAnchor={-1.5}
-      yAnchor={1.1}
+      xAnchor={anchor.x}
+      yAnchor={anchor.y}
     >
-      <MessageWrapper>
+      <MessageWrapper style={{ transform: transform }}>
         <LikeButton onClick={handleLike}>
           <img
-            src={likeCount > 0 ? Heart : EmptyHeart}
+            src={iLiked ? Heart : EmptyHeart}
             alt="좋아요"
             width={35}
             height={35}
           />
-          {likeCount > 0 && <LikeCount>{likeCount}</LikeCount>}
+          {totalLikes > 0 && <LikeCount>{totalLikes}</LikeCount>}
         </LikeButton>
         <Message>{user.message}</Message>
       </MessageWrapper>
@@ -50,9 +65,9 @@ const MessageWrapper = styled.div`
 `;
 
 const Message = styled.div`
-  min-height: 19px;
+  min-height: 24px;
   background: #ffffff;
-  padding: 2px 4px;
+  padding: 4px 8px;
   border-radius: 4px;
   color: #00b353;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -63,8 +78,10 @@ const Message = styled.div`
 `;
 
 const LikeButton = styled.button`
-  position: relative;
-  transform: translate(50%, 40%);
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(60%, -50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;

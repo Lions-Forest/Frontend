@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import errorIcon from '@/assets/icons/error.svg';
 import alertboxImage from '@/assets/icons/alertbox.png';
+import { getMyInfo } from '@/api/user/myInfoCheckAPI';
 
 interface StepTwoNameProps {
   onNextStep?: () => void;
@@ -10,8 +11,23 @@ interface StepTwoNameProps {
 
 const StepTwoName: React.FC<StepTwoNameProps> = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // 임시로 localStorage에서 닉네임 가져오기 (추후 백엔드 API로 대체)
-  const nickname = localStorage.getItem('nickname') || '임시 닉네임';
+  const [nickname, setNickname] = useState<string>(''); 
+
+  useEffect(() => {
+    const fetchMyInfo = async () => {
+      try {
+        const data = await getMyInfo();
+        setNickname(data.nickname);
+      } catch (error) {
+        console.error('내 정보 조회 실패:', error);
+        // API 실패 시 기존 로컬 스토리지 값을 폴백으로 사용
+        const fallbackNickname = localStorage.getItem('nickname') || '임시 닉네임';
+        setNickname(fallbackNickname);
+      }
+    };
+
+    void fetchMyInfo();
+  }, []);
 
   const handleErrorIconClick = () => {
     setIsModalOpen(true);

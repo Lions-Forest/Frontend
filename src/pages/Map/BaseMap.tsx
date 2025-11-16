@@ -14,6 +14,7 @@ import BottomSheet from "./BottomSheet";
 import StatusSelector from "./StatusSelector";
 import MapNotification from "./MapNotification";
 import StatusMessage from "./StatusMessage";
+import { useLocationActions } from "@/hooks/useLocationActions";
 
 export default function BaseMap({
   userId,
@@ -29,11 +30,11 @@ export default function BaseMap({
   const [mapLevel, setMapLevel] = useState(3);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [followMe, setFollowMe] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<UserLocation | null>(null);
-  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const { likeUser } = useLocationActions();
 
   // GPS 기반 실시간 내 위치
-  const myPosition = useMyLocation({
+  const { myPosition, geoError } = useMyLocation({
     userId,
     name,
     shareLocation,
@@ -55,13 +56,6 @@ export default function BaseMap({
     }
   };
 
-  const handleLike = (likedUserId: string) => {
-    setLikeCounts((prevCounts) => ({
-      ...prevCounts,
-      [likedUserId]: (prevCounts[likedUserId] || 0) + 1,
-    }));
-  };
-
   // GPS 기반으로 내 화면 중심 계속 이동
   useEffect(() => {
     if (followMe && myPosition) {
@@ -69,7 +63,45 @@ export default function BaseMap({
     }
   }, [myPosition, followMe]);
 
+  if (geoError) {
+    return (
+      <GeolocationErrorBanner>
+        <span>위치를 불러올 수 없습니다.</span>
+        <span>GPS 신호가 약하거나 권한을 확인해주세요.</span>
+      </GeolocationErrorBanner>
+    );
+  }
+
   if (!myPosition) return <LoadingPage />;
+  let selectedUser:
+    | (UserLocation & { latitude: number; longitude: number })
+    | null = null;
+
+  if (selectedUserId) {
+    if (selectedUserId === userId) {
+      selectedUser = {
+        userId: userId,
+        name: name,
+        latitude: myPosition.lat,
+        longitude: myPosition.lng,
+        status: selectedStatus,
+        message: statusMessage,
+        shareLocation: shareLocation,
+        likedBy: locations[userId]?.likedBy || [],
+      };
+      // selectedUser = locations[selectedUserId];
+    } else {
+      const target = locations[selectedUserId];
+      if (target) {
+        selectedUser = {
+          ...target,
+          latitude: target.latitude,
+          longitude: target.longitude,
+          likedBy: target.likedBy || [],
+        };
+      }
+    }
+  }
 
   return (
     <MapContainer>
@@ -107,6 +139,11 @@ export default function BaseMap({
               options: { offset: { x: 39, y: 145 } },
             }}
             title={`${name} (나)`}
+            onClick={() => {
+              setSelectedUserId((prevId) =>
+                prevId === userId ? null : userId
+              );
+            }}
           />
           {/* shareLocation 켜졌을 때만 그라데이션 원 표시 */}
           {shareLocation && (
@@ -114,7 +151,7 @@ export default function BaseMap({
               position={myPosition}
               zIndex={-1}
               xAnchor={0.5}
-              yAnchor={1}
+              yAnchor={0.5}
             >
               <div
                 style={{
@@ -123,7 +160,6 @@ export default function BaseMap({
                   borderRadius: "50%",
                   background:
                     "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
-                  transform: "translateY(30%)",
                   pointerEvents: "none",
                 }}
               />
@@ -137,6 +173,12 @@ export default function BaseMap({
             const markerImg =
               getMarkerImage(user.status, false) || nothingMarker;
 
+            const handleMarkerClick = () => {
+              setSelectedUserId((prevId) =>
+                prevId === user.userId ? null : user.userId
+              );
+            };
+
             return (
               <React.Fragment key={user.userId}>
                 <MapMarker
@@ -146,12 +188,7 @@ export default function BaseMap({
                     size: { width: 93, height: 102 },
                     options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
                   }}
-                  onClick={() => {
-                    setSelectedUser((prev) => {
-                      if (prev?.userId === user.userId) return null;
-                      return user;
-                    });
-                  }}
+                  onClick={handleMarkerClick}
                 />
 
                 <CustomOverlayMap
@@ -172,8 +209,10 @@ export default function BaseMap({
                 ...selectedUser,
                 message: selectedUser.message || "",
               }}
-              likeCount={likeCounts[selectedUser.userId] || 0}
-              onLike={handleLike}
+              likedBy={selectedUser.likedBy || []}
+              currentUserId={userId}
+              onLike={() => likeUser(selectedUser.userId, userId)}
+              isMe={selectedUser.userId === userId}
             />
           )}
         </Map>
@@ -246,6 +285,7 @@ const FooterWrap = styled.div`
 `;
 
 const NameLabel = styled.div`
+  display: inline-block;
   transform: translate(-1px, -35px);
   pointer-events: none;
   background: none;
@@ -253,4 +293,28 @@ const NameLabel = styled.div`
   font-size: 10px;
   font-weight: 600;
   color: #ffffff;
+`;
+
+const GeolocationErrorBanner = styled.div`
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 280px;
+  max-width: 500px;
+  padding: 12px 10px;
+  border-radius: 12px;
+  background: rgba(255, 77, 79, 0.9);
+  color: #fff;
+  font-family: Pretendard;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  white-space: pre-line;
 `;

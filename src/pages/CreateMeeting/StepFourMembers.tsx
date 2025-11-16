@@ -9,7 +9,10 @@ interface StepFourMembersProps {
   initialCapacity?: number;
 }
 
-const StepFourMembers: React.FC<StepFourMembersProps> = ({ onDataChange, initialCapacity = 0 }) => {
+const StepFourMembers: React.FC<StepFourMembersProps> = ({
+  onDataChange,
+  initialCapacity = 0,
+}) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string>(
     initialCapacity > 0 ? String(initialCapacity).padStart(2, '0') : '02'
@@ -19,7 +22,8 @@ const StepFourMembers: React.FC<StepFourMembersProps> = ({ onDataChange, initial
     String(i + 2).padStart(2, '0')
   );
 
-  // 초기값이 변경되면 로컬 상태 업데이트 (뒤로 가기 시 복원)
+  // 초기값이 변경되면 로컬 상태만 업데이트 (뒤로 가기 시 복원)
+  // 실제 기본값(2명)은 부모 formData의 초기값으로 관리
   useEffect(() => {
     if (initialCapacity > 0) {
       const memberStr = String(initialCapacity).padStart(2, '0');

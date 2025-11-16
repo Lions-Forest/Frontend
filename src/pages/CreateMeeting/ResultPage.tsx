@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import resultOutButtonIcon from '@/assets/icons/resultOutButton.svg';
 import resultLionImage from '@/assets/images/resultLion.png';
 import resultpageTextImage from '@/assets/icons/resultpageText.png';
+import resultBackImage from '@/assets/images/resultBack.png';
 
 const ResultPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const ResultPage: React.FC = () => {
       <ContentArea>
         {/* ResultPage 내용 영역 */}
       </ContentArea>
+      <BackgroundImage src={resultBackImage} alt="" />
       <LionImage src={resultLionImage} alt="Result Lion" />
       <BottomActionBar>
         <ActionText>확인하러 가볼까요?</ActionText>
@@ -41,6 +43,7 @@ const ResultContainer = styled.div`
   height: 100vh;
   position: relative;
   background-color: #E2EDE7;
+  overflow: hidden;
 `;
 
 const TopSection = styled.div`
@@ -70,18 +73,27 @@ const ContentArea = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+`;
+
+const BackgroundImage = styled.img`
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
 `;
 
 const LionImage = styled.img`
-  position: fixed;
-  bottom: 228px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+  display: block;
+  // width: 140px;
+  // height: 251px;
+  margin: 40px auto 140px; /* 가운데 정렬 + 상단/하단 여백 */
+  position: relative;
+  z-index: 2; /* 배경보다 위에 위치 */
 `;
 
 const BottomActionBar = styled.div`

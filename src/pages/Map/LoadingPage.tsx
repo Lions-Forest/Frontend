@@ -1,39 +1,38 @@
 import styled, { keyframes } from "styled-components";
 import Background from "@/assets/images/LoadingBackground.svg";
 import SpinnerIcon from "@/assets/images/LoadingLion.svg";
-import Layout from "@/components/layout/Layout";
+import Footer from "@/components/layout/Footer";
 
 export default function LoadingPage() {
   return (
-    <Layout>
-      <PageWrap>
-        <Container>
-          <Spinner>
-            <img src={SpinnerIcon} width={150} height={120} />
-          </Spinner>
-          <TextContainer>
-            <TextShadow>
-              <span>위치</span>
-              <span style={{ display: "inline-block", width: "10px" }} />
-              <span>로딩중</span>
-            </TextShadow>
+    <PageWrap>
+      <Container>
+        <Spinner>
+          <img src={SpinnerIcon} width={150} height={120} />
+        </Spinner>
+        <TextContainer>
+          <TextShadow>
+            <span>위치</span>
+            <span style={{ display: "inline-block", width: "10px" }} />
+            <span>로딩중</span>
+          </TextShadow>
 
-            <Text>
-              <ColoredText color="#FBBC04">위치</ColoredText>
-              <span style={{ width: "10px" }} />
-              <ColoredText color="#FF2370">로</ColoredText>
-              <ColoredText color="#0095FF">딩</ColoredText>
-              <ColoredText color="#43D687">중</ColoredText>
+          <Text>
+            <ColoredText color="#FBBC04">위치</ColoredText>
+            <span style={{ width: "10px" }} />
+            <ColoredText color="#FF2370">로</ColoredText>
+            <ColoredText color="#0095FF">딩</ColoredText>
+            <ColoredText color="#43D687">중</ColoredText>
 
-              <Dots>
-                <DotShadow />
-                <DotText />
-              </Dots>
-            </Text>
-          </TextContainer>
-        </Container>
-      </PageWrap>
-    </Layout>
+            <Dots>
+              <DotShadow />
+              <DotText />
+            </Dots>
+          </Text>
+        </TextContainer>
+      </Container>
+      <Footer />
+    </PageWrap>
   );
 }
 
@@ -50,8 +49,10 @@ const dotsAnimation = keyframes`
 `;
 
 const PageWrap = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background-image: url(${Background});
   background-size: cover;
   background-position: center;
@@ -63,7 +64,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 85%;
+  flex: 1;
   gap: 10px;
 `;
 

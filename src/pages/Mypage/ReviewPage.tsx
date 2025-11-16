@@ -455,10 +455,10 @@ const SectionDescription = styled.div`
 
 const PhotoTitle = styled.div`
   color: #000;
-  font-family: Pretendard;
-  font-size: 24px;
+  font-family: dongleRegular;
+  font-size: 30px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 700;
   line-height: normal;
 `;
 
