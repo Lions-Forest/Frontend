@@ -89,7 +89,6 @@ export default function BaseMap({
         shareLocation: shareLocation,
         likedBy: locations[userId]?.likedBy || [],
       };
-      // selectedUser = locations[selectedUserId];
     } else {
       const target = locations[selectedUserId];
       if (target) {
@@ -102,6 +101,11 @@ export default function BaseMap({
       }
     }
   }
+
+  const baseCircleSize = 427;
+  const step = 0.07;
+  const scale = Math.max(1 - (mapLevel - 3) * step, 0.3);
+  const circleSize = baseCircleSize * scale;
 
   return (
     <MapContainer>
@@ -153,7 +157,9 @@ export default function BaseMap({
               xAnchor={0.5}
               yAnchor={0.5}
             >
-              <div
+              <CircleWrapper size={circleSize}>
+                <Circle size={circleSize} />
+                {/* <div
                 style={{
                   width: 427,
                   height: 427,
@@ -162,7 +168,8 @@ export default function BaseMap({
                     "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
                   pointerEvents: "none",
                 }}
-              />
+              /> */}
+              </CircleWrapper>
             </CustomOverlayMap>
           )}
           {/* 다른 사용자 마커 표시 (Firestore 기반) */}
@@ -221,8 +228,8 @@ export default function BaseMap({
           src={moveToMyLocationBtn}
           onClick={() => {
             if (myPosition) {
-              setCenter(myPosition);
               setFollowMe(true);
+              setCenter(myPosition);
               setMapLevel(3);
             }
           }}
@@ -282,6 +289,24 @@ const FooterWrap = styled.div`
   left: 0;
   right: 0;
   z-index: 200;
+`;
+const CircleWrapper = styled.div<{ size: number }>`
+  position: relative;
+  width: ${(p) => p.size}px;
+  height: ${(p) => p.size}px;
+`;
+const Circle = styled.div<{ size: number }>`
+  position: absolute;
+  width: ${(p) => p.size}px;
+  height: ${(p) => p.size}px;
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(255, 255, 255, 0.3) 28.85%,
+    rgba(67, 214, 135, 0.3) 100%
+  );
+  pointer-events: none;
+  transition: width 0.2s ease, height 0.2s ease;
 `;
 
 const NameLabel = styled.div`
