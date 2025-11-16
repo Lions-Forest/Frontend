@@ -206,7 +206,7 @@ const CreateMeetingLayout = styled.div`
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background-color: #E2EDE7;
+    background-color: #E4F2EA;
     overflow: hidden;
 `;
 
@@ -214,7 +214,7 @@ const ProgressBarContainer = styled.div`
     width: 100%;
     padding: 0 16px;
     flex-shrink: 0;
-    background-color: #E2EDE7;
+    background-color: #E4F2EA;
 `;
 
 const ProgressBarWrapper = styled.div`

@@ -36,7 +36,7 @@ const NavBarWrapper = styled.nav<{ $isNotificationPage: boolean }>`
   display: flex;
   align-items: center;
   padding: 11px 16px;
-  background-color: ${props => props.$isNotificationPage ? '#ffffff' : '#E2EDE7'};
+  background-color: ${props => props.$isNotificationPage ? '#ffffff' : '#E4F2EA'};
   color: black;
   justify-content: space-between;
 `;
