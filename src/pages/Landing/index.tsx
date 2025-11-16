@@ -45,12 +45,16 @@ function Index() {
         const result = await getRedirectResult(auth);
 
         // 리다이렉트 로그인 결과가 없는 첫 방문 등의 경우
-        if (!result) return;
+        // 단, 이미 로그인된 사용자가 있다면 currentUser로 처리
+        if (!result && !auth.currentUser) return;
 
         setIsLoading(true);
         setError(null);
 
-        const idToken = await result.user.getIdToken();
+        const firebaseUser = result?.user ?? auth.currentUser;
+        if (!firebaseUser) return;
+
+        const idToken = await firebaseUser.getIdToken();
         const loginResponse = await loginWithGoogle({ idToken });
 
         localStorage.setItem("accessToken", loginResponse.accessToken);
@@ -59,7 +63,7 @@ function Index() {
         localStorage.setItem("nickname", loginResponse.nickname);
         localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
 
-        navigate("/home");
+        navigate('/home');
       } catch (err: any) {
         console.error("Google redirect login failed", err);
 
