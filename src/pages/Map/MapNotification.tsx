@@ -89,7 +89,7 @@ export default function MapNotification({
       <Message>{message}</Message>
       <BannerButton onClick={() => navigate("/home/create-meeting")}>
         바로 모임 개설하기
-        <img src={Arrow} width={7} height={5} />
+        <img src={Arrow} width={14} height={10} />
       </BannerButton>
     </StatusBanner>
   ) : (
@@ -128,6 +128,7 @@ const StatusBanner = styled.div`
   height: 95px;
   top: 50px;
   left: 50%;
+  margin-top: 21px;
   transform: translateX(-50%);
   background: #ffffff;
   padding: 8px 10px;
