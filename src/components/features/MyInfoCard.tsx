@@ -4,7 +4,7 @@ import { getMyInfo, type MyInfoResponse } from "@/api/user/myInfoCheckAPI";
 import { reviseMyInfo } from "@/api/user/myInfoReviseAPI";
 import { getRandomNickname } from "@/api/user/randomNickAPI";
 import cameraReviseIcon from "@/assets/icons/cameraRevise.svg";
-import refreshIcon from "@/assets/icons/refresh.svg";
+import refreshNickNameIcon from "@/assets/icons/refreshNickName.svg";
 
 function MyInfoCard() {
     const [myInfo, setMyInfo] = useState<MyInfoResponse | null>(null);
@@ -228,8 +228,7 @@ function MyInfoCard() {
                                     onClick={(e) => e.stopPropagation()}
                                 />
                                 <RandomButton onClick={handleRandomNickname}>
-                                    <RefreshIcon src={refreshIcon} alt="새로고침" />
-                                    <span>랜덤 생성</span>
+                                    <RefreshIcon src={refreshNickNameIcon} alt="랜덤 닉네임 생성" />
                                 </RandomButton>
                             </NicknameEditWrapper>
                         ) : (
@@ -410,18 +409,19 @@ const InvisibleInput = styled.input`
   border: none;
   background: transparent;
   outline: none;
-  flex: 1;
-//  min-width: 0;
-  max-width: 64px;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
   font-family: Pretendard;
   cursor: text;
+  margin-right: 2px;
 `;
 
 const NicknameEditWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-//  gap: 10px;
+  gap: 0;
   flex: 1;
   min-width: 0;
   max-width: 100%;
@@ -430,14 +430,14 @@ const NicknameEditWrapper = styled.div`
 const RandomButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
   padding: 2px;
   border-radius: 4px;
-  border: 0.5px solid #000;
-  background: #FFF;
+  border: none;
+  background: transparent;
   cursor: pointer;
   font-family: Pretendard;
-  white-space: nowrap;
+  flex-shrink: 0;
 `;
 
 const RefreshIcon = styled.img`
