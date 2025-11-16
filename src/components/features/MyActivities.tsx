@@ -7,6 +7,7 @@ import { getMyReviewList, type MyReviewListResponse } from "@/api/user/myReviewL
 import starOnIcon from "@/assets/icons/starOn.svg";
 import starOffIcon from "@/assets/icons/starOff.svg";
 import pencilIcon from "@/assets/icons/pencil.svg";
+import { fetchMeetingDetail } from "@/api/meeting/meetingListApi";
 
 const tabs = ["신청 내역", "개설 내역", "모임 후기 관리"] as const;
 type TabType = (typeof tabs)[number];
@@ -49,8 +50,8 @@ interface ReviewHistory {
   photos: { photoUrl: string; order: number }[];
 }
 
-function formatMeetingDate(dateString: string): string {
-  const date = new Date(dateString);
+function formatMeetingDate(dateInput: string | Date): string {
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -244,6 +245,26 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
     }
   };
 
+  const handleInfoClick = async () => {
+    if (!cardContent?.id) return;
+
+    try {
+      const meetingDetail = await fetchMeetingDetail(cardContent.id ?? 0);
+      if (!meetingDetail) {
+        console.error("모임 정보를 찾을 수 없습니다.");
+        return;
+      }
+
+      const timeText = formatMeetingDate(meetingDetail.date);
+
+      navigate(`/home/meeting-detail/${meetingDetail.id}`, {
+        state: { meeting: meetingDetail, timeText },
+      });
+    } catch (error) {
+      console.error("모임 정보 조회 실패:", error);
+    }
+  };
+
   const handleEditClick = (reviewId: number) => {
     navigate("/mypage/review/revise", { state: { reviewId } });
   };
@@ -318,7 +339,10 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
             </InfoItem>
           </SecondRow>
           <ButtonRow isOpen={cardContent.state === "OPEN"}>
-            <InfoButton isOpen={cardContent.state === "OPEN"}>
+            <InfoButton
+              isOpen={cardContent.state === "OPEN"}
+              onClick={handleInfoClick}
+            >
               모임 정보 확인
             </InfoButton>
             {cardContent.state !== "OPEN" && (
