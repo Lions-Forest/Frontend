@@ -1,5 +1,3 @@
-// TODO: Reply에 likesPressed 방법 고안 및 구현하기
-
 import Layout from "@/components/layout/Layout";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
