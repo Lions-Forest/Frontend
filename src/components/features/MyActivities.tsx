@@ -292,7 +292,11 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
           <ReviewMeetingDate>{formatMeetingDate(item.meetingAt)}</ReviewMeetingDate>
         </ReviewCardHeader>
         <ReviewCardBody>
-          {photoUrl && <ReviewPhoto src={photoUrl} alt="모임 사진" />}
+          {photoUrl ? (
+            <ReviewPhoto src={photoUrl} alt="모임 사진" />
+          ) : (
+            <ReviewPhotoPlaceholder />
+          )}
           <ReviewContentWrapper>
             <StarRating>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -669,6 +673,14 @@ const ReviewPhoto = styled.img`
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
+`;
+
+const ReviewPhotoPlaceholder = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.2);
 `;
 
 const ReviewContentWrapper = styled.div`
