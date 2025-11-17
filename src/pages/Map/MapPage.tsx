@@ -3,6 +3,7 @@ import BaseMap from "./BaseMap";
 import { useEffect, useState } from "react";
 import LoadingPage from "./LoadingPage";
 import { Navigate } from "react-router-dom";
+import { getMyInfo } from "@/api/user/myInfoCheckAPI";
 
 export default function MapPage() {
   const [authStatus, setAuthStatus] = useState<
@@ -13,10 +14,26 @@ export default function MapPage() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUserId(user.uid);
-        setName(user.displayName || user.email?.split("@")[0] || "사용자");
+
+        let nickname: string | null = localStorage.getItem("nickname");
+
+        if (!nickname) {
+          try {
+            const myInfo = await getMyInfo();
+            nickname = myInfo.nickname;
+            localStorage.setItem("nickname", nickname);
+            setName(nickname);
+          } catch (err) {
+            console.error("닉네임 자동 동기화 실패:", err);
+            nickname = null;
+          }
+        }
+        setName(
+          nickname || user.displayName || user.email?.split("@")[0] || "사용자"
+        );
         setAuthStatus("authed");
       } else {
         setUserId(null);

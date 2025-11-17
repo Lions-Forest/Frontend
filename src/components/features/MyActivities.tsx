@@ -63,6 +63,17 @@ function formatMeetingDate(dateInput: string | Date): string {
   return `${year}.${month}.${day}(${hour12}${period})`;
 }
 
+function formatCategory(category: string): string {
+  const categoryMap: Record<string, string> = {
+    'MEAL': '식사',
+    'WORK': '모각작',
+    'SOCIAL': '소모임',
+    'CULTURE': '문화예술',
+    'ETC': '기타',
+  };
+  return categoryMap[category] || category;
+}
+
 function MyActivities() {
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState<TabType>("신청 내역");
@@ -281,7 +292,11 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
           <ReviewMeetingDate>{formatMeetingDate(item.meetingAt)}</ReviewMeetingDate>
         </ReviewCardHeader>
         <ReviewCardBody>
-          {photoUrl && <ReviewPhoto src={photoUrl} alt="모임 사진" />}
+          {photoUrl ? (
+            <ReviewPhoto src={photoUrl} alt="모임 사진" />
+          ) : (
+            <ReviewPhotoPlaceholder />
+          )}
           <ReviewContentWrapper>
             <StarRating>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -335,7 +350,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
             <InfoItem>
               <InfoLabel>모임종류</InfoLabel>
               <Separator>|</Separator>
-              <InfoValue>{cardContent.category}</InfoValue>
+              <InfoValue>{formatCategory(cardContent.category)}</InfoValue>
             </InfoItem>
           </SecondRow>
           <ButtonRow isOpen={cardContent.state === "OPEN"}>
@@ -361,7 +376,7 @@ const Layout = styled.div`
   flex-direction: column;
   align-items: start;
   gap: 16px;
-  padding: 16px;
+  padding: 0px 16px;
   position: relative;
 `;
 
@@ -434,8 +449,10 @@ const CardHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 35px;
+  padding: 12px 20px;
   background: #ffffff;
+  flex-wrap: wrap;
+  gap: 8px;
 `;
 
 const StatusText = styled.div`
@@ -477,11 +494,11 @@ const CardSubInfo = styled.div`
 `;
 
 const CardBody = styled.div`
-  padding: 0 27px;
+  padding: 0 20px;
 `;
 
 const CardBodyContent = styled.div`
-  width: 307px;
+  width: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -492,24 +509,27 @@ const CardBodyContent = styled.div`
 const FirstRow = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 64px;
+  gap: 16px;
   width: 100%;
+  flex-wrap: wrap;
 `;
 
 const SecondRow = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 64px;
+  gap: 16px;
   width: 100%;
   margin-top: 7px;
+  flex-wrap: wrap;
 `;
 
 const InfoItem = styled.div<{ isFirst?: boolean }>`
   display: flex;
   align-items: flex-start;
+  flex: 1;
+  min-width: 0;
   ${({ isFirst }) => isFirst && `
-    width: 120px;
-    flex-shrink: 0;
+    min-width: 100px;
   `}
 `;
 
@@ -525,7 +545,7 @@ const Separator = styled.div`
 const ButtonRow = styled.div<{ isOpen?: boolean }>`
   display: flex;
   flex-direction: ${({ isOpen }) => (isOpen ? "column" : "row")};
-  gap: ${({ isOpen }) => (isOpen ? "0" : "23px")};
+  gap: ${({ isOpen }) => (isOpen ? "0" : "8px")};
   width: 100%;
   margin-top: 15px;
 `;
@@ -558,7 +578,17 @@ const InfoValue = styled.div`
 `;
 
 const InfoButton = styled.button<{ isOpen?: boolean }>`
-  width: ${({ isOpen }) => (isOpen ? "287px" : "132px")};
+  ${({ isOpen }) => 
+    isOpen 
+      ? `
+        width: 100%;
+        min-width: 0;
+      `
+      : `
+        flex: 1;
+        min-width: 0;
+      `
+  }
   height: 24px;
   flex-shrink: 0;
   border-radius: 8px;
@@ -569,10 +599,14 @@ const InfoButton = styled.button<{ isOpen?: boolean }>`
   font-size: 12px;
   font-weight: 600;
   color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ReviewButton = styled.button`
-  width: 132px;
+  flex: 1;
+  min-width: 0;
   height: 24px;
   flex-shrink: 0;
   border-radius: 8px;
@@ -583,6 +617,9 @@ const ReviewButton = styled.button`
   font-size: 12px;
   font-weight: 600;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ReviewCardLayout = styled.div<{ backgroundColor: string }>`
@@ -636,6 +673,14 @@ const ReviewPhoto = styled.img`
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
+`;
+
+const ReviewPhotoPlaceholder = styled.div`
+  width: 160px;
+  height: 120px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.2);
 `;
 
 const ReviewContentWrapper = styled.div`

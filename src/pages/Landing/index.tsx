@@ -208,12 +208,12 @@ function Index() {
             {isLoading ? "Signing in..." : "Sign in with Google"}
           </LoginText>
         </LoginBtn>
-      </BtnSection>
         <HelperText>
           기등록된 멋사 회원만 이용 가능합니다.
           <br />
           멋사에 등록된 구글 계정으로 로그인해 주세요.
         </HelperText>
+      </BtnSection>
     </div>
   );
 }
@@ -260,8 +260,10 @@ const BtnSection = styled.div<BtnSectionProps>`
   left: 0;
   width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-//  align-items: center;
+  gap: 12px;
   // opacity: 0%;
   opacity: ${({ opacity }) => opacity}; // 0 또는 1
   transition: opacity 2s;
@@ -328,9 +330,7 @@ const ErrorBanner = styled.div`
 `;
 
 const HelperText = styled.div`
-  margin-top: 12px;
   color: rgba(250, 20, 24, 0.9);
-
   font-family: Pretendard;
   font-size: 13px;
   font-weight: 700;
@@ -338,8 +338,4 @@ const HelperText = styled.div`
   text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.35);
   line-height: 1.5;
   white-space: pre-line;
-  position: fixed;
-  top: 90%;
-  left: 30%;
-  
 `;

@@ -15,6 +15,13 @@ import StatusSelector from "./StatusSelector";
 import MapNotification from "./MapNotification";
 import StatusMessage from "./StatusMessage";
 import { useLocationActions } from "@/hooks/useLocationActions";
+import { useRecoilState } from "recoil";
+import {
+  shareLocationState,
+  selectedStatusState,
+  statusMessageState,
+} from "@/store/mapState";
+import UserTag from "./UserTag";
 
 export default function BaseMap({
   userId,
@@ -23,10 +30,11 @@ export default function BaseMap({
   userId: string;
   name: string;
 }) {
-  const [shareLocation, setShareLocation] = useState(false);
+  const [shareLocation, setShareLocation] = useRecoilState(shareLocationState);
   const [selectedStatus, setSelectedStatus] =
-    useState<NonNullable<UserLocation["status"]>>("nothing");
-  const [statusMessage, setStatusMessage] = useState("");
+    useRecoilState(selectedStatusState);
+  const [statusMessage, setStatusMessage] = useRecoilState(statusMessageState);
+
   const [mapLevel, setMapLevel] = useState(3);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [followMe, setFollowMe] = useState(true);
@@ -89,7 +97,6 @@ export default function BaseMap({
         shareLocation: shareLocation,
         likedBy: locations[userId]?.likedBy || [],
       };
-      // selectedUser = locations[selectedUserId];
     } else {
       const target = locations[selectedUserId];
       if (target) {
@@ -102,6 +109,11 @@ export default function BaseMap({
       }
     }
   }
+
+  const baseCircleSize = 427;
+  const step = 0.07;
+  const scale = Math.max(1 - (mapLevel - 3) * step, 0.3);
+  const circleSize = baseCircleSize * scale;
 
   return (
     <MapContainer>
@@ -153,7 +165,9 @@ export default function BaseMap({
               xAnchor={0.5}
               yAnchor={0.5}
             >
-              <div
+              <CircleWrapper size={circleSize}>
+                <Circle size={circleSize} />
+                {/* <div
                 style={{
                   width: 427,
                   height: 427,
@@ -162,7 +176,8 @@ export default function BaseMap({
                     "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
                   pointerEvents: "none",
                 }}
-              />
+              /> */}
+              </CircleWrapper>
             </CustomOverlayMap>
           )}
           {/* 다른 사용자 마커 표시 (Firestore 기반) */}
@@ -185,7 +200,7 @@ export default function BaseMap({
                   position={{ lat: user.latitude, lng: user.longitude }}
                   image={{
                     src: markerImg,
-                    size: { width: 93, height: 102 },
+                    size: { width: 65, height: 87 },
                     options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
                   }}
                   onClick={handleMarkerClick}
@@ -196,7 +211,11 @@ export default function BaseMap({
                   yAnchor={1}
                   xAnchor={0.5}
                 >
-                  <NameLabel>{user.name}</NameLabel>
+                  <UserTag
+                    name={user.name}
+                    status={user.status}
+                    onClick={handleMarkerClick}
+                  />
                 </CustomOverlayMap>
               </React.Fragment>
             );
@@ -221,8 +240,8 @@ export default function BaseMap({
           src={moveToMyLocationBtn}
           onClick={() => {
             if (myPosition) {
-              setCenter(myPosition);
               setFollowMe(true);
+              setCenter(myPosition);
               setMapLevel(3);
             }
           }}
@@ -285,16 +304,24 @@ const FooterWrap = styled.div`
   display: flex;
   justify-content: center;
 `;
+const CircleWrapper = styled.div<{ size: number }>`
+  position: relative;
+  width: ${(p) => p.size}px;
+  height: ${(p) => p.size}px;
+`;
 
-const NameLabel = styled.div`
-  display: inline-block;
-  transform: translate(-1px, -35px);
+const Circle = styled.div<{ size: number }>`
+  position: absolute;
+  width: ${(p) => p.size}px;
+  height: ${(p) => p.size}px;
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(255, 255, 255, 0.3) 28.85%,
+    rgba(67, 214, 135, 0.3) 100%
+  );
   pointer-events: none;
-  background: none;
-  font-family: Pretendard;
-  font-size: 10px;
-  font-weight: 600;
-  color: #ffffff;
+  transition: width 0.2s ease, height 0.2s ease;
 `;
 
 const GeolocationErrorBanner = styled.div`
@@ -302,7 +329,7 @@ const GeolocationErrorBanner = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 5px;
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
@@ -311,7 +338,7 @@ const GeolocationErrorBanner = styled.div`
   padding: 12px 10px;
   border-radius: 12px;
   background: rgba(255, 77, 79, 0.9);
-  color: #fff;
+  color: #ffffff;
   font-family: Pretendard;
   font-size: 15px;
   font-weight: 600;
