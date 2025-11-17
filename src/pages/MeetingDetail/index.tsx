@@ -262,7 +262,7 @@ function index() {
                                             {memberSlots.map((participant, index) => (
                                                 <Profile
                                                     key={index}
-                                                    src={!participant ? '' : (isAnonymous(meeting.date) ? defaultProfile : participant?.photoUrl)}
+                                                    src={!participant ? undefined : (isAnonymous(meeting.date) ? defaultProfile : participant?.photoUrl)}
                                                     $clickable={!!participant}
                                                     onClick={() => handleMemberClick(participant)}
                                                 />
@@ -304,10 +304,16 @@ function index() {
                                       )
                                 )
                             ) : (
-                            <>
-                                <InfoButton onClose={true} />
-                                <InfoButton onReview={true} onClick={handleReviewClick}/>
-                            </>
+                                joinState === 'join' ? (
+                                <>
+                                    <InfoButton onClose={true} />
+                                </>
+                                ) : (
+                                <>
+                                    <InfoButton onClose={true} />
+                                    <InfoButton onReview={true} onClick={handleReviewClick}/>
+                                </>
+                                )
                             )}
                         </Buttons>
                     </>
@@ -353,11 +359,10 @@ const PicInfo = styled.div`
 
 const Picture = styled.img`
     width: 100%;
-    // height: 219px;
-    height: 100%;
     aspect-ratio: 110/70;
     padding: 14px 16px;
     object-fit: scale-down;
+    overflow: hidden;
 `;
 
 const PicHeader = styled.div`

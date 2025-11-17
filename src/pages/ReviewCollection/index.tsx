@@ -87,9 +87,10 @@ const EmptyText = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6B7280;
-    font-family: dongleLight;
-    font-size: 30px;
-    font-style: normal;
-    font-weight: 700;
+  color: #5f5f5f;
+  font-family: dongleRegular;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 `;

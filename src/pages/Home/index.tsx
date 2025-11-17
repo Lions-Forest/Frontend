@@ -20,37 +20,33 @@ function index() {
   const { fetchMeetingList } = useMeetingStore();
   const [loading, setLoading] = useState(false);
 
-  // 전체 모임 리스트 가져오기
-  useEffect(() => {
-    const fetchData = async() => {
-      try {
-        setLoading(true);
-        const meetings = await fetchMeetingList();
-        console.log("전체 모임 리스트: ", meetings);
-        setMeetingList(meetings);
-      } catch (error) {
-        console.error("데이터 로딩 실패: ", error);
-        setMeetingList([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // 전체 + 나의 모임 리스트 재로딩 함수
+  const reloadHomeData = async () => {
+    try {
+      setLoading(true);
+      const meetings = await fetchMeetingList();
+      console.log("전체 모임 리스트: ", meetings);
+      setMeetingList(meetings);
+    } catch (error) {
+      console.error("데이터 로딩 실패: ", error);
+      setMeetingList([]);
+    } finally {
+      setLoading(false);
+    }
 
-  // 내가 참여한 모임 리스트 가져오기
+    try {
+      const myMeetings = await fetchMyMeetingList();
+      console.log("나의 모임 리스트: ", myMeetings);
+      setMyMeetingList(myMeetings);
+    } catch (error) {
+      console.error("데이터 로딩 실패: ", error);
+      setMyMeetingList([]);
+    }
+  };
+
+  // 최초 1회 로딩
   useEffect(() => {
-    const fetchMyData = async() => {
-      try {
-        const myMeetings = await fetchMyMeetingList();
-        console.log("나의 모임 리스트: ", myMeetings);
-        setMyMeetingList(myMeetings);
-      } catch (error) {
-        console.error("데이터 로딩 실패: ", error);
-        setMyMeetingList([]);
-      }
-    };
-    fetchMyData();
+    reloadHomeData();
   }, []);
 
   const dueMeetings = meetingList.filter((m) => {
@@ -71,7 +67,7 @@ function index() {
           <>
             <MyMeeting meetings={myMeetingList}/>
             <Line />
-            <MeetingList meetings={meetingList} />
+            <MeetingList meetings={meetingList} onChange={reloadHomeData} />
             <Line />
             <DueList meetings={dueMeetings} />
             <Line />

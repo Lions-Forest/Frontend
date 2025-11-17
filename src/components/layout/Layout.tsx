@@ -50,7 +50,8 @@ const Root = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100vh;
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
 `;
 
@@ -68,12 +69,7 @@ const Content = styled.div`
 `;
 
 const FooterWrapper = styled.div`
-    // flex-shrink: 0;
+    flex-shrink: 0;
     width: 100%;
-`;
-
-const ButtonWrapper = styled.div`
-    width: 100%;
-    margin: 0px 16px 54px 16px;
 `;
 

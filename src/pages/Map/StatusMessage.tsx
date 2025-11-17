@@ -71,7 +71,7 @@ const Message = styled.div`
   border-radius: 4px;
   color: #00b353;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  max-width: 120px;
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -25,7 +25,7 @@ function ReplyList({
         <Title>댓글</Title>
         <Replies>
           {replies.length === 0 ? (
-            <EmptyText>아직 댓글이 없습니다.</EmptyText>
+            <EmptyText>아직 댓글이 없습니다</EmptyText>
           ) : (
             replies.map((reply) => (
               <ReplySpan
