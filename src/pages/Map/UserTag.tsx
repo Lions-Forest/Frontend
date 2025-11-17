@@ -12,6 +12,17 @@ const statusToKorean: Record<string, string> = {
   hungry: "배고파",
 };
 
+const statusColor: Record<string, string> = {
+  nothing: "#848484",
+  studying: "#43D687",
+  working: "#FEFF00",
+  relaxing: "#0095FF",
+  eating: "#FF2370",
+  playing: "#0CE3D8",
+  boring: "#FBBC04",
+  hungry: "#C243D6",
+};
+
 interface Props {
   name: string;
   status: NonNullable<UserLocation["status"]>;
@@ -20,9 +31,10 @@ interface Props {
 
 export default function UserTag({ name, status, onClick }: Props) {
   const statusText = statusToKorean[status] || "상태 X";
+  const color = statusColor[status] || "#848484";
 
   return (
-    <TagWrapper onClick={onClick}>
+    <TagWrapper $color={color} onClick={onClick}>
       <Nickname>{name}</Nickname>
       <StatusContainer>
         <Status>{statusText}</Status>
@@ -31,20 +43,19 @@ export default function UserTag({ name, status, onClick }: Props) {
   );
 }
 
-const TagWrapper = styled.div`
-  position: relative;
+const TagWrapper = styled.div<{ $color: string }>`
   display: inline-flex;
-  align-items: center;
   height: 20px;
-  border: 1px solid #ff2370;
+  border: 1px solid ${(p) => p.$color};
   border-radius: 16px;
-  background-color: #ff2370;
+  background-color: ${(p) => p.$color};
   cursor: pointer;
+  align-items: center;
   transform: translateY(-43px);
 `;
 
 const Nickname = styled.div`
-  padding: 4px 8px;
+  padding: 4px 10px;
   font-family: Pretendard;
   font-size: 10px;
   font-weight: 600;
@@ -54,12 +65,9 @@ const Nickname = styled.div`
 `;
 
 const StatusContainer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 100%;
   display: flex;
-  //   justify-content: center;
-  //   align-items: center;
+  justify-content: center;
+  align-items: center;
   width: 47px;
   height: 100%;
   padding: 4px 12px 4px 9px;
@@ -67,7 +75,6 @@ const StatusContainer = styled.div`
   border: none;
   border-radius: 0 16px 16px 0;
   box-sizing: border-box;
-  border-left: 2px solid #ff2370;
 `;
 
 const Status = styled.div`
