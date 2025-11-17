@@ -105,11 +105,12 @@ const EmptyText = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6B7280;
-    font-family: Pretendard;
-    font-size: 16px;
+    color: #5f5f5f;
+    font-family: dongleRegular;
+    font-size: 22px;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
+    line-height: normal;
     padding: 40px 0px;
 `;
 

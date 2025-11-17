@@ -395,10 +395,10 @@ function BottomSheet({
       <BottomSheetContainer
         ref={bottomSheetRef}
         style={{
-          position: "fixed",
-          top: "100%",
-          left: 0,
-          right: 0,
+          // position: "fixed",
+          // top: "100%",
+          // left: 0,
+          // right: 0,
           zIndex: 100,
           willChange: "transform",
           transition: "transform 0.4s ease-in-out",
@@ -487,11 +487,15 @@ function BottomSheet({
 }
 
 const BottomSheetContainer = styled.div`
-  position: fixed;
+  position: absolute; 
+  // position: fixed;
   top: 100%;
-  left: 0;
+  // left: 0;
   width: 100%;
   background-color: white;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
 `;
 
 const SheetContainer = styled.div`
@@ -505,6 +509,7 @@ const SheetContainer = styled.div`
   background: #ffffff;
   border-radius: 4px 4px 0 0;
   z-index: 50;
+  justify-content: center;
 `;
 
 const HandleBarWrapper = styled.div`

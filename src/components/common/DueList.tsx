@@ -87,12 +87,11 @@ const CardList = styled.div<{ $shouldScroll?: boolean }>`
 `;
 
 const NoneText = styled.div`
-  color: #000;
+  color: #5f5f5f;
   font-family: dongleRegular;
-  font-size: 30px;
-  font-weight: 700;
-  line-height: normal;
-  align-self: stretch;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
   line-height: normal;
 
   display: flex;

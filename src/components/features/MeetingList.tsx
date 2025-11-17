@@ -3,15 +3,15 @@ import styled from "styled-components";
 import { IoIosArrowDown as Arrow } from "react-icons/io";
 import PreviewCard from "../common/PreviewCard";
 import type { Meeting } from "@/types";
-import { fetchMyMeetingList } from "@/api/meeting/meetingJoinApi";
 
 interface MeetingListProps {
   meetings: Meeting[];
+  onChange?: () => void;
 }
 
 const types = ["전체", "식사", "모각작", "소모임", "문화예술", "기타"];
 
-function MeetingList({ meetings }: MeetingListProps) {
+function MeetingList({ meetings, onChange }: MeetingListProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [recruitState, setRecruitState] = useState("모집 중");
   const [selectedType, setSelectedType] = useState("전체");
@@ -63,7 +63,7 @@ function MeetingList({ meetings }: MeetingListProps) {
           </TypeList>
         </ListHeader>
         <NoList>
-          <OptionTitle>생성된 모임이 없습니다</OptionTitle>
+          <NoText>생성된 모임이 없습니다</NoText>
         </NoList>
       </Layout>
     );
@@ -131,12 +131,16 @@ function MeetingList({ meetings }: MeetingListProps) {
       </ListHeader>
       {filteredMeetings.length === 0 ? (
         <NoList>
-          <OptionTitle>생성된 모임이 없습니다</OptionTitle>
+          <NoText>생성된 모임이 없습니다</NoText>
         </NoList>
       ) : (
         <ListUp>
           {previewMeetings.map((meeting) => (
-            <PreviewCard key={meeting.id} meeting={meeting} />
+            <PreviewCard
+              key={meeting.id}
+              meeting={meeting}
+              onChange={onChange}
+            />
           ))}
           {!showAll && filteredMeetings.length > 2 && (
             <MoreBtn onClick={() => setShowAll(true)}>
@@ -272,4 +276,13 @@ const ListUp = styled.div`
   // align-items: center;
   gap: 16px;
   align-items: end;
+`;
+
+const NoText = styled.div`
+  color: #5f5f5f;
+  font-family: dongleRegular;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 `;

@@ -8,7 +8,6 @@ import CreateMeetingPage from "./pages/CreateMeeting";
 import MyPage from "./pages/Mypage";
 import NotificationPage from "./pages/NotificationPage";
 import { GlobalStyle } from "./styles/global";
-import "./App.css";
 import MapPage from "./pages/Map/MapPage";
 import ReviewPage from "./pages/Mypage/ReviewPage";
 import ReviewRevisePage from "./pages/Mypage/ReviewRevisePage";

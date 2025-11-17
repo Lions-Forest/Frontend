@@ -114,6 +114,9 @@ const BtnContainer = styled.div`
   flex-wrap: wrap;
   gap: 6px 20px;
   margin-top: 7px;
+  // display: grid;
+  // grid-template-columns: 1fr 1fr 1fr 1fr;
+  // grid-template-rows: 1fr 1fr;
 `;
 
 const Icon = styled.img`

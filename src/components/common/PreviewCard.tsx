@@ -54,7 +54,13 @@ function calculateRemaining(meetingDate: Date) {
   return remaining;
 }
 
-function PreviewCard({ meeting }: { meeting: Meeting }) {
+interface PreviewCardProps {
+  meeting: Meeting;
+  // 상위(홈)에서 리스트를 다시 불러오도록 하는 콜백
+  onChange?: () => void;
+}
+
+function PreviewCard({ meeting, onChange }: PreviewCardProps) {
   const navigate = useNavigate();
   const remaining = calculateRemaining(meeting.date);
   const remainingTime = `${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`;
@@ -64,7 +70,10 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
   const [showModal, setShowModal] = useState(false);
 
   const userId = localStorage.getItem("userId");
-  const isOwner = Number(userId) === meeting?.owner.id ? true : false;
+  const isOwner =
+    meeting?.owner && userId
+      ? Number(userId) === meeting.owner.id
+      : false;
 
   let theme: ColorTheme;
 
@@ -98,7 +107,8 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
         try {
             await deleteMeeting(meeting.id);
             setJoinState('cancel');
-            navigate('/home');
+            // 홈(상위) 데이터 새로고침
+            onChange?.();
         } catch(e) {
             console.log("handleDelete 함수 실패: ", e);
         }
@@ -157,7 +167,11 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
                     </InfoTitle>
                     <InfoDetail>
                         <div>{meeting.type}</div>
-                        <div>{meeting.complete ? meeting.owner.name : meeting.owner?.nickname}</div>
+                        <div>
+                          {meeting.complete
+                            ? meeting.owner?.name
+                            : meeting.owner?.nickname}
+                        </div>
                         <div>{meeting.memberNumber}/{meeting.memberLimit}</div>
                         <div>{meeting.location}</div>
                     </InfoDetail>

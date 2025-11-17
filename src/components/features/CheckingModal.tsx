@@ -19,8 +19,8 @@ function CheckingModal({ onClick, onClose }: ClickingModalProps ) {
             </ParticipantDetail>
         </DetailRow>
         <ButtonRow>
-            <Button>네</Button>
-            <Button onClick={onClick}>아니오</Button>
+            <Button onClick={onClick}>네</Button>
+            <Button onClick={onClose}>아니오</Button>
         </ButtonRow>
       </ModalBox>
     </Overlay>

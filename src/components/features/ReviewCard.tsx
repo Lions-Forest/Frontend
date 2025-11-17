@@ -14,7 +14,7 @@ function ReviewCard({ review }: { review: Review }){
     };
 
     return(
-        <CardLayout>
+        <CardLayout  onClick={handleCardClick}>
             <Header>
             <ProfileImg src={review.userProfile || ""} />
                 <ProfileName>{review.userName}</ProfileName>
@@ -22,7 +22,7 @@ function ReviewCard({ review }: { review: Review }){
             <CardPhoto src={(review.photo && (review.photo.find(p => p.order === 0)?.photoUrl || review.photo[0]?.photoUrl)) || ''}/>
             <DetailSection>
                 <ScoreNav review={review} />
-                <ZoomIcon src={zoomIcon} onClick={handleCardClick}/>
+                <ZoomIcon src={zoomIcon}/>
             </DetailSection>
             <CardDetail>{review.detail}</CardDetail>
         </CardLayout>
@@ -48,6 +48,7 @@ const CardLayout = styled.div`
 
 const Header = styled.div`
     display: flex;
+    width: 100%;
     align-items: center;
     justify-content: flex-start;
     padding: 4px;
@@ -78,10 +79,11 @@ const ProfileName = styled.div`
 `;
 
 const CardPhoto = styled.img`
-    width: 80px;
+    width: 100%;
     height: 79px;
-    flex-shrink: 0;
+    // flex-shrink: 0;
     background: #848484;
+    object-fit: cover;
 `;
 
 const DetailSection = styled.div`
@@ -97,7 +99,7 @@ const DetailSection = styled.div`
 
 const CardDetail = styled.div`
     display: -webkit-box;
-    // width: 73px;
+    padding: 0px 5px;
     width: 100%;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;

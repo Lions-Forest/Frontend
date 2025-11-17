@@ -58,7 +58,7 @@ export default Footer;
 const FooterLayout = styled.div`
   width: 100%;
   height: 75px;
-  // max-width: 600px;
+  max-width: 600px;
   background: #fff;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   padding: 15px 75px;
