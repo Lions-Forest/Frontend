@@ -21,6 +21,7 @@ import {
   selectedStatusState,
   statusMessageState,
 } from "@/store/mapState";
+import UserTag from "./UserTag";
 
 export default function BaseMap({
   userId,
@@ -199,7 +200,7 @@ export default function BaseMap({
                   position={{ lat: user.latitude, lng: user.longitude }}
                   image={{
                     src: markerImg,
-                    size: { width: 93, height: 102 },
+                    size: { width: 65, height: 87 },
                     options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
                   }}
                   onClick={handleMarkerClick}
@@ -210,7 +211,11 @@ export default function BaseMap({
                   yAnchor={1}
                   xAnchor={0.5}
                 >
-                  <NameLabel>{user.name}</NameLabel>
+                  <UserTag
+                    name={user.name}
+                    status={user.status}
+                    onClick={handleMarkerClick}
+                  />
                 </CustomOverlayMap>
               </React.Fragment>
             );
@@ -315,17 +320,6 @@ const Circle = styled.div<{ size: number }>`
   );
   pointer-events: none;
   transition: width 0.2s ease, height 0.2s ease;
-`;
-
-const NameLabel = styled.div`
-  display: inline-block;
-  transform: translate(-1px, -35px);
-  pointer-events: none;
-  background: none;
-  font-family: Pretendard;
-  font-size: 10px;
-  font-weight: 600;
-  color: #ffffff;
 `;
 
 const GeolocationErrorBanner = styled.div`
