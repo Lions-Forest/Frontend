@@ -20,7 +20,7 @@ export default index;
 const MyPageLayout = styled.div`
     background: #E4F2EA;
     width: 100%;
-    height: auto;
+    height: 100%;
     // overflow: auto;
     display: flex;
     padding: 0px 0px 14px 0px;
