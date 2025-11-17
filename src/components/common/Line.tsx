@@ -10,7 +10,7 @@ function Line() {
 export default Line;
 
 const LineObject = styled.div`
-    width: 361px;
+    width: 100%;
     height: 2px;
     background: #E2E2E2;
 `;

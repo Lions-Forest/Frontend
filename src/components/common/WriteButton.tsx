@@ -20,9 +20,12 @@ function WriteButton() {
 export default WriteButton;
 
 const BtnLayout = styled.div`
-  position: fixed;
-  bottom: 91px;
-  right: 15px;
+  // position: fixed;
+  // bottom: 91px;
+  // right: 15px;
+  position: absolute;
+  bottom: 12%;
+  right: 5%;
 
   width: 40px;
   height: 40px;

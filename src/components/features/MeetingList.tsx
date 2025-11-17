@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { IoIosArrowDown as Arrow } from "react-icons/io";
 import PreviewCard from "../common/PreviewCard";
 import type { Meeting } from "@/types";
+import { fetchMyMeetingList } from "@/api/meeting/meetingJoinApi";
 
 interface MeetingListProps {
   meetings: Meeting[];
@@ -11,13 +12,9 @@ interface MeetingListProps {
 const types = ["전체", "식사", "모각작", "소모임", "문화예술", "기타"];
 
 function MeetingList({ meetings }: MeetingListProps) {
-  // 드롭다운 상태 (true: 메뉴 open)
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  // '모집 중'('모집 완료') 상태값, 기본 '모집 중'
   const [recruitState, setRecruitState] = useState("모집 중");
-  // type 버튼과 연동, 기본 '전체'
   const [selectedType, setSelectedType] = useState("전체");
-  // 더보기 상태 (true: 전체 보여주기)
   const [showAll, setShowAll] = useState(false);
 
   if (!meetings || meetings.length === 0) {
@@ -164,15 +161,20 @@ const Layout = styled.div`
 `;
 
 const ListHeader = styled.div`
+  width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items:center;
+    justify-content: center;
+    // align-items: flex-start;
+    // justify-content: flex-start;
     gap: 8px;
     margin-bottom: 20px;
 `;
 
 const OptionInfo = styled.div`
+  width: 100%;
+  justify-content: flex-start;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -181,16 +183,19 @@ const OptionInfo = styled.div`
 
 const OptionTitle = styled.div`
   color: #000;
-  font-family: dongleLight;
+  font-family: dongleRegular;
   font-size: 30px;
   font-weight: 700;
   line-height: normal;
 `;
 
 const TypeList = styled.div`
+  width: 100%;
+  justify-content: center;
   display: flex;
   align-items: center;
-  gap: 8.6px;
+  // gap: 8.6px;
+  gap: 3%;
   align-self: stretch;
 `;
 
@@ -227,7 +232,7 @@ const MoreBtn = styled.div`
     cursor: pointer;
 
   color: #000;
-  font-family: dongleLight;
+  font-family: dongleRegular;
   font-size: 20px;
   font-weight: 700;
   line-height: normal;

@@ -42,7 +42,7 @@ const Title = styled.div`
   align-self: stretch;
   color: #000;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  font-family: dongleLight;
+  font-family: dongleRegular;
   font-size: 30px;
   font-style: normal;
   font-weight: 700;
@@ -88,7 +88,7 @@ const CardList = styled.div<{ $shouldScroll?: boolean }>`
 
 const NoneText = styled.div`
   color: #000;
-  font-family: dongleLight;
+  font-family: dongleRegular;
   font-size: 30px;
   font-weight: 700;
   line-height: normal;

@@ -4,6 +4,7 @@ import background from "../../assets/images/background.png";
 import lionWatching from "../../assets/images/lionWatching.png";
 import arrow from "../../assets/images/arrow.png";
 import type { Meeting } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 function formatMeetingDate(date: Date | string) {
   const d: Date = date instanceof Date ? date : new Date(date as string);
@@ -33,8 +34,11 @@ interface MyMeetingProps {
 function MyMeeting({ meetings = [] }: MyMeetingProps) {
   const [current, setCurrent] = useState(0);
 
-  // const showArrows = meetings.length > 1;
   const meeting = meetings[current];
+  const navigate = useNavigate();
+  const handleTextClick = () => {
+    navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting }})
+  }
 
   return (
     <Layout>
@@ -54,14 +58,14 @@ function MyMeeting({ meetings = [] }: MyMeetingProps) {
                       setCurrent((current - 1 + meetings.length) % meetings.length)
                     }
                   />
-                  <SubTitle>{meeting.title}</SubTitle>
+                  <SubTitle onClick={handleTextClick}>{meeting.title}</SubTitle>
                   <ArrowRight
                     src={arrow}
                     onClick={() => setCurrent((current + 1) % meetings.length)}
                   />
                 </SubTitleSpan>
               ) : (
-                <SubTitle>{meeting.title}</SubTitle>
+                <SubTitle onClick={handleTextClick}>{meeting.title}</SubTitle>
               )
           ) : (
             <NoneTitle>신청한 모임이 없어요</NoneTitle>
@@ -72,18 +76,6 @@ function MyMeeting({ meetings = [] }: MyMeetingProps) {
       </MeetingInfo>
     </Layout>
   );
-  // return(
-  //     <Layout>
-  //         <SubTitle>내가 신청한 모임</SubTitle>
-  //         <MeetingInfo>
-  //             <Background src={background} />
-  //             <Info>
-  //                 <Date>{}</Date>
-  //             </Info>
-  //             <LionImage src={lionWatching} />
-  //         </MeetingInfo>
-  //     </Layout>
-  // )
 }
 
 export default MyMeeting;
@@ -101,9 +93,9 @@ const Layout = styled.div`
 
 const Title = styled.div`
   color: #000;
-  font-family: dongleLight;
+  font-family: dongleRegular;
   font-weight: 700;
-  font-size: 45px;
+  font-size: 30px;
   align-self: stretch;
   margin-bottom: 8px;
 `;
@@ -142,7 +134,7 @@ const Info = styled.div`
   justify-content: center;
   position: absolute;
   top: 50%;
-  left: -10%;
+  left: -5%;
   transform: translateY(-50%);
   z-index: 2;
 `;
@@ -163,16 +155,18 @@ const DateInfo = styled.div`
 `;
 
 const ArrowLeft = styled.img`
-  width: 10px;
+  width: 13px;
 `;
 
 const ArrowRight = styled.img`
-  width: 10px;
+  width: 13px;
   transform: rotate(180deg);
 `;
 
 const Background = styled.img`
-  width: 332px;
+  // width: 332px;
+  width: 90%;
+  height: 85px;
   position: relative;
   display: block;
   z-index: 1;

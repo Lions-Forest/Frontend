@@ -5,8 +5,8 @@ import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
 import CardButton from "./CardButton";
 import type { Meeting } from "@/types";
-import { cancelJoinMeeting, deleteMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
-import { useState } from "react";
+import { cancelJoinMeeting, deleteMeeting, fetchMyMeetingList, joinMeeting } from "@/api/meeting/meetingJoinApi";
+import { useEffect, useState } from "react";
 import CheckingModal from "../features/CheckingModal";
 
 interface ColorTheme {
@@ -72,6 +72,21 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
   else if (meeting.id % 4 === 2) theme = blueTheme;
   else if (meeting.id % 4 === 3) theme = yellowTheme;
   else theme = pinkTheme;
+
+  useEffect (() => {
+    const fetchJoinState = async() => {
+      try {
+        const result = await fetchMyMeetingList();
+        console.log("나의 후기 리스트: ", result);
+        if (result.some(m => m.id === meeting.id)) setJoinState('cancel');
+      } catch (error) {
+        console.error("데이터 로딩 실패: ", error);
+        setJoinState('join');
+      }
+    };
+    fetchJoinState();
+  }, []);
+
 
   const handleCardClick = () => {
     navigate(`/home/meeting-detail/${meeting.id}`, { state: { meeting, remainingTime } });
@@ -154,14 +169,14 @@ function PreviewCard({ meeting }: { meeting: Meeting }) {
                 meeting.memberNumber === meeting.memberLimit ? (
                   <CardButton onClose={true} />
                 ) : (
-                  joinState === 'join' ? (
-                    isOwner === true ? (
-                      <CardButton onMakeCancel={true} onClick={() => setShowModal(true)} color={theme.button}/>
-                    ) : (
+                  isOwner === false ? (
+                    joinState === 'join' ? (
                       <CardButton onJoin={true} onClick={handleJoin} color={theme.button}/>
+                    ) : (
+                      <CardButton onJoinCancel={true} onClick={handleJoinCancel} color={theme.button}/>
                     )
                   ) : (
-                    <CardButton onJoinCancel={true} onClick={handleJoinCancel} color={theme.button}/>
+                    <CardButton onMakeCancel={true} onClick={() => setShowModal(true)} color={theme.button}/>
                   )
                 )
               ) : (

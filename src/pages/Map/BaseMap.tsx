@@ -282,6 +282,8 @@ const FooterWrap = styled.div`
   left: 0;
   right: 0;
   z-index: 200;
+  display: flex;
+  justify-content: center;
 `;
 
 const NameLabel = styled.div`

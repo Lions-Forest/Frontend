@@ -172,10 +172,10 @@ function index() {
         fetchParticipantData();
     }, [meeting?.id]);
 
-    // 참여 멤버 슬롯 (참가자 정보 포함)
+    const MAX_VISIBLE = 6;
     const memberSlots: (Participant | undefined)[] = meeting
-        ? Array.from({ length: meeting.memberLimit }, (_, index) => participantList[index])
-        : [];
+      ? Array.from({ length: meeting.memberLimit }, (_, index) => participantList[index]).slice(0, MAX_VISIBLE)
+      : [];
 
     const handleMemberClick = (participant?: Participant) => {
         if (!participant) return;
@@ -268,6 +268,11 @@ function index() {
                                                 />
                                             ))}
                                         </MemberProfiles>
+                                        {meeting.memberLimit > 6 ? (
+                                            <MemberCount> ... </MemberCount>
+                                        ) : (
+                                            <></>
+                                        )}
                                         <MemberCount>{meeting.memberNumber} / {meeting.memberLimit}</MemberCount>
                                     </DetailText>
                                 </Detail>
@@ -288,15 +293,15 @@ function index() {
                                 meeting.memberNumber === meeting.memberLimit ? (
                                     <InfoButton onClose={true} />
                                 ) : (
-                                    joinState === 'join' ? (
-                                        isOwner === true ? (
-                                            <InfoButton onMakeCancel={true} onClick={() => setShowModal(true)} />
+                                    isOwner === false ? (
+                                        joinState === 'join' ? (
+                                          <InfoButton onJoin={true} onClick={handleJoin}/>
                                         ) : (
-                                            <InfoButton onJoin={true} onClick={handleJoin}/>
+                                          <InfoButton onJoinCancel={true} onClick={handleJoinCancel} />
                                         )
-                                    ) : (
-                                        <InfoButton onJoinCancel={true} onClick={handleJoinCancel} />
-                                    )
+                                      ) : (
+                                        <InfoButton onMakeCancel={true} onClick={() => setShowModal(true)} />
+                                      )
                                 )
                             ) : (
                             <>
