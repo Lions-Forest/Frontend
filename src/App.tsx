@@ -11,8 +11,23 @@ import { GlobalStyle } from "./styles/global";
 import MapPage from "./pages/Map/MapPage";
 import ReviewPage from "./pages/Mypage/ReviewPage";
 import ReviewRevisePage from "./pages/Mypage/ReviewRevisePage";
+import { useEffect } from "react";
 
 function App() {
+
+  function setMobileHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+
+  useEffect(() => {
+    setMobileHeight();
+    
+    // resize 이벤트가 발생하면 다시 계산하도록 아래 코드 추가
+    window.addEventListener('resize', setMobileHeight);
+    return () => window.removeEventListener('resize', setMobileHeight);
+  }, []);
+
   return (
     <>
       <GlobalStyle />
