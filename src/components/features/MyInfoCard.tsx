@@ -7,9 +7,11 @@ import cameraReviseIcon from "@/assets/icons/cameraRevise.svg";
 import refreshNickNameIcon from "@/assets/icons/refreshNickName.svg";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 function MyInfoCard() {
+  const navigate = useNavigate();
   const [myInfo, setMyInfo] = useState<MyInfoResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -204,18 +206,45 @@ function MyInfoCard() {
     }
   }, [isEditMode]);
 
+  const handleLogout = async () => {
+    if (window.confirm("로그아웃하시겠습니까?")) {
+      try {
+        // Firebase Auth 로그아웃
+        const auth = getAuth();
+        await signOut(auth);
+
+        // localStorage 클리어
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("nickname");
+        localStorage.removeItem("isNewUser");
+
+        // 랜딩 페이지로 리다이렉트
+        navigate("/", { replace: true });
+      } catch (error) {
+        console.error("로그아웃 실패:", error);
+      }
+    }
+  };
+
   return (
     <Layout>
       {" "}
       {/* Layout 컴포넌트 아님 */}
       <HeaderWrapper>
         <HeaderTitle>내 정보</HeaderTitle>
-        <HeaderButton
-          isEditMode={isEditMode}
-          onClick={isEditMode ? handleSaveClick : handleEditClick}
-        >
-          {isEditMode ? "저장하기" : "수정하기"}
-        </HeaderButton>
+        <ButtonWrapper>
+          <HeaderButton
+            isEditMode={isEditMode}
+            onClick={isEditMode ? handleSaveClick : handleEditClick}
+          >
+            {isEditMode ? "저장하기" : "수정하기"}
+          </HeaderButton>
+          <LogoutButton onClick={handleLogout}>
+            로그아웃
+          </LogoutButton>
+        </ButtonWrapper>
       </HeaderWrapper>
       <BodyWrapper>
         <UserImageWrapper>
@@ -329,6 +358,12 @@ const HeaderTitle = styled.div`
   align-self: stretch;
   margin-bottom: 8px;
 `;
+const ButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+`;
 const HeaderButton = styled.button<{ isEditMode?: boolean }>`
   color: #ffffff;
   background: ${({ isEditMode }) => (isEditMode ? "#FBBC04" : "#9F9F9F")};
@@ -341,6 +376,25 @@ const HeaderButton = styled.button<{ isEditMode?: boolean }>`
   //padding: 4px 8px;
   cursor: pointer;
   border: none;
+`;
+const LogoutButton = styled.button`
+  color: #ffffff;
+  background: #FBBC04;
+  width: 78px;
+  height: 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
 `;
 
 const BodyWrapper = styled.div`
