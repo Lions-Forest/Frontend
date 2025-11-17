@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  GoogleAuthProvider,
-  getAuth,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-} from "firebase/auth";
+import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import landingImage from "../../assets/images/landingImage.png";
 import { db } from "@/firebase/firebase";
@@ -21,10 +15,6 @@ type BtnSectionProps = {
   opacity: number;
 };
 
-const isInStandaloneMode = () =>
-  window.matchMedia?.("(display-mode: standalone)").matches ||
-  // iOS PWA
-  (window.navigator as any).standalone === true;
 
 function Index() {
   const [colorStep, setColorStep] = useState(false);
@@ -51,69 +41,72 @@ function Index() {
     }
   }, [navigate]);
 
-  // Firebase 리다이렉트 로그인 결과 처리 (PWA/standalone 등에서 사용)
+  // Google OAuth Callback 처리 (code 받기)
   useEffect(() => {
-    const handleRedirectResult = async () => {
+    const handleOAuthCallback = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const error = urlParams.get("error");
+
+      // 에러가 있으면 표시
+      if (error) {
+        setError("로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.");
+        // URL에서 에러 파라미터 제거
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // code가 없으면 로그인 처리 안 함
+      if (!code) return;
+
+      setIsLoading(true);
+      setError(null);
+
       try {
-        const auth = getAuth(db.app);
-        const redirectPending = localStorage.getItem("googleRedirectPending");
-        const result = await getRedirectResult(auth);
+        // URL에서 code 파라미터 제거
+        window.history.replaceState({}, document.title, window.location.pathname);
 
-        // 리다이렉트 로그인 시도 후 돌아왔는데, 결과/유저가 없으면
-        // 시크릿 모드 또는 스토리지 제약 등으로 인해 실패한 것으로 간주
-        if (redirectPending === "1" && !result && !auth.currentUser) {
-          localStorage.removeItem("googleRedirectPending");
-          setError(
-            "시크릿 모드 또는 쿠키/스토리지 제한 환경에서는\n구글 로그인이 제한될 수 있습니다.\n일반 브라우저 모드에서 다시 시도해 주세요.",
-          );
-          return;
-        }
+        // 백엔드에 code와 redirectUri 전송
+        const redirectUri = window.location.origin;
+        const loginResponse = await loginWithGoogle({ 
+          code, 
+          redirectUri 
+        });
 
-        // 리다이렉트 로그인 결과가 없는 첫 방문 등의 경우
-        // 단, 이미 로그인된 사용자가 있다면 currentUser로 처리
-        if (!result && !auth.currentUser) return;
-
-        setIsLoading(true);
-        setError(null);
-
-        const firebaseUser = result?.user ?? auth.currentUser;
-        if (!firebaseUser) return;
-
-        localStorage.removeItem("googleRedirectPending");
-
-        const idToken = await firebaseUser.getIdToken();
-        const loginResponse = await loginWithGoogle({ idToken });
-
+        // 백엔드 JWT 토큰 저장
         localStorage.setItem("accessToken", loginResponse.accessToken);
         localStorage.setItem("refreshToken", loginResponse.refreshToken);
         localStorage.setItem("userId", String(loginResponse.id));
         localStorage.setItem("nickname", loginResponse.nickname);
-        localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
+        localStorage.setItem(
+          "isNewUser",
+          JSON.stringify(loginResponse.newUser)
+        );
+
+        // Firebase Custom Token으로 로그인
+        const auth = getAuth(db.app);
+        await signInWithCustomToken(auth, loginResponse.firebaseToken);
 
         navigate("/home");
       } catch (err: any) {
-        console.error("Google redirect login failed", err);
-
-        // Firebase가 세션스토리지/쿠키 제약으로 state를 잃어버린 경우 안내 문구 표시
-        // Axios 에러인 경우 서버 응답 메시지 확인
+        // 서버 에러인 경우 서버 응답 메시지 확인
         if (err.response) {
           const status = err.response.status;
           const message =
             err.response.data?.message ||
             err.response.data?.error ||
             err.message;
-          console.error("서버 응답:", err.response.data);
 
           if (status === 500) {
             setError("서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.");
           } else {
             setError(
-              message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.",
+              message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요."
             );
           }
         } else {
           setError(
-            err.message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.",
+            err.message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요."
           );
         }
       } finally {
@@ -121,45 +114,34 @@ function Index() {
       }
     };
 
-    void handleRedirectResult();
+    void handleOAuthCallback();
   }, [navigate]);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     setError(null);
     setIsLoading(true);
 
     try {
-      const auth = getAuth(db.app);
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
+      // Google OAuth Client ID (환경변수에서 가져오거나 직접 입력)
+      const clientId =
+        import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+        "130525625125-uiduhl2t9iugih013903j4ue18lhj2a1.apps.googleusercontent.com";
+      const redirectUri = window.location.origin;
+      const scope = "openid email profile";
+      const responseType = "code";
 
-      if (isInStandaloneMode()) {
-        // PWA/설치 앱 환경: 리다이렉트 방식 사용
-        localStorage.setItem("googleRedirectPending", "1");
-        await signInWithRedirect(auth, provider);
-        return;
-      }
+      // Google OAuth URL 생성
+      const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${encodeURIComponent(clientId)}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `response_type=${encodeURIComponent(responseType)}&` +
+        `scope=${encodeURIComponent(scope)}&` +
+        `prompt=select_account`;
 
-      // 일반 브라우저: 팝업 방식 사용
-      const result = await signInWithPopup(auth, provider);
-
-      const firebaseUser = result.user;
-      const idToken = await firebaseUser.getIdToken();
-      const loginResponse = await loginWithGoogle({ idToken });
-
-      localStorage.setItem("accessToken", loginResponse.accessToken);
-      localStorage.setItem("refreshToken", loginResponse.refreshToken);
-      localStorage.setItem("userId", String(loginResponse.id));
-      localStorage.setItem("nickname", loginResponse.nickname);
-      localStorage.setItem("isNewUser", JSON.stringify(loginResponse.newUser));
-
-      navigate("/home");
+      // Google 로그인 페이지로 이동
+      window.location.href = oauthUrl;
     } catch (err: any) {
-      console.error("Google login failed", err);
-      setError(
-        err.message || "로그인에 실패했습니다.\n잠시 후 다시 시도해주세요.",
-      );
-    } finally {
+      setError("로그인 페이지로 이동할 수 없습니다.\n잠시 후 다시 시도해주세요.");
       setIsLoading(false);
     }
   };
@@ -321,7 +303,7 @@ const ErrorBanner = styled.div`
   font-family: Pretendard;
   font-size: 14px;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
   line-height: 1.5;
   word-break: keep-all;
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
