@@ -325,7 +325,7 @@ const GeolocationErrorBanner = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 5px;
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
@@ -334,7 +334,7 @@ const GeolocationErrorBanner = styled.div`
   padding: 12px 10px;
   border-radius: 12px;
   background: rgba(255, 77, 79, 0.9);
-  color: #fff;
+  color: #ffffff;
   font-family: Pretendard;
   font-size: 15px;
   font-weight: 600;
