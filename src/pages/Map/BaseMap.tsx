@@ -302,6 +302,7 @@ const CircleWrapper = styled.div<{ size: number }>`
   width: ${(p) => p.size}px;
   height: ${(p) => p.size}px;
 `;
+
 const Circle = styled.div<{ size: number }>`
   position: absolute;
   width: ${(p) => p.size}px;

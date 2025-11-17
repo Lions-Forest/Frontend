@@ -28,8 +28,12 @@ export function useMyLocation({
   const [geoError, setGeoError] = useState<GeolocationPositionError | null>(
     null
   );
-
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const lastMetaRef = useRef<{
+    name: string;
+    status: string;
+    message: string;
+  } | null>(null);
   const firstWriteDone = useRef(false);
 
   // 1) GPS 위치 추적
@@ -54,6 +58,7 @@ export function useMyLocation({
     return () => {
       navigator.geolocation.clearWatch(watchId);
       lastLocationRef.current = null;
+      lastMetaRef.current = null;
       firstWriteDone.current = false;
     };
   }, [userId]);
@@ -66,6 +71,7 @@ export function useMyLocation({
     if (!shareLocation) {
       deleteDoc(doc(db, "locations", userId));
       lastLocationRef.current = null;
+      lastMetaRef.current = null;
       firstWriteDone.current = false;
       return;
     }
@@ -73,25 +79,37 @@ export function useMyLocation({
     // 위치 로딩 중이면 DB 쓰기 보류
     if (!myPosition) return;
 
-    const last = lastLocationRef.current;
+    const lastLoc = lastLocationRef.current;
+    const lastMeta = lastMetaRef.current;
+
     let shouldWrite = false;
 
     // 첫 write는 무조건 실행
-    if (!firstWriteDone.current || !last) {
+    if (!firstWriteDone.current) {
+      shouldWrite = true;
+    } else if (!lastLoc) {
       shouldWrite = true;
     } else {
       // 위치가 20m 이상 변하면 write
       const distance = getDistanceFromLatLonInMeters(
-        last.lat,
-        last.lng,
+        lastLoc.lat,
+        lastLoc.lng,
         myPosition.lat,
         myPosition.lng
       );
+
       if (distance >= 20) {
         shouldWrite = true;
       } else {
         // 상태(status/message)가 변경된 경우도 write
-        shouldWrite = true;
+        if (
+          !lastMeta ||
+          lastMeta.name !== name ||
+          lastMeta.status !== status ||
+          lastMeta.message !== message
+        ) {
+          shouldWrite = true;
+        }
       }
     }
 
@@ -99,6 +117,7 @@ export function useMyLocation({
 
     // 최신 위치로 ref 업데이트
     lastLocationRef.current = myPosition;
+    lastMetaRef.current = { name, status, message };
     firstWriteDone.current = true;
 
     // Firestore 업데이트

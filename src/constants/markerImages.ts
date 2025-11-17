@@ -6,7 +6,7 @@ import boringLion from "@/assets/lion/boringLion.svg";
 import playingLion from "@/assets/lion/playingLion.svg";
 import hungryLion from "@/assets/lion/hungryLion.svg";
 import nothingLion from "@/assets/lion/nothingLion.svg";
-import eatingMarker from "@/assets/marker/eatingMarker.svg";
+import eatingMarker from "@/assets/marker/eatingBigMarker.svg";
 import studyingMarker from "@/assets/marker/studyingMarker.svg";
 import workingMarker from "@/assets/marker/workingMarker.svg";
 import relaxingMarker from "@/assets/marker/relaxingMarker.svg";
