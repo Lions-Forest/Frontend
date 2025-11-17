@@ -10,7 +10,7 @@ function ScoreNav({ review }: { review: Review }){
     <StarSection>
         {[...Array(MAX_STARS)].map((_, i) =>
             i < review.starNumber ? (
-                <StyledStar key={i} filled />
+                <StyledStar key={i} $filled />
             ) : (
                 <StyledStar key={i} />
             )
@@ -30,11 +30,13 @@ const StarSection = styled.div`
   max-width: 100%;
 `;
 
-const StyledStar = styled(Star)<{ filled?: boolean }>`
+const StyledStar = styled(Star).withConfig({
+  shouldForwardProp: (prop) => prop !== 'filled',
+})<{ $filled?: boolean }>`
   // font-size: 15px;
   // vertical-align: middle;
-  fill: ${({ filled }) => (filled ? "#FEFF00" : "none")};
-  color: ${({ filled }) => (filled ? "transparent" : " #808080")};
-  filter: ${({ filled }) => (filled ? "drop-shadow(0px 0px 2px #000000B2)" : "")};
+  fill: ${({ $filled }) => ($filled ? "#FEFF00" : "none")};
+  color: ${({ $filled }) => ($filled ? "transparent" : " #808080")};
+  filter: ${({ $filled }) => ($filled ? "drop-shadow(0px 0px 2px #000000B2)" : "")};
   // margin-right: 1.5px;
 `;
