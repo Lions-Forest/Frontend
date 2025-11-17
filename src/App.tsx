@@ -12,74 +12,71 @@ import "./App.css";
 import MapPage from "./pages/Map/MapPage";
 import ReviewPage from "./pages/Mypage/ReviewPage";
 import ReviewRevisePage from "./pages/Mypage/ReviewRevisePage";
-import { RecoilRoot } from "recoil";
 
 function App() {
   return (
     <>
-      <RecoilRoot>
-        <GlobalStyle />
-        <div className="container">
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/notification" element={<NotificationPage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/mypage" element={<MyPage />} />
-              <Route
-                path="/home/meeting-detail/:id"
-                element={<MeetingDetailPage />}
-              />
-              <Route
-                path="/home/review-collection"
-                element={<ReviewCollectionPage />}
-              />
-              <Route path="/mypage/review" element={<ReviewPage />} />
-              <Route
-                path="/mypage/review/revise"
-                element={<ReviewRevisePage />}
-              />
-              <Route
-                path="/home/meeting-detail"
-                element={<MeetingDetailPage />}
-              />
-              <Route
-                path="/home/create-meeting"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/step1"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/step2"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/step3"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/step4"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/step5"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/step6"
-                element={<CreateMeetingPage />}
-              />
-              <Route
-                path="/home/create-meeting/result"
-                element={<CreateMeetingPage />}
-              />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      </RecoilRoot>
+      <GlobalStyle />
+      <div className="container">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/notification" element={<NotificationPage />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route
+              path="/home/meeting-detail/:id"
+              element={<MeetingDetailPage />}
+            />
+            <Route
+              path="/home/review-collection"
+              element={<ReviewCollectionPage />}
+            />
+            <Route path="/mypage/review" element={<ReviewPage />} />
+            <Route
+              path="/mypage/review/revise"
+              element={<ReviewRevisePage />}
+            />
+            <Route
+              path="/home/meeting-detail"
+              element={<MeetingDetailPage />}
+            />
+            <Route
+              path="/home/create-meeting"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step1"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step2"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step3"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step4"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step5"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/step6"
+              element={<CreateMeetingPage />}
+            />
+            <Route
+              path="/home/create-meeting/result"
+              element={<CreateMeetingPage />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </div>
     </>
   );
 }
