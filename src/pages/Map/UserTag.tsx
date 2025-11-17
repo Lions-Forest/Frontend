@@ -32,13 +32,14 @@ export default function UserTag({ name, status, onClick }: Props) {
 }
 
 const TagWrapper = styled.div`
+  position: relative;
   display: inline-flex;
+  align-items: center;
   height: 20px;
   border: 1px solid #ff2370;
   border-radius: 16px;
   background-color: #ff2370;
   cursor: pointer;
-  align-items: center;
   transform: translateY(-43px);
 `;
 
@@ -53,9 +54,12 @@ const Nickname = styled.div`
 `;
 
 const StatusContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  //   justify-content: center;
+  //   align-items: center;
   width: 47px;
   height: 100%;
   padding: 4px 12px 4px 9px;
@@ -63,6 +67,7 @@ const StatusContainer = styled.div`
   border: none;
   border-radius: 0 16px 16px 0;
   box-sizing: border-box;
+  border-left: 2px solid #ff2370;
 `;
 
 const Status = styled.div`
