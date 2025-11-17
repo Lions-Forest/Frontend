@@ -1,10 +1,10 @@
+import apiClient from "@/api/client";
 import { db } from "@/firebase/firebase";
 import {
   arrayRemove,
   arrayUnion,
   doc,
   getDoc,
-  increment,
   updateDoc,
 } from "firebase/firestore";
 
@@ -21,6 +21,7 @@ export function useLocationActions() {
 
       const alreadyLiked = likedByArray.includes(currentUserId);
 
+      // 한번 더 누르면 좋아요 취소
       if (alreadyLiked) {
         await updateDoc(likedUserDocRef, {
           likedBy: arrayRemove(currentUserId),
@@ -28,6 +29,10 @@ export function useLocationActions() {
       } else {
         await updateDoc(likedUserDocRef, {
           likedBy: arrayUnion(currentUserId),
+        });
+
+        await apiClient.post("/notifications/like", {
+          likedUserId: likedUserId,
         });
       }
     } catch (error) {

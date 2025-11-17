@@ -3,6 +3,11 @@ import { db } from "@/firebase/firebase";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { getDistanceFromLatLonInMeters } from "@/utils/distance";
 
+type MyLocationReturn = {
+  myPosition: { lat: number; lng: number } | null;
+  geoError: GeolocationPositionError | null;
+};
+
 export function useMyLocation({
   userId,
   name,
@@ -15,82 +20,103 @@ export function useMyLocation({
   shareLocation: boolean;
   status: string;
   message: string;
-}) {
+}): MyLocationReturn {
   const [myPosition, setMyPosition] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-
   const [geoError, setGeoError] = useState<GeolocationPositionError | null>(
     null
   );
-  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
-  // 위치 추적
+  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const firstWriteDone = useRef(false);
+
+  // 1) GPS 위치 추적
   useEffect(() => {
+    if (!userId) return;
+
     const watchId = navigator.geolocation.watchPosition(
-      async (position) => {
+      (position) => {
         const { latitude, longitude } = position.coords;
         const newPosition = { lat: latitude, lng: longitude };
-
         setMyPosition(newPosition);
         setGeoError(null);
-
-        if (!shareLocation) {
-          deleteDoc(doc(db, "locations", userId));
-          return;
-        }
-
-        const last = lastLocationRef.current;
-        let shouldWriteToDB = false;
-
-        // 위치 변화가 충분히 큰지 확인 (20m 이상)
-        if (!last) {
-          shouldWriteToDB = true; // 토글을 켠 후 최초 1회를 무조건 DB에 씀
-        } else {
-          const distance = getDistanceFromLatLonInMeters(
-            last.lat,
-            last.lng,
-            latitude,
-            longitude
-          );
-          if (distance >= 20) {
-            shouldWriteToDB = true;
-          }
-        }
-
-        if (!shouldWriteToDB) {
-          return;
-        }
-
-        lastLocationRef.current = newPosition;
-
-        // Firestore에 업데이트
-        await setDoc(doc(db, "locations", userId), {
-          userId,
-          name,
-          latitude,
-          longitude,
-          shareLocation: true,
-          status,
-          message,
-          updatedAt: Date.now(),
-        });
       },
       (error) => {
-        console.error("Geolocation Error: ", error);
+        console.error("Geolocation Error:", error);
         setGeoError(error);
         setMyPosition(null);
       },
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 }
     );
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
       lastLocationRef.current = null;
-      deleteDoc(doc(db, "locations", userId));
+      firstWriteDone.current = false;
     };
-  }, [userId, name, shareLocation, status, message]);
+  }, [userId]);
+
+  // 2) Firestore 업데이트 (단 하나만 존재)
+  useEffect(() => {
+    if (!userId) return;
+
+    // 위치 공유 끄면 Firestore에서 삭제
+    if (!shareLocation) {
+      deleteDoc(doc(db, "locations", userId));
+      lastLocationRef.current = null;
+      firstWriteDone.current = false;
+      return;
+    }
+
+    // 위치 로딩 중이면 DB 쓰기 보류
+    if (!myPosition) return;
+
+    const last = lastLocationRef.current;
+    let shouldWrite = false;
+
+    // 첫 write는 무조건 실행
+    if (!firstWriteDone.current || !last) {
+      shouldWrite = true;
+    } else {
+      // 위치가 20m 이상 변하면 write
+      const distance = getDistanceFromLatLonInMeters(
+        last.lat,
+        last.lng,
+        myPosition.lat,
+        myPosition.lng
+      );
+      if (distance >= 20) {
+        shouldWrite = true;
+      } else {
+        // 상태(status/message)가 변경된 경우도 write
+        shouldWrite = true;
+      }
+    }
+
+    if (!shouldWrite) return;
+
+    // 최신 위치로 ref 업데이트
+    lastLocationRef.current = myPosition;
+    firstWriteDone.current = true;
+
+    // Firestore 업데이트
+    setDoc(
+      doc(db, "locations", userId),
+      {
+        userId,
+        name,
+        latitude: myPosition.lat,
+        longitude: myPosition.lng,
+        shareLocation: true,
+        status,
+        message,
+        updatedAt: Date.now(),
+      },
+      { merge: true } // likeCount 등 다른 필드가 덮어쓰이지 않음
+    );
+  }, [userId, name, shareLocation, status, message, myPosition]);
 
   return { myPosition, geoError };
 }

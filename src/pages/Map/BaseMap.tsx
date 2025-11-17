@@ -15,6 +15,12 @@ import StatusSelector from "./StatusSelector";
 import MapNotification from "./MapNotification";
 import StatusMessage from "./StatusMessage";
 import { useLocationActions } from "@/hooks/useLocationActions";
+import { useRecoilState } from "recoil";
+import {
+  shareLocationState,
+  selectedStatusState,
+  statusMessageState,
+} from "@/store/mapState";
 
 export default function BaseMap({
   userId,
@@ -23,10 +29,11 @@ export default function BaseMap({
   userId: string;
   name: string;
 }) {
-  const [shareLocation, setShareLocation] = useState(false);
+  const [shareLocation, setShareLocation] = useRecoilState(shareLocationState);
   const [selectedStatus, setSelectedStatus] =
-    useState<NonNullable<UserLocation["status"]>>("nothing");
-  const [statusMessage, setStatusMessage] = useState("");
+    useRecoilState(selectedStatusState);
+  const [statusMessage, setStatusMessage] = useRecoilState(statusMessageState);
+
   const [mapLevel, setMapLevel] = useState(3);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [followMe, setFollowMe] = useState(true);
