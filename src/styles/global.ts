@@ -23,7 +23,7 @@ export const GlobalStyle = createGlobalStyle`
 
   #root {
     width: 100%;
-    min-height: 100dvh;
+    min-height: 100svh;
   }
   
   /* font */

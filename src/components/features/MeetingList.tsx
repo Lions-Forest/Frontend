@@ -199,7 +199,7 @@ const TypeList = styled.div`
   display: flex;
   align-items: center;
   // gap: 8.6px;
-  gap: 3%;
+  gap: 1.5%;
   align-self: stretch;
 `;
 
