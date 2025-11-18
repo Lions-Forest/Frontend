@@ -35,7 +35,7 @@ export default function UserTag({ name, status, onClick }: Props) {
 
   return (
     <TagWrapper $color={color} onClick={onClick}>
-      <Nickname>{name}</Nickname>
+      <Nickname $status={status}>{name}</Nickname>
       <StatusContainer>
         <Status>{statusText}</Status>
       </StatusContainer>
@@ -55,12 +55,12 @@ const TagWrapper = styled.div<{ $color: string }>`
   pointer-events: none;
 `;
 
-const Nickname = styled.div`
+const Nickname = styled.div<{ $status: string }>`
   padding: 4px 10px;
   font-family: Pretendard;
   font-size: 10px;
   font-weight: 600;
-  color: #ffffff;
+  color: ${(p) => (p.$status === "working" ? "000000" : "#ffffff")};
   white-space: nowrap;
   line-height: 20px;
 `;
