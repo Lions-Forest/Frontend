@@ -284,9 +284,17 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
   if (tab === "모임 후기 관리") {
     const item = data as ReviewHistory;
     const photoUrl = item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : null;
+    const handleReviewCardClick = () => {
+      navigate("/home/review-collection");
+    };
 
     return (
-      <ReviewCardLayout backgroundColor={background}>
+      <ReviewCardLayout
+        backgroundColor={background}
+        onClick={handleReviewCardClick}
+        role="button"
+        tabIndex={0}
+      >
         <ReviewCardHeader>
           <ReviewCardTitle>{item.groupTitle}</ReviewCardTitle>
           <ReviewMeetingDate>{formatMeetingDate(item.meetingAt)}</ReviewMeetingDate>
@@ -311,7 +319,12 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
             </StarRating>
             <ReviewText>{item.content}</ReviewText>
           </ReviewContentWrapper>
-          <EditButton onClick={() => handleEditClick(item.id)}>
+          <EditButton
+            onClick={(event) => {
+              event.stopPropagation();
+              handleEditClick(item.id);
+            }}
+          >
             <EditIcon src={pencilIcon} alt="수정" />
           </EditButton>
         </ReviewCardBody>
@@ -636,6 +649,7 @@ const ReviewCardLayout = styled.div<{ backgroundColor: string }>`
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
   overflow: hidden;
   box-sizing: border-box;
+  cursor: pointer;
 `;
 
 const ReviewCardHeader = styled.div`
