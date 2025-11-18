@@ -122,7 +122,7 @@ const BtnContainer = styled.div`
 const Icon = styled.img`
   width: 65.6px;
   height: 96px;
-  transition: transform 0.2s ease-in-out;
+  // transition: transform 0.2s ease-in-out;
 `;
 
 const StatusButton = styled.button<{ $active: boolean; $disabled: boolean }>`
