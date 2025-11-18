@@ -6,14 +6,14 @@ import boringLion from "@/assets/lion/boringLion.svg";
 import playingLion from "@/assets/lion/playingLion.svg";
 import hungryLion from "@/assets/lion/hungryLion.svg";
 import nothingLion from "@/assets/lion/nothingLion.svg";
-import eatingMarker from "@/assets/marker/eatingMarker.svg";
-import studyingMarker from "@/assets/marker/studyingMarker.svg";
-import workingMarker from "@/assets/marker/workingMarker.svg";
-import relaxingMarker from "@/assets/marker/relaxingMarker.svg";
-import boringMarker from "@/assets/marker/boringMarker.svg";
-import playingMarker from "@/assets/marker/playingMarker.svg";
-import hungryMarker from "@/assets/marker/hungryMarker.svg";
-import nothingMarker from "@/assets/marker/nothingMarker.svg";
+import eatingMarker from "@/assets/marker/eatingMarker.png";
+import studyingMarker from "@/assets/marker/studyingMarker.png";
+import workingMarker from "@/assets/marker/workingMarker.png";
+import relaxingMarker from "@/assets/marker/relaxingMarker.png";
+import boringMarker from "@/assets/marker/boringMarker.png";
+import playingMarker from "@/assets/marker/playingMarker.png";
+import hungryMarker from "@/assets/marker/hungryMarker.png";
+import nothingMarker from "@/assets/marker/nothingMarker.png";
 
 export const getMarkerImage = (status: string, isMe = false) => {
   if (isMe) {

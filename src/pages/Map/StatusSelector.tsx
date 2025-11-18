@@ -1,21 +1,21 @@
 import type { UserLocation } from "@/api/UserLocation";
 import styled from "styled-components";
 import Nothing from "@/assets/status/nothing.svg";
-import NothingActive from "@/assets/status/nothingBigActive.png";
+import NothingActive from "@/assets/status/nothingActive.png";
 import Studying from "@/assets/status/studying.svg";
-import StudyingActive from "@/assets/status/studyingActive.svg";
+import StudyingActive from "@/assets/status/studyingActive.png";
 import Working from "@/assets/status/working.svg";
-import WorkingActive from "@/assets/status/workingActive.svg";
+import WorkingActive from "@/assets/status/workingActive.png";
 import Relaxing from "@/assets/status/relaxing.svg";
-import RelaxingActive from "@/assets/status/relaxingActive.svg";
+import RelaxingActive from "@/assets/status/relaxingActive.png";
 import Eating from "@/assets/status/eating.svg";
-import EatingActive from "@/assets/status/eatingActive.svg";
+import EatingActive from "@/assets/status/eatingActive.png";
 import Playing from "@/assets/status/playing.svg";
-import PlayingActive from "@/assets/status/playingActive.svg";
+import PlayingActive from "@/assets/status/playingActive.png";
 import Boring from "@/assets/status/boring.svg";
-import BoringActive from "@/assets/status/boringActive.svg";
+import BoringActive from "@/assets/status/boringActive.png";
 import Hungry from "@/assets/status/hungry.svg";
-import HungryActive from "@/assets/status/hungryActive.svg";
+import HungryActive from "@/assets/status/hungryActive.png";
 import { useState } from "react";
 
 interface StatusSelectorProps {
