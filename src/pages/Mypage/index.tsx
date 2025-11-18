@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 function index() {
     return(
-        <Layout>
+        <Layout page="mypage">
             <MyPageLayout>
                 <MyInfoCard />
                 <DivideLine />

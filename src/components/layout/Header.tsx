@@ -8,6 +8,8 @@ import more from '../../assets/icons/alarmMore.png'
 import type { Member } from '@/types';
 import { useEffect, useState } from 'react';
 import { getNotificationNumber } from '@/api/notification/numberAPI';
+import logoutIcon from '@/assets/icons/log-out.svg';
+import { performLogout } from '@/utils/logout';
 
 interface HeaderProps {
     member?: Member;
@@ -45,8 +47,23 @@ function Header({ page = 'home' }: HeaderProps = {}) {
     else if ( notification >= 4 ) alarmImgSrc = more;
     else alarmImgSrc = none;
 
+    const isMyPage = page === 'mypage';
+
     const handleLogoClick = () => {
         navigate('/home');
+    };
+
+    const handleLogoutClick = async () => {
+        if (!window.confirm("로그아웃하시겠습니까?")) {
+            return;
+        }
+
+        try {
+            await performLogout();
+            navigate("/", { replace: true });
+        } catch (error) {
+            console.error("로그아웃 실패:", error);
+        }
     };
 
     // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
@@ -64,7 +81,16 @@ function Header({ page = 'home' }: HeaderProps = {}) {
                     <TitleLetter color='#FBBC04'>의</TitleLetter>
                     <TitleLetter color='#43D687'>숲</TitleLetter>
                 </TitleButton>
-                <AlarmImg src={alarmImgSrc} onClick={handleAlarmClick} /> {/*핸들러 추가 p.s. 정건*/}
+                <RightActions>
+                    {isMyPage && (
+                        <IconButton type="button" onClick={handleLogoutClick} aria-label="로그아웃">
+                            <LogoutImg src={logoutIcon} alt="로그아웃" />
+                        </IconButton>
+                    )}
+                    <IconButton type="button" onClick={handleAlarmClick} aria-label="알림">
+                        <AlarmImg src={alarmImgSrc} alt="알림" />
+                    </IconButton>
+                </RightActions>
             </HeaderLayout>
         </Layout>
     )
@@ -88,6 +114,21 @@ const HeaderLayout = styled.div`
     align-items: center;
 `;
 
+const RightActions = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+`;
+
+const IconButton = styled.button`
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+`;
+
 const TitleButton = styled.button`
     border: none;
     background: transparent;
@@ -108,5 +149,8 @@ const TitleLetter = styled.div`
 
 const AlarmImg = styled.img`
     width: 23px;
-    cursor: pointer; // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
+`;
+
+const LogoutImg = styled.img`
+    width: 24px;
 `;
