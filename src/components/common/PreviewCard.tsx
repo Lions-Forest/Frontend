@@ -319,6 +319,7 @@ const ImagePlaceholder = styled.img`
 
 const Info = styled.div`
   display: flex;
+  flex: 1;
   gap: 14.87px;
 `;
 
