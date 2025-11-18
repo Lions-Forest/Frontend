@@ -7,7 +7,7 @@ export interface MakeClassResponse {
   leaderNickname: string;
   leaderName: string;
   title: string;
-  category: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC";
+  category: "MEAL" | "WORK" | "SOCIAL" | "CULTURE" | "ETC";
   capacity: number;
   meetingAt: string;
   location: string;
@@ -18,7 +18,7 @@ export interface MakeClassResponse {
 // API 요청 파라미터 타입 정의
 export interface MakeClassRequest {
   title: string;
-  category: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC";
+  category: "MEAL" | "WORK" | "SOCIAL" | "CULTURE" | "ETC";
   capacity: number;
   meetingAt: string; // ISO-8601 형식
   location: string;

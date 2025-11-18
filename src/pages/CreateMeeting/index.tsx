@@ -17,7 +17,7 @@ const TOTAL_STEPS = 7;
 interface MeetingFormData {
     title: string;
     photos: File[];
-    category: "MEAL" | "WORK" | "CAFE" | "SOCIAL" | "CULTURE" | "ETC" | null;
+    category: "MEAL" | "WORK" | "SOCIAL" | "CULTURE" | "ETC" | null;
     meetingAt: string;
     capacity: number;
     location: string;
