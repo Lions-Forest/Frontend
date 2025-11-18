@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import photoIcon from '@/assets/icons/photo.svg';
-import xIcon from '@/assets/icons/x.svg';
+import xIcon from '@/assets/icons/x.png';
 
 interface StepOneInfoProps {
   onNextStep?: () => void;
@@ -261,8 +261,8 @@ const RemoveButton = styled.button`
   position: absolute;
   bottom: 4px;
   right: 4px;
-  width: 12px;
-  height: 12px;
+  width: 34px;
+  height: 34px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -277,8 +277,8 @@ const RemoveButton = styled.button`
 `;
 
 const XIcon = styled.img`
-  width: 12px;
-  height: 12px;
+  width: 34px;
+  height: 34px;
 `;
 
 const PhotoUploadButton = styled.button`

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import starOnIcon from "@/assets/icons/starOn.svg";
 import starOffIcon from "@/assets/icons/starOff.svg";
 import photoIcon from "@/assets/icons/photo.svg";
-import xIcon from "@/assets/icons/x.svg";
+import xIcon from "@/assets/icons/x.png";
 import BackToNavBar from "@/components/common/BackToNavBar";
 import Footer from "@/components/layout/Footer";
 import { getGroupSimple, type GroupSimpleResponse } from "@/api/class/reveiwClassInfoAPI";
