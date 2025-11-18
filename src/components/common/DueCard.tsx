@@ -13,13 +13,6 @@ function getTimeDiffMs(date: Date | string) {
   return Math.max(d.getTime() - now.getTime(), 0);
 }
 
-// function formatTime(diffMs: number) {
-//   const totalSeconds = Math.floor(diffMs / 1000);
-//   const minutes = Math.floor(totalSeconds / 60);
-//   const seconds = totalSeconds % 60;
-//   return `${minutes}M:${String(seconds).padStart(2, '0')}S`;
-// }
-
 function formatTime(diffMs: number) {
     let totalSeconds = Math.max(Math.floor(diffMs / 1000), 0);
   

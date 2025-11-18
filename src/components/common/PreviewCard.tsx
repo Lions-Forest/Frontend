@@ -1,5 +1,3 @@
-// TODO: width px -> %로 바꾸기
-
 import { useNavigate } from "react-router-dom";
 import lionHead from '../../assets/icons/lionHead.png';
 import styled from "styled-components";
@@ -65,7 +63,7 @@ function PreviewCard({ meeting, onChange }: PreviewCardProps) {
   const remaining = calculateRemaining(meeting.date);
   const remainingTime = `${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`;
   const calculateProgress = remaining.day * 24 + remaining.hour;
-  // const progress = calculateProgress < 168 ? (168 - calculateProgress) / 168 * 100 : 0 ;
+
   const progress = calculateProgress < 24 ? (calculateProgress < 6 ? 100 : 60) : 0 ;
   console.log(`${meeting.title}의 progress: ${progress}`);
 

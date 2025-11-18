@@ -18,7 +18,7 @@ import { fetchParticipantList } from "@/api/meeting/meetingMemberApi";
 import MemberModal from "@/components/features/MemberModal";
 import { fetchMeetingDetail } from "@/api/meeting/meetingListApi";
 import { cancelJoinMeeting, deleteMeeting, joinMeeting } from "@/api/meeting/meetingJoinApi";
-import defaultProfile from '../../assets/images/LoadingLion.svg'
+import defaultProfile from '../../assets/icons/lionHead.png'
 import CheckingModal from "@/components/features/CheckingModal";
 
 function formatMeetingDate(date: Date | string) {

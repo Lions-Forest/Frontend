@@ -112,7 +112,7 @@ const SubTitle = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
-  max-width: 70%;
+  max-width: 65%;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;

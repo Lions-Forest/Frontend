@@ -4,7 +4,7 @@ import { MdFavorite as FilledLike} from "react-icons/md";
 import { MdFavoriteBorder as EmptyLike } from "react-icons/md";
 import type { Reply } from "@/types";
 import { fetchLikeState } from "@/api/meeting/replyApi";
-import defaultProfile from '../../assets/images/LoadingLion.svg'
+import defaultProfile from '../../assets/icons/lionHead.png'
 
 interface ReplyProps {
     reply: Reply;

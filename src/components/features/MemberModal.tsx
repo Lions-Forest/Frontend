@@ -3,7 +3,7 @@ import styled from "styled-components";
 import type { Member, Participant } from "@/types";
 import { IoIosClose as Close } from "react-icons/io";
 import { fetchParticipantDetail } from "@/api/meeting/meetingMemberApi";
-import defaultProfile from '../../assets/images/LoadingLion.svg'
+import defaultProfile from '../../assets/icons/lionHead.png'
 
 interface MemberModalProps {
   participant: Participant;
