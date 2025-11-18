@@ -295,7 +295,9 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
           {photoUrl ? (
             <ReviewPhoto src={photoUrl} alt="모임 사진" />
           ) : (
-            <ReviewPhotoPlaceholder />
+            <ReviewPhotoPlaceholder>
+              <PlaceholderText>사진없음</PlaceholderText>
+            </ReviewPhotoPlaceholder>
           )}
           <ReviewContentWrapper>
             <StarRating>
@@ -308,10 +310,10 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
               ))}
             </StarRating>
             <ReviewText>{item.content}</ReviewText>
-            <EditButton onClick={() => handleEditClick(item.id)}>
-              <EditIcon src={pencilIcon} alt="수정" />
-            </EditButton>
           </ReviewContentWrapper>
+          <EditButton onClick={() => handleEditClick(item.id)}>
+            <EditIcon src={pencilIcon} alt="수정" />
+          </EditButton>
         </ReviewCardBody>
       </ReviewCardLayout>
     );
@@ -681,19 +683,31 @@ const ReviewPhoto = styled.img`
   flex-shrink: 0;
 `;
 
+const PlaceholderText = styled.div`
+  color: #fff;
+  font-family: Pretendard;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  text-align: center;
+`;
+
 const ReviewPhotoPlaceholder = styled.div`
   width: 160px;
   height: 140px;
   border-radius: 4px;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ReviewContentWrapper = styled.div`
   width: 151px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   flex: 1;
   position: relative;
@@ -709,6 +723,7 @@ const StarRating = styled.div`
   gap: 4px;
   align-items: center;
   flex-shrink: 0;
+  align-self: center;
 `;
 
 const StarIcon = styled.img`
@@ -726,7 +741,7 @@ const ReviewText = styled.div`
   font-weight: 400;
   width: 100%;
   flex: 1;
-  text-align: center;
+  text-align: left;
   word-break: break-word;
   line-height: 1.4;
   min-height: 0;
@@ -736,7 +751,7 @@ const ReviewText = styled.div`
 const EditButton = styled.button`
   position: absolute;
   right: 0;
-  bottom: -100px;
+  bottom: 0;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -748,6 +763,7 @@ const EditButton = styled.button`
   cursor: pointer;
   padding: 0;
   z-index: 10;
+  flex-shrink: 0;
 `;
 
 const EditIcon = styled.img`
