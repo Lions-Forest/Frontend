@@ -8,7 +8,7 @@ import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
 import defaultLion from "@/assets/lion/defaultLion.svg";
 import nothingMarker from "@/assets/marker/nothingMarker.svg";
-import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.svg";
+import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.png";
 import Footer from "@/components/layout/Footer";
 import BottomSheet from "./BottomSheet";
 import StatusSelector from "./StatusSelector";
@@ -22,6 +22,8 @@ import {
   statusMessageState,
 } from "@/store/mapState";
 import UserTag from "./UserTag";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
 
 export default function BaseMap({
   userId,
@@ -63,6 +65,31 @@ export default function BaseMap({
       setSelectedStatus("nothing");
     }
   };
+
+  useEffect(() => {
+    if (!selectedUserId) return;
+
+    const target =
+      selectedUserId === userId
+        ? { message: statusMessage, userId }
+        : locations[selectedUserId];
+
+    if (!target || !target.message || target.message.trim() === "") {
+      setSelectedUserId(null); // 상태메세지 지우면 자동 닫힘
+
+      (async () => {
+        try {
+          await setDoc(
+            doc(db, "locations", target.userId),
+            { likedBy: [] },
+            { merge: true }
+          );
+        } catch (err) {
+          console.error("좋아요 초기화 실패: ", err);
+        }
+      })();
+    }
+  }, [statusMessage, locations, selectedUserId]);
 
   // GPS 기반으로 내 화면 중심 계속 이동
   useEffect(() => {
