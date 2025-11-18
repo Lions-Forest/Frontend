@@ -137,9 +137,11 @@ export default function BaseMap({
     }
   }
 
+  const baseLevel = 3;
   const baseCircleSize = 427;
-  const step = 0.1;
-  const scale = Math.max(1 - (mapLevel - 3) * step, 0.2);
+  // const step = 0.1;
+  // const scale = Math.max(1 - (mapLevel - 3) * step, 0.2);
+  const scale = 1 / Math.pow(2, mapLevel - baseLevel);
   const circleSize = baseCircleSize * scale;
 
   return (
@@ -187,16 +189,15 @@ export default function BaseMap({
           />
           {/* shareLocation 켜졌을 때만 그라데이션 원 표시 */}
           {shareLocation && (
-            <CustomOverlayMap position={myPosition} zIndex={-1}>
-              <div
-                style={{
-                  position: "relative",
-                  left: `-${circleSize / 2}px`,
-                  top: `-${circleSize / 2}px`,
-                }}
-              >
-                <Circle size={circleSize} />
-              </div>
+            <CustomOverlayMap
+              position={myPosition}
+              xAnchor={0.5}
+              yAnchor={0.5}
+              zIndex={-1}
+            >
+              <Circle
+                style={{ transform: `translate(-50%, -50%) scale(${scale})` }}
+              />
             </CustomOverlayMap>
           )}
           {/* 다른 사용자 마커 표시 (Firestore 기반) */}
@@ -326,20 +327,25 @@ const FooterWrap = styled.div`
   justify-content: center;
 `;
 
-const Circle = styled.div<{ size: number }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: ${(p) => p.size}px;
-  height: ${(p) => p.size}px;
+const Circle = styled.div`
+  width: 427px; // baseCircleSize
+  height: 427px;
   border-radius: 50%;
+  pointer-events: none;
+
   background: radial-gradient(
     50% 50% at 50% 50%,
     rgba(255, 255, 255, 0.3) 28.85%,
     rgba(67, 214, 135, 0.3) 100%
   );
-  pointer-events: none;
-  transition: width 0.2s ease, height 0.2s ease;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%); // 중심 고정
+  transform-origin: center;
+
+  transition: transform 0.25s ease-out; // 부드럽게
 `;
 
 const GeolocationErrorBanner = styled.div`
