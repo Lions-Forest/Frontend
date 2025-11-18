@@ -23,7 +23,7 @@ export default function StatusMessageInput({
             shareLocation ? "내용을 입력해주세요." : "레이더를 켜주세요."
           }
           onChange={(e) => onChange(e.target.value)}
-          maxLength={30}
+          maxLength={10}
           disabled={!shareLocation}
         />
         <Icon src={PencilIcon} />
