@@ -43,6 +43,28 @@ export default function MapPage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const bodyStyle = document.body.style;
+    const htmlStyle = document.documentElement.style;
+
+    const prevBodyOverflow = bodyStyle.overflow;
+    const prevHtmlOverflow = htmlStyle.overflow;
+    const prevBodyOverscroll = bodyStyle.overscrollBehavior;
+    const prevHtmlOverscroll = htmlStyle.overscrollBehavior;
+
+    bodyStyle.overflow = "hidden";
+    htmlStyle.overflow = "hidden";
+    bodyStyle.overscrollBehavior = "contain";
+    htmlStyle.overscrollBehavior = "contain";
+
+    return () => {
+      bodyStyle.overflow = prevBodyOverflow;
+      htmlStyle.overflow = prevHtmlOverflow;
+      bodyStyle.overscrollBehavior = prevBodyOverscroll;
+      htmlStyle.overscrollBehavior = prevHtmlOverscroll;
+    };
+  }, []);
+
   if (authStatus === "loading") {
     return <LoadingPage />;
   }

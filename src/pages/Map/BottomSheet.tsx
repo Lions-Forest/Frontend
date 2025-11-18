@@ -510,6 +510,9 @@ const SheetContainer = styled.div`
   border-radius: 4px 4px 0 0;
   z-index: 50;
   justify-content: center;
+//  max-height: ${sheetHeight}px;
+  min-height: 75px;
+  box-sizing: border-box;
 `;
 
 const HandleBarWrapper = styled.div`
