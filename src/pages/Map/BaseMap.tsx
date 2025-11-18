@@ -111,8 +111,8 @@ export default function BaseMap({
   }
 
   const baseCircleSize = 427;
-  const step = 0.07;
-  const scale = Math.max(1 - (mapLevel - 3) * step, 0.3);
+  const step = 0.1;
+  const scale = Math.max(1 - (mapLevel - 3) * step, 0.2);
   const circleSize = baseCircleSize * scale;
 
   return (
@@ -159,25 +159,16 @@ export default function BaseMap({
           />
           {/* shareLocation 켜졌을 때만 그라데이션 원 표시 */}
           {shareLocation && (
-            <CustomOverlayMap
-              position={myPosition}
-              zIndex={-1}
-              xAnchor={0.5}
-              yAnchor={0.5}
-            >
-              <CircleWrapper size={circleSize}>
-                <Circle size={circleSize} />
-                {/* <div
+            <CustomOverlayMap position={myPosition} zIndex={-1}>
+              <div
                 style={{
-                  width: 427,
-                  height: 427,
-                  borderRadius: "50%",
-                  background:
-                    "radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.3) 28.85%, rgba(67,214,135,0.3) 100%)",
-                  pointerEvents: "none",
+                  position: "relative",
+                  left: `-${circleSize / 2}px`,
+                  top: `-${circleSize / 2}px`,
                 }}
-              /> */}
-              </CircleWrapper>
+              >
+                <Circle size={circleSize} />
+              </div>
             </CustomOverlayMap>
           )}
           {/* 다른 사용자 마커 표시 (Firestore 기반) */}
@@ -201,7 +192,7 @@ export default function BaseMap({
                   image={{
                     src: markerImg,
                     size: { width: 65, height: 87 },
-                    options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
+                    options: { offset: { x: 32, y: 87 } }, // (마커 이미지의 핀포인트)
                   }}
                   onClick={handleMarkerClick}
                 />
@@ -304,14 +295,11 @@ const FooterWrap = styled.div`
   display: flex;
   justify-content: center;
 `;
-const CircleWrapper = styled.div<{ size: number }>`
-  position: relative;
-  width: ${(p) => p.size}px;
-  height: ${(p) => p.size}px;
-`;
 
 const Circle = styled.div<{ size: number }>`
   position: absolute;
+  top: 0;
+  left: 0;
   width: ${(p) => p.size}px;
   height: ${(p) => p.size}px;
   border-radius: 50%;

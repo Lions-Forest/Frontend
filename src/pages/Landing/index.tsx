@@ -147,7 +147,7 @@ function Index() {
   };
 
   return (
-    <div>
+    <Root>
       {error && <ErrorBanner role="alert">{error}</ErrorBanner>}
       <Background src={landingImage} />
       <OverlayText>
@@ -196,21 +196,30 @@ function Index() {
           멋사에 등록된 구글 계정으로 로그인해 주세요.
         </HelperText>
       </BtnSection>
-    </div>
+    </Root>
   );
 }
 
 export default Index;
 
-// TODO: 랜딩페이지 이미지 확대시키기 (위아래 크롭)
-const Background = styled.img`
+const Root = styled.div`
   width: 100%;
   height: 100%;
+  overflow: hidden;
+`;
+
+const Background = styled.img`
+  width: 100%;
   display: flex;
   flex-direction: column;
+  // height: 100%;
   justify-content: center;
   align-items: center;
-  object-fit: scale-up;
+  position: absolute;
+
+  @media (min-width: 600px) {
+    bottom: -15%;
+  }
 `;
 
 const OverlayText = styled.div`

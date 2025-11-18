@@ -632,6 +632,8 @@ const ReviewCardLayout = styled.div<{ backgroundColor: string }>`
   border-radius: 8px;
   background: ${({ backgroundColor }) => backgroundColor};
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  box-sizing: border-box;
 `;
 
 const ReviewCardHeader = styled.div`
@@ -665,11 +667,15 @@ const ReviewCardBody = styled.div`
   gap: 16px;
   flex: 1;
   position: relative;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 `;
 
 const ReviewPhoto = styled.img`
   width: 160px;
-  height: 120px;
+  height: 140px;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
@@ -677,7 +683,7 @@ const ReviewPhoto = styled.img`
 
 const ReviewPhotoPlaceholder = styled.div`
   width: 160px;
-  height: 120px;
+  height: 140px;
   border-radius: 4px;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.2);
@@ -691,6 +697,10 @@ const ReviewContentWrapper = styled.div`
   gap: 8px;
   flex: 1;
   position: relative;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 `;
 
 const StarRating = styled.div`
@@ -698,6 +708,7 @@ const StarRating = styled.div`
   flex-direction: row;
   gap: 4px;
   align-items: center;
+  flex-shrink: 0;
 `;
 
 const StarIcon = styled.img`
@@ -709,14 +720,17 @@ const StarIcon = styled.img`
 const ReviewText = styled.div`
   overflow: hidden;
   color: #fff;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-family: Pretendard;
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
   width: 100%;
+  flex: 1;
   text-align: center;
+  word-break: break-word;
+  line-height: 1.4;
+  min-height: 0;
+  box-sizing: border-box;
 `;
 
 const EditButton = styled.button`
