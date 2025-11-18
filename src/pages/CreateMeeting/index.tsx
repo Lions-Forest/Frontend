@@ -72,6 +72,13 @@ function index() {
     }, [location.pathname, navigate]);
 
     const handleNextStep = async () => {
+        if (step === 1) {
+            if (!formData.title.trim()) {
+                setTopAlert("모임 제목을 입력해주세요.");
+                return;
+            }
+        }
+
         if (step === 5) {
             if (!formData.meetingAt) {
                 setTopAlert("모임 날짜/시각은 현재 시점 이후로만 설정 가능합니다");
