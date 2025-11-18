@@ -33,39 +33,43 @@ const formatToISO8601 = (
   return `${year}-${month}-${day}T${hourStr}:${minuteStr}:00`;
 };
 
+const extractDateParts = (date: Date): { year: string; month: string; day: string; amPm: string; hour: string; minute: string } => {
+  const year = String(date.getFullYear());
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  let hour24 = date.getHours();
+  const minute = String(date.getMinutes()).padStart(2, '0');
+
+  let amPm = '오전';
+  let hour = hour24;
+
+  if (hour24 === 0) {
+    hour = 12;
+  } else if (hour24 === 12) {
+    amPm = '오후';
+  } else if (hour24 > 12) {
+    amPm = '오후';
+    hour = hour24 - 12;
+  }
+
+  return {
+    year,
+    month,
+    day,
+    amPm,
+    hour: String(hour).padStart(2, '0'),
+    minute,
+  };
+};
+
 // ISO-8601 형식을 파싱하는 함수
 const parseISO8601 = (isoString: string): { year: string; month: string; day: string; amPm: string; hour: string; minute: string } | null => {
   if (!isoString) return null;
   
   try {
     const date = new Date(isoString);
-    const year = String(date.getFullYear());
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    
-    let hour24 = date.getHours();
-    const minute = String(date.getMinutes()).padStart(2, '0');
-    
-    let amPm = '오전';
-    let hour = hour24;
-    
-    if (hour24 === 0) {
-      hour = 12;
-    } else if (hour24 === 12) {
-      amPm = '오후';
-    } else if (hour24 > 12) {
-      amPm = '오후';
-      hour = hour24 - 12;
-    }
-    
-    return {
-      year,
-      month,
-      day,
-      amPm,
-      hour: String(hour).padStart(2, '0'),
-      minute,
-    };
+    return extractDateParts(date);
   } catch (e) {
     return null;
   }
@@ -80,12 +84,13 @@ const StepFiveDate: React.FC<StepFiveDateProps> = ({ onDataChange, initialMeetin
   const [isMinuteOpen, setIsMinuteOpen] = useState(false);
   
   const parsedDate = parseISO8601(initialMeetingAt);
-  const [selectedYear, setSelectedYear] = useState<string>(parsedDate?.year || '2025');
-  const [selectedMonth, setSelectedMonth] = useState<string>(parsedDate?.month || '01');
-  const [selectedDay, setSelectedDay] = useState<string>(parsedDate?.day || '01');
-  const [selectedAmPm, setSelectedAmPm] = useState<string>(parsedDate?.amPm || '오전');
-  const [selectedHour, setSelectedHour] = useState<string>(parsedDate?.hour || '01');
-  const [selectedMinute, setSelectedMinute] = useState<string>(parsedDate?.minute || '00');
+  const defaultDateParts = parsedDate ?? extractDateParts(new Date());
+  const [selectedYear, setSelectedYear] = useState<string>(defaultDateParts.year);
+  const [selectedMonth, setSelectedMonth] = useState<string>(defaultDateParts.month);
+  const [selectedDay, setSelectedDay] = useState<string>(defaultDateParts.day);
+  const [selectedAmPm, setSelectedAmPm] = useState<string>(defaultDateParts.amPm);
+  const [selectedHour, setSelectedHour] = useState<string>(defaultDateParts.hour);
+  const [selectedMinute, setSelectedMinute] = useState<string>(defaultDateParts.minute);
 
   // 컴포넌트 마운트 시 또는 초기값 변경 시 meetingAt 업데이트
   useEffect(() => {
@@ -113,7 +118,8 @@ const StepFiveDate: React.FC<StepFiveDateProps> = ({ onDataChange, initialMeetin
     }
   }, []); // 마운트 시 한 번만 실행
 
-  const years = ['2025', '2026', '2027', '2028', '2029'];
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => String(currentYear + i));
   const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
   const days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
   const amPmOptions = ['오전', '오후'];
