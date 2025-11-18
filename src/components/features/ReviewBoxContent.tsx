@@ -1,8 +1,10 @@
-import React from 'react'
+import type { FC } from 'react';
 import styled from 'styled-components'
 import ScoreNav from '../common/ScoreNav'
 import type { Review } from '@/types'
-import WriteButton from '../common/WriteButton'
+import { useNavigate } from 'react-router-dom'
+import { HiMiniPencil as Pen } from "react-icons/hi2";
+import type { ColorTheme } from './ReviewBox';
 
 function getRelativeTime(date: Date | string): string {
   const now = new Date();
@@ -18,9 +20,18 @@ function getRelativeTime(date: Date | string): string {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function ReviewBoxContent({ review }: { review: Review }){
+interface ReviewBoxContentProps {
+  review: Review;
+  theme: ColorTheme;
+}
+
+const ReviewBoxContent: FC<ReviewBoxContentProps> = ({ review, theme }) => {
 
   const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
+  const handleEditClick = (reviewId: number) => {
+    navigate("/mypage/review/revise", { state: { reviewId } });
+  };
 
   return (
     <ContentLayout>
@@ -32,7 +43,15 @@ function ReviewBoxContent({ review }: { review: Review }){
                     <DateText>{getRelativeTime(review.date)}</DateText>
                 </ProfileInfo>
                 {Number(userId) === review.userId && (
-                    <WriteButton />
+                    <EditButton
+                      type="button"
+                      aria-label="리뷰 수정"
+                      $background={theme.subheader}
+                      $border={theme.button}
+                      onClick={() => handleEditClick(review.id)}
+                    >
+                      <EditIcon $color={theme.button} />
+                    </EditButton>
                 )}
             </ProfileLayout>
             <ScoreNav review={review}/>
@@ -144,4 +163,25 @@ const ReviewDetail = styled.div`
     align-self: stretch;
     word-wrap: break-word;
     overflow-wrap: break-word;
+`;
+
+const EditButton = styled.button<{ $background: string; $border: string }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${({ $background }) => $background};
+  border: 1px solid ${({ $border }) => $border};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  flex-shrink: 0;
+`;
+
+const EditIcon = styled(Pen)<{ $color: string }>`
+  width: 20px;
+  height: 20px;
+  color: ${({ $color }) => $color};
 `;

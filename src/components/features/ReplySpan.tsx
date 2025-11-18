@@ -4,6 +4,7 @@ import { MdFavorite as FilledLike} from "react-icons/md";
 import { MdFavoriteBorder as EmptyLike } from "react-icons/md";
 import type { Reply } from "@/types";
 import { fetchLikeState } from "@/api/meeting/replyApi";
+import defaultProfile from '../../assets/images/LoadingLion.svg'
 
 interface ReplyProps {
     reply: Reply;
@@ -26,7 +27,7 @@ function ReplySpan({ reply, onLikeClick }: ReplyProps){
     return(
         <ReplyLayout>
           <ReplySection>
-            <ProfileImg src={reply.photoUrl} />
+            <ProfileImg src={defaultProfile} />
             <DetailSection>
               <ProfileName>{reply.userNickname}</ProfileName>
               <ReplyDetail>{reply.detail}</ReplyDetail>
@@ -67,7 +68,7 @@ const ProfileImg = styled.img`
     width: 32px;
     height: 32px;
     border-radius: 4px;
-    background: #848484;
+    background: #fff;
     object-fit: scale-down;
 `;
 

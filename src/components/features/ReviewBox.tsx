@@ -1,11 +1,11 @@
 import { fetchMeetingDetail } from '@/api/meeting/meetingListApi';
 import type { Meeting, Review } from '@/types';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ReviewBoxContent from './ReviewBoxContent';
 
-interface ColorTheme {
+export interface ColorTheme {
   header: string;
   subheader: string;
   button: string;
@@ -126,7 +126,7 @@ function ReviewBox({ reviews, color = 'green' }: ReviewBoxProps){
         </SubHeader>
         <ReviewSection>
           {reviews.map((review) => (
-            <ReviewBoxContent key={review.id} review={review} />
+            <ReviewBoxContent key={review.id} review={review} theme={theme} />
           ))}
         </ReviewSection>
     </BoxLayout>
