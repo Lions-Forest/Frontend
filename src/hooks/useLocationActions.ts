@@ -18,7 +18,6 @@ export function useLocationActions() {
 
       const data = docSnap.data();
       const likedByArray = data.likedBy || [];
-
       const alreadyLiked = likedByArray.includes(currentUserId);
 
       // 한번 더 누르면 좋아요 취소
@@ -31,9 +30,16 @@ export function useLocationActions() {
           likedBy: arrayUnion(currentUserId),
         });
 
-        await apiClient.post("/notifications/like", {
-          likedUserId: likedUserId,
-        });
+        const receiverIdAsNumber = Number(likedUserId);
+
+        if (isNaN(receiverIdAsNumber)) {
+          console.error("receiverId가 숫자가 아닙니다: ", likedUserId);
+          return;
+        }
+
+        await apiClient.post(
+          `/api/notifications/radar/like/${receiverIdAsNumber}`
+        );
       }
     } catch (error) {
       console.error("좋아요 업데이트 실패: ", error);
