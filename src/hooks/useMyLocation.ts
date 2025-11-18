@@ -131,6 +131,7 @@ export function useMyLocation({
         shareLocation: true,
         status,
         message,
+        likedBy: [],
         updatedAt: Date.now(),
       },
       { merge: true } // likeCount 등 다른 필드가 덮어쓰이지 않음
