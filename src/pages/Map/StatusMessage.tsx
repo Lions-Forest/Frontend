@@ -28,7 +28,7 @@ export default function StatusMessage({
   const anchor = { x: 0, y: 1 };
   const transform = isMe
     ? "translateX(35px) translateY(-130px)"
-    : "translateX(65px) translateY(0px)";
+    : "translateX(45px) translateY(-35px)";
 
   const handleLike = () => {
     onLike();
