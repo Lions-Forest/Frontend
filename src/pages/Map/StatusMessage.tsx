@@ -30,6 +30,14 @@ export default function StatusMessage({
     ? "translateX(35px) translateY(-130px)"
     : "translateX(45px) translateY(-35px)";
 
+  const heartIcon = isMe
+    ? totalLikes > 0
+      ? Heart
+      : EmptyHeart
+    : iLiked
+    ? Heart
+    : EmptyHeart;
+
   const handleLike = () => {
     onLike();
   };
@@ -44,13 +52,8 @@ export default function StatusMessage({
       yAnchor={anchor.y}
     >
       <MessageWrapper style={{ transform: transform }}>
-        <LikeButton onClick={handleLike}>
-          <img
-            src={iLiked ? Heart : EmptyHeart}
-            alt="좋아요"
-            width={35}
-            height={35}
-          />
+        <LikeButton onClick={!isMe ? handleLike : undefined} disabled={isMe}>
+          <img src={heartIcon} alt="좋아요" width={35} height={35} />
           {totalLikes > 0 && <LikeCount>{totalLikes}</LikeCount>}
         </LikeButton>
         <Message>{user.message}</Message>
@@ -77,7 +80,7 @@ const Message = styled.div`
   text-overflow: ellipsis;
 `;
 
-const LikeButton = styled.button`
+const LikeButton = styled.button<{ disabled?: boolean }>`
   position: absolute;
   top: 0;
   right: 0;
@@ -89,7 +92,7 @@ const LikeButton = styled.button`
   border: none;
   width: 35px;
   height: 35px;
-  cursor: pointer;
+  cursor: ${(p) => (p.disabled ? "default" : "pointer")};
   z-index: 10;
 `;
 

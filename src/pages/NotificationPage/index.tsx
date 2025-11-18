@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BackToNavBar from "@/components/common/BackToNavBar";
 import styled from 'styled-components';
 import NotificationCard, {type NotificationCardProps } from '@/components/features/NotificationCard';
@@ -7,6 +8,7 @@ import { markNotificationAsRead } from '@/api/notification/readNoteAPI';
 import notNoteIcon from '@/assets/icons/notNote.png';
 
 function index() {
+    const navigate = useNavigate();
     const [notifications, setNotifications] = useState<NotificationCardProps[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -58,22 +60,33 @@ function index() {
         fetchNotifications();
     }, [fetchNotifications]);
 
-    const handleNotificationClick = useCallback(async (notificationId: number, read: boolean) => {
-        if (read || updatingId === notificationId) {
+    const handleNotificationClick = useCallback(async (notification: NotificationCardProps) => {
+        if (notification.read || updatingId === notification.id) {
             return;
         }
 
         try {
-            setUpdatingId(notificationId);
-            await markNotificationAsRead(notificationId);
+            setUpdatingId(notification.id);
+            await markNotificationAsRead(notification.id);
             await fetchNotifications({ showLoading: false });
+
+            // targetType에 따라 라우팅 처리
+            if (notification.targetType === "GROUP") {
+                // GROUP인 경우 targetId가 있을 때만 이동
+                if (notification.targetId) {
+                    navigate(`/home/meeting-detail/${notification.targetId}`);
+                }
+            } else if (notification.targetType === "RADAR") {
+                // RADAR인 경우 /map으로 이동
+                navigate("/map");
+            }
         } catch (err) {
             console.error("알림 읽음 처리 실패:", err);
             setError("알림을 읽음 처리하는데 실패했습니다.");
         } finally {
             setUpdatingId(null);
         }
-    }, [fetchNotifications, updatingId]);
+    }, [fetchNotifications, updatingId, navigate]);
 
     const showEmptyState = !loading && (!!error || notifications.length === 0);
 
@@ -92,7 +105,7 @@ function index() {
                     <NotificationCard
                         key={notification.id}
                         {...notification}
-                        onClick={() => handleNotificationClick(notification.id, notification.read)}
+                        onClick={() => handleNotificationClick(notification)}
                         disabled={notification.read || updatingId === notification.id}
                     />
                 ))}

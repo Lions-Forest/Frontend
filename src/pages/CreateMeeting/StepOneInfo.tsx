@@ -97,10 +97,13 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    setTitle(newTitle);
-    // 데이터 변경 시 콜백 호출
-    if (onDataChange) {
-      onDataChange(newTitle, files);
+    // 15자 이내로 제한
+    if (newTitle.length <= 15) {
+      setTitle(newTitle);
+      // 데이터 변경 시 콜백 호출
+      if (onDataChange) {
+        onDataChange(newTitle, files);
+      }
     }
   };
 
@@ -110,9 +113,10 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
         <Title>모임 제목</Title>
         <TitleInput 
           type="text" 
-          placeholder="제목을 입력해주세요." 
+          placeholder="제목을 입력해주세요. (15자 이내)" 
           value={title}
           onChange={handleTitleChange}
+          maxLength={15}
         />
       </TitleSection>
       <PhotoSection>
