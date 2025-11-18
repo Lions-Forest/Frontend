@@ -12,7 +12,7 @@ import InfoButton from "@/components/common/InfoButton";
 import ReviewList from "@/components/features/ReviewList";
 import ReplyList from "@/components/features/ReplyList";
 import CircleArrow from "@/components/common/CircleArrow";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchReplyList, submitReply, toggleReplyLikes } from "@/api/meeting/replyApi";
 import { fetchParticipantList } from "@/api/meeting/meetingMemberApi";
 import MemberModal from "@/components/features/MemberModal";
@@ -57,13 +57,22 @@ function index() {
 
     const now = new Date();
   
+    const sortedPhotos = useMemo(() => {
+        if (!meeting?.photo) return [];
+        return [...meeting.photo].sort((a, b) => a.order - b.order);
+    }, [meeting?.photo]);
+
     const goPrev = () => setCurrentIdx(i => Math.max(0, i - 1));
     const goNext = () => {
         setCurrentIdx(i => {
-            const maxIdx = Math.max((meeting?.photo?.length ?? 1) - 1, 0);
+            const maxIdx = Math.max(sortedPhotos.length - 1, 0);
             return Math.min(maxIdx, i + 1);
         });
     };
+
+    useEffect(() => {
+        setCurrentIdx(0);
+    }, [sortedPhotos.length]);
     
     const [ replyList, setReplyList ] = useState<Reply[]>([]);
     const [ participantList, setParticipantList ] = useState<Participant[]>([]);
@@ -240,10 +249,7 @@ function index() {
                             <PicDetail>{meeting.title}</PicDetail>
                         </PicHeader>
                         <Picture 
-                            src={
-                                meeting.photo && meeting.photo.length > 0
-                                ? meeting.photo.find(p => p.order === 0)?.photoUrl || meeting.photo[0].photoUrl
-                                : ''} 
+                            src={sortedPhotos[currentIdx]?.photoUrl || ''} 
                             alt={meeting.title}
                         />
                         <ArrowWrapperRight>
