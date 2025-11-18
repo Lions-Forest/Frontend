@@ -6,6 +6,8 @@ export interface NotificationCardProps {
   id: number;
   content: string;
   imageUrl?: string;
+  targetId: number;
+  targetType: "GROUP" | "RADAR";
   read: boolean;
   onClick?: () => void;
   disabled?: boolean;

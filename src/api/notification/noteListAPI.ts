@@ -6,6 +6,8 @@ export interface NotificationResponse {
   id: number;
   content: string;
   photo: string;
+  targetId: number;
+  targetType: "GROUP" | "RADAR";
   read: boolean;
   createdAt: string; // ISO 8601 형식: "2025-11-12T10:42:34.325Z"
 }
@@ -77,6 +79,8 @@ export const transformNotifications = (
       id: notification.id,
       content: notification.content,
       imageUrl: notification.photo || undefined, // 빈 문자열인 경우 undefined
+      targetId: notification.targetId,
+      targetType: notification.targetType,
       read: notification.read,
     }));
 };
