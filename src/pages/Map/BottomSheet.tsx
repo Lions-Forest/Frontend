@@ -511,7 +511,7 @@ const SheetContainer = styled.div`
   z-index: 50;
   justify-content: center;
 //  max-height: ${sheetHeight}px;
-  min-height: 75px;
+//  min-height: 75px;
   box-sizing: border-box;
 `;
 
