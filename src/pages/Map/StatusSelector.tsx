@@ -1,7 +1,7 @@
 import type { UserLocation } from "@/api/UserLocation";
 import styled from "styled-components";
 import Nothing from "@/assets/status/nothing.svg";
-import NothingActive from "@/assets/status/nothingActive.svg";
+import NothingActive from "@/assets/status/nothingBigActive.png";
 import Studying from "@/assets/status/studying.svg";
 import StudyingActive from "@/assets/status/studyingActive.svg";
 import Working from "@/assets/status/working.svg";
@@ -138,7 +138,7 @@ const StatusButton = styled.button<{ $active: boolean; $disabled: boolean }>`
     !props.$disabled &&
     `
     ${Icon} {
-      transform: scale(1.25); 
+      // transform: scale(1.25); 
     }
   `}
 
