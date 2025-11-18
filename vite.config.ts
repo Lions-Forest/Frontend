@@ -14,7 +14,7 @@ export default defineConfig({
       includeAssets: ["icons/icon-192x192.png", "icons/icon-512x512.png"],
       manifest: {
         name: "모여봐요 사자의숲",
-        short_name: "사자의숲",
+        short_name: "모사숲",
         description: "모여봐요 사자의숲 PWA",
         start_url: "/",
         display: "standalone",
