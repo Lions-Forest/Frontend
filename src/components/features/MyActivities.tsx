@@ -246,6 +246,7 @@ function ActivityCard({ tab, data, background, reviewLookup }: ActivityCardProps
         location: item.location,
         category: item.category,
         state: item.state,
+        meetingAt: item.meetingAt,
       };
     }
 
@@ -262,6 +263,7 @@ function ActivityCard({ tab, data, background, reviewLookup }: ActivityCardProps
         location: item.location,
         category: item.category,
         state: item.state,
+        meetingAt: item.meetingAt,
       };
     }
 
@@ -353,6 +355,12 @@ function ActivityCard({ tab, data, background, reviewLookup }: ActivityCardProps
   if (!cardContent) return null;
   const hasReview = cardContent.id ? reviewLookup.has(cardContent.id) : false;
   const reviewData = cardContent.id ? reviewLookup.get(cardContent.id) : undefined;
+  const meetingDate = cardContent.meetingAt ? new Date(cardContent.meetingAt) : null;
+  const isPastMeeting =
+    meetingDate instanceof Date && !Number.isNaN(meetingDate.valueOf())
+      ? meetingDate.getTime() <= Date.now()
+      : false;
+  const canShowReviewButton = cardContent.state !== "OPEN" && isPastMeeting;
 
   const handleReviewButtonClick = () => {
     if (!cardContent?.id) return;
@@ -403,7 +411,7 @@ function ActivityCard({ tab, data, background, reviewLookup }: ActivityCardProps
             >
               모임 정보 확인
             </InfoButton>
-            {cardContent.state !== "OPEN" && (
+            {canShowReviewButton && (
               <ReviewButton
                 variant={hasReview ? "edit" : "write"}
                 onClick={handleReviewButtonClick}
