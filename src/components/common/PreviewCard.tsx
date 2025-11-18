@@ -64,7 +64,9 @@ function PreviewCard({ meeting, onChange }: PreviewCardProps) {
   const navigate = useNavigate();
   const remaining = calculateRemaining(meeting.date);
   const remainingTime = `${remaining.day}D : ${String(remaining.hour).padStart(2, '0')}H : ${String(remaining.min).padStart(2, '0')}M`;
-  const progress = meeting.memberNumber / meeting.memberLimit;
+  const calculateProgress = remaining.day * 24 + remaining.hour;
+  const progress = calculateProgress < 168 ? (168 - calculateProgress) / 168 * 100 : 0 ;
+  console.log(`${meeting.title}의 progress: ${progress}`);
 
   const [ joinState, setJoinState ] = useState<'join' | 'cancel'>('join');
   const [showModal, setShowModal] = useState(false);
@@ -144,8 +146,8 @@ function PreviewCard({ meeting, onChange }: PreviewCardProps) {
         </TitleLayout>
         <Progress>
             <ProgressOuter>
-                <ProgressBarInner width={progress * 100} color={theme.loading}/>
-                <ProgressBarLion src={lionHead} left={180 * progress}/>
+                <ProgressBarInner width={progress} color={theme.loading}/>
+                <ProgressBarLion src={lionHead} left={180 * progress / 100}/>
             </ProgressOuter>
             <Time>{remainingTime}</Time>
         </Progress>
@@ -166,14 +168,14 @@ function PreviewCard({ meeting, onChange }: PreviewCardProps) {
                         <div>장소</div>
                     </InfoTitle>
                     <InfoDetail>
-                        <div>{meeting.type}</div>
-                        <div>
+                        <InfoText>{meeting.type}</InfoText>
+                        <InfoText>
                           {meeting.complete
                             ? meeting.owner?.name
                             : meeting.owner?.nickname}
-                        </div>
-                        <div>{meeting.memberNumber}/{meeting.memberLimit}</div>
-                        <div>{meeting.location}</div>
+                        </InfoText>
+                        <InfoText>{meeting.memberNumber}/{meeting.memberLimit}</InfoText>
+                        <InfoText>{meeting.location}</InfoText>
                     </InfoDetail>
                 </Info>
             </Body>
@@ -272,7 +274,7 @@ const ProgressBarInner = styled.div<ProgressBarInnerProps>`
 const ProgressBarLion = styled.img<{ left?: number }>`
   width: 36px;
   height: 31px;
-  margin-left: 3%;
+  margin-left: 2%;
   position: absolute;
   left: ${(props) => `${props.left}px` || "0px"};
   top: -15px;
@@ -311,7 +313,7 @@ const ImagePlaceholder = styled.img`
   height: 85px;
   background: #fff;
   border-radius: 7px;
-  object-fit: scale-down; // TODO: 이게 낫나,,? 아님 그냥 cover로 바꿔??
+  object-fit: cover;
 `;
 
 const Info = styled.div`
@@ -326,6 +328,10 @@ const InfoTitle = styled.div`
   justify-content: center;
   margin-left: 16px;
   gap: 6px;
+  align-self: stretch;
+  flex-shrink: 0;
+  min-width: max-content;
+  white-space: nowrap;
 
   color: #000;
   font-family: Pretendard;
@@ -341,6 +347,14 @@ const InfoDetail = styled.div`
   align-item: start;
   justify-content: center;
   gap: 6px;
+  padding-right: 10px;
+`;
+
+const InfoText = styled.div`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 
   color: #000;
   font-family: Pretendard;
@@ -353,6 +367,6 @@ const InfoDetail = styled.div`
 const Buttons = styled.div`
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: 15px;
   margin: 11px;
 `;

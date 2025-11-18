@@ -463,7 +463,7 @@ const DetailText = styled.div`
     line-height: normal;
 
     display: flex;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
 `;
 
@@ -485,7 +485,7 @@ const MemberProfiles = styled.div`
 `;
 
 const MemberCount = styled.span`
-    margin-left: 8px;
+    margin-left: 6px;
 `;
 
 const EtcText = styled.div`
