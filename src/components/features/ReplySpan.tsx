@@ -60,6 +60,7 @@ const ReplySection = styled.div`
     display: flex;
     align-items: flex-start;
     gap: 16px;
+    width: 95%;
 `;
 
 const ProfileImg = styled.img`
@@ -89,12 +90,11 @@ const ProfileName = styled.div`
 `;
 
 const ReplyDetail = styled.div`
-    // height: 25px;
     align-self: stretch;
-    overflow: hidden;
     color: #000;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
     font-family: Pretendard;
     font-size: 12px;
     font-style: normal;

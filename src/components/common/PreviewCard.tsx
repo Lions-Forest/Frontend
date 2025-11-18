@@ -241,7 +241,7 @@ const Title = styled.div`
 
 const Progress = styled.div`
   display: flex;
-  margin: 0px 16px;
+  padding: 0px 16px;
   gap: 16px;
   align-items: center;
   width: 100%;
@@ -249,6 +249,7 @@ const Progress = styled.div`
 
 const ProgressOuter = styled.div`
   width: 187px;
+  // width: 60%;
   height: 7px;
   border-radius: 50px;
 
@@ -283,6 +284,16 @@ const Time = styled.div`
   font-weight: 700;
   font-size: 15px;
   color: #ffffff;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 40%;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 `;
 
 const Body = styled.div`

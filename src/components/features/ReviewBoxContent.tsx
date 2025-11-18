@@ -133,8 +133,6 @@ const Photo = styled.img`
 const ReviewDetail = styled.div`
     overflow: hidden;
     color: #000;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     font-family: Pretendard;
     font-size: 12px;
     font-style: normal;
@@ -143,4 +141,7 @@ const ReviewDetail = styled.div`
 
     display: flex;
     justify-content: flex-start;
+    align-self: stretch;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 `;
