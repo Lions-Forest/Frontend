@@ -148,7 +148,7 @@ const BannerButton = styled.button`
   display: flex;
   align-items: center;
   align-self: flex-end;
-  gap: 9px;
+  gap: 6px;
   width: 139px;
   height: 30px;
   background: #ffffff;
