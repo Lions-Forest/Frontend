@@ -6,7 +6,6 @@ import two from '../../assets/icons/alarmTwo.png'
 import three from '../../assets/icons/alarmThree.png'
 import more from '../../assets/icons/alarmMore.png'
 import type { Member } from '@/types';
-import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useState } from 'react';
 import { getNotificationNumber } from '@/api/notification/numberAPI';
 
@@ -18,8 +17,6 @@ interface HeaderProps {
 function Header({ page = 'home' }: HeaderProps = {}) {
     const navigate = useNavigate();
     
-    let text : string = '';
-
     const [notification, setNotification] = useState(0);
     let userId = localStorage.getItem("userId");
 
@@ -48,37 +45,27 @@ function Header({ page = 'home' }: HeaderProps = {}) {
     else if ( notification >= 4 ) alarmImgSrc = more;
     else alarmImgSrc = none;
 
+    const handleLogoClick = () => {
+        navigate('/home');
+    };
+
     // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
     const handleAlarmClick = () => {
         navigate('/notification');
     };
 
-    // subheader 타이틀 설정
-    if (page === 'meeting-detail') {
-        text = '소모임';
-    } else if (page === 'create-meeting'){
-        text = '모임 개설하기';
-    } else {
-        text = '사진 선택';
-    }
-    
     return(
         <Layout>
             <HeaderLayout>
-                <Title>
+                <TitleButton type="button" onClick={handleLogoClick} aria-label="홈으로 이동">
                     <TitleLetter color='#FFF200'>모여봐요</TitleLetter>
                     <TitleLetter color='#FF2370'>사</TitleLetter>
                     <TitleLetter color='#0095FF'>자</TitleLetter>
                     <TitleLetter color='#FBBC04'>의</TitleLetter>
                     <TitleLetter color='#43D687'>숲</TitleLetter>
-                </Title>
+                </TitleButton>
                 <AlarmImg src={alarmImgSrc} onClick={handleAlarmClick} /> {/*핸들러 추가 p.s. 정건*/}
             </HeaderLayout>
-            {page !== 'home' &&
-            <HeaderLayout> 
-                {/*<SubTitle>{text}</SubTitle>*/}
-            </HeaderLayout>
-            }
         </Layout>
     )
 }
@@ -101,13 +88,17 @@ const HeaderLayout = styled.div`
     align-items: center;
 `;
 
-const Title = styled.div`
+const TitleButton = styled.button`
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
     font-family: dongleBold;
     font-size: 36px;
     leading-trim: NONE;
     line-height: 100%;
     letter-spacing: 0%;
-    display: flex;
 `;
 
 const TitleLetter = styled.div`
@@ -118,12 +109,4 @@ const TitleLetter = styled.div`
 const AlarmImg = styled.img`
     width: 23px;
     cursor: pointer; // 알림 아이콘 클릭 핸들러(알림 페이지 이동)_p.s. 정건
-`;
-
-const SubTitle = styled.div`
-    color: #000;
-    font-family: dongleRegular;
-    font-weight: 700;
-    font-size: 30px;
-    align-self: stretch;
 `;

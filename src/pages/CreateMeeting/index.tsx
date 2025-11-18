@@ -37,6 +37,19 @@ function index() {
         capacity: 2,
         location: "",
     });
+    const [topAlert, setTopAlert] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!topAlert) return;
+
+        const timerId = window.setTimeout(() => {
+            setTopAlert(null);
+        }, 4000);
+
+        return () => {
+            window.clearTimeout(timerId);
+        };
+    }, [topAlert]);
 
     // URL에서 현재 step 추출
     const getStepFromPath = (pathname: string): number => {
@@ -59,6 +72,28 @@ function index() {
     }, [location.pathname, navigate]);
 
     const handleNextStep = async () => {
+        if (step === 1) {
+            if (!formData.title.trim()) {
+                setTopAlert("모임 제목을 입력해주세요.");
+                return;
+            }
+        }
+
+        if (step === 5) {
+            if (!formData.meetingAt) {
+                setTopAlert("모임 날짜/시각은 현재 시점 이후로만 설정 가능합니다");
+                return;
+            }
+
+            const meetingDate = new Date(formData.meetingAt);
+            const now = new Date();
+
+            if (isNaN(meetingDate.getTime()) || meetingDate <= now) {
+                setTopAlert("모임 날짜/시각은 현재 시점 이후로만 설정 가능합니다");
+                return;
+            }
+        }
+
         if (step === 6) {
             // Step 6일 때는 API 호출을 위해 StepSixLocation의 handleComplete를 호출
             // 하지만 여기서는 직접 API를 호출하는 것이 더 간단함
@@ -124,6 +159,7 @@ function index() {
     return(
         <Layout page="create-meeting" showBackNavBar={true} backNavBarText="모임 개설하기">
             <CreateMeetingLayout>
+                {topAlert && <TopAlert role="alert">{topAlert}</TopAlert>}
                 <ProgressBarContainer>
                     <ProgressBarWrapper>
                         <ProgressBarFill progress={(step / TOTAL_STEPS) * 100} />
@@ -252,4 +288,26 @@ const ButtonWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+`;
+
+const TopAlert = styled.div`
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 280px;
+    max-width: 480px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: rgba(255, 77, 79, 0.9);
+    color: #fff;
+    font-family: Pretendard;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.5;
+    word-break: keep-all;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 999;
+    white-space: pre-line;
 `;
