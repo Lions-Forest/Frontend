@@ -192,7 +192,7 @@ export default function BaseMap({
                   image={{
                     src: markerImg,
                     size: { width: 65, height: 87 },
-                    options: { offset: { x: 25, y: 50 } }, // (마커 이미지의 핀포인트)
+                    options: { offset: { x: 32, y: 87 } }, // (마커 이미지의 핀포인트)
                   }}
                   onClick={handleMarkerClick}
                 />

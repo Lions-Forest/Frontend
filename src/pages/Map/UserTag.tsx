@@ -51,7 +51,8 @@ const TagWrapper = styled.div<{ $color: string }>`
   background-color: ${(p) => p.$color};
   cursor: pointer;
   align-items: center;
-  transform: translateY(-43px);
+  transform: translateY(-77px);
+  pointer-events: none;
 `;
 
 const Nickname = styled.div`
