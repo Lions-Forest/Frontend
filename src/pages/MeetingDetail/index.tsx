@@ -1,5 +1,5 @@
 import Layout from "@/components/layout/Layout";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import type { Meeting, Participant, Reply } from "@/types";
 import { MdToday as DateIcon} from "react-icons/md";
@@ -46,6 +46,8 @@ function formatMeetingDate(date: Date | string) {
 
 function index() {
     const location = useLocation();
+    const params = useParams<{ id: string }>();
+    const groupId = params.id ? Number(params.id) : undefined;
     const initialMeeting = location.state?.meeting as Meeting | undefined;
     const remainingTime = location.state?.remainingTime as string;
     const timeText = location.state?.timeText as string;
@@ -132,6 +134,24 @@ function index() {
         if (!meeting?.id) return;
         navigate(`/mypage/review`, { state: { groupId: meeting.id } });
     };
+
+    // URL 파라미터로 이동한 경우 (알림 등) meeting 데이터 가져오기
+    useEffect(() => {
+        const fetchMeetingData = async () => {
+            // initialMeeting이 없고 groupId가 있는 경우 API 호출
+            if (!initialMeeting && groupId) {
+                try {
+                    const meetingDetail = await fetchMeetingDetail(groupId);
+                    if (meetingDetail) {
+                        setMeeting(meetingDetail);
+                    }
+                } catch (error) {
+                    console.error("모임 정보 불러오기 실패:", error);
+                }
+            }
+        };
+        fetchMeetingData();
+    }, [groupId, initialMeeting]);
   
     // 해당 모임 댓글 정보 불러오기
     useEffect (() => {
