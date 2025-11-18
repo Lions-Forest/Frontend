@@ -10,6 +10,8 @@ interface StepOneInfoProps {
   initialPhotos?: File[];
 }
 
+const MAX_PHOTOS = 5;
+
 const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = "", initialPhotos = [] }) => {
   const [images, setImages] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>(initialPhotos);
@@ -26,8 +28,9 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
   useEffect(() => {
     // initialPhotos가 변경되면 파일과 이미지 복원
     if (initialPhotos.length > 0) {
+      const limitedInitialPhotos = initialPhotos.slice(0, MAX_PHOTOS);
       // 파일이 있으면 미리보기 이미지 생성
-      const promises = initialPhotos.map((file) => {
+      const promises = limitedInitialPhotos.map((file) => {
         return new Promise<string>((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => {
@@ -38,7 +41,7 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
       });
       Promise.all(promises).then((newImages) => {
         setImages(newImages);
-        setFiles(initialPhotos);
+        setFiles(limitedInitialPhotos);
       });
     } else if (initialPhotos.length === 0) {
       // 초기값이 비어있으면 초기화
@@ -50,7 +53,15 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
     if (selectedFiles && selectedFiles.length > 0) {
-      const fileArray = Array.from(selectedFiles);
+      const availableSlots = Math.max(MAX_PHOTOS - files.length, 0);
+      if (availableSlots === 0) {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      const fileArray = Array.from(selectedFiles).slice(0, availableSlots);
       const promises = fileArray.map((file) => {
         return new Promise<string>((resolve) => {
           const reader = new FileReader();
@@ -80,6 +91,9 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
   };
 
   const handlePhotoIconClick = () => {
+    if (files.length >= MAX_PHOTOS) {
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -107,6 +121,8 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
     }
   };
 
+  const isMaxPhotoLimitReached = files.length >= MAX_PHOTOS;
+
   return (
     <Container>
       <TitleSection>
@@ -121,7 +137,7 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
       </TitleSection>
       <PhotoSection>
         <Title>대표 사진</Title>
-        <Description>공고에 사용할 사진이 있다면 추가해주세요.</Description>
+        <Description>공고에 사용할 사진이 있다면 추가해주세요. (최대 5장)</Description>
         <PhotoContainer>
           <PhotoList>
             {images.map((image, index) => (
@@ -132,7 +148,11 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
                 </RemoveButton>
               </PhotoItem>
             ))}
-            <PhotoUploadButton onClick={handlePhotoIconClick}>
+            <PhotoUploadButton
+              type="button"
+              onClick={handlePhotoIconClick}
+              disabled={isMaxPhotoLimitReached}
+            >
               <PhotoIcon src={photoIcon} alt="Add photo" />
             </PhotoUploadButton>
           </PhotoList>
@@ -281,20 +301,21 @@ const XIcon = styled.img`
   height: 34px;
 `;
 
-const PhotoUploadButton = styled.button`
+const PhotoUploadButton = styled.button<{ disabled?: boolean }>`
   flex-shrink: 0;
   width: 94px;
   height: 94px;
   border: none;
   background: transparent;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   
   &:hover {
-    opacity: 0.8;
+    opacity: ${({ disabled }) => (disabled ? 0.4 : 0.8)};
   }
 `;
 
