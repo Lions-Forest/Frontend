@@ -152,6 +152,7 @@ export default function BaseMap({
             }}
             title={`${name} (나)`}
             onClick={() => {
+              if (!statusMessage || statusMessage.trim() === "") return;
               setSelectedUserId((prevId) =>
                 prevId === userId ? null : userId
               );
@@ -180,6 +181,8 @@ export default function BaseMap({
               getMarkerImage(user.status, false) || nothingMarker;
 
             const handleMarkerClick = () => {
+              if (!user.message || user.message.trim() === "") return;
+
               setSelectedUserId((prevId) =>
                 prevId === user.userId ? null : user.userId
               );
