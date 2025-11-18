@@ -12,6 +12,7 @@ import MapPage from "./pages/Map/MapPage";
 import ReviewPage from "./pages/Mypage/ReviewPage";
 import ReviewRevisePage from "./pages/Mypage/ReviewRevisePage";
 import { useEffect } from "react";
+import AuthAlert from "./components/common/AuthAlert";
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
       <GlobalStyle />
       <div className="container">
         <BrowserRouter>
+          <AuthAlert />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/home" element={<HomePage />} />
