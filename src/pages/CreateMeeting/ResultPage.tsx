@@ -40,8 +40,10 @@ const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 430px;
   height: 100vh;
-  position: relative;
+  margin: 0 auto;
+//  position: relative;
   background-color: #E2EDE7;
   overflow: hidden;
 `;
@@ -80,11 +82,15 @@ const ContentArea = styled.div`
 
 const BackgroundImage = styled.img`
   position: absolute;
-  top: 40%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
   pointer-events: none;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 `;
 
 const LionImage = styled.img`
@@ -97,13 +103,18 @@ const LionImage = styled.img`
 `;
 
 const BottomActionBar = styled.div`
-  position: fixed;
-  bottom: 111px;
-  right: 46px;
+  position: absolute;
+  bottom: 5%;
+  left: 65%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
   z-index: 100;
+  width: calc(100% - 32px);
+  max-width: 398px;
+  padding: 0 16px;
 `;
 
 const ActionText = styled.div`
