@@ -107,6 +107,15 @@ const SubTitle = styled.div`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 70%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 `;
 
 const NoneTitle = styled.div`
