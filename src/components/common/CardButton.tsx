@@ -77,18 +77,20 @@ const BtnLayout = styled.div<BtnLayoutProps>`
   display: flex;
   width: 100%;
   max-width: 162px;
-  height: 100%;
+  // height: 100%;
+  height: 30px;
   padding: 8px 10px;
   justify-content: center;
   align-items: center;
   gap: 10px;
+  border-radius: 7px;
+
   color: #000;
   font-family: Pretendard;
   font-size: 10px;
   font-style: normal;
   font-weight: 700;
-  line-height: normal;
-  border-radius: 7px;
+
   background: ${({ bgColor }) => bgColor};
   color: ${({ textColor }) => textColor};
   border: ${({ border }) => border};

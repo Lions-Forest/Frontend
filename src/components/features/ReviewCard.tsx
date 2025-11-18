@@ -19,7 +19,7 @@ function ReviewCard({ review }: { review: Review }){
             <ProfileImg src={review.userProfile || ""} />
                 <ProfileName>{review.userName}</ProfileName>
             </Header>
-            <CardPhoto src={(review.photo && (review.photo.find(p => p.order === 0)?.photoUrl || review.photo[0]?.photoUrl)) || ''}/>
+            <CardPhoto src={(review.photo && (review.photo.find(p => p.order === 0)?.photoUrl || review.photo[0]?.photoUrl)) || undefined}/>
             <DetailSection>
                 <ScoreNav review={review} />
                 <ZoomIcon src={zoomIcon}/>

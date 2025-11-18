@@ -120,7 +120,7 @@ const StepOneInfo: React.FC<StepOneInfoProps> = ({ onDataChange, initialTitle = 
         />
       </TitleSection>
       <PhotoSection>
-        <Title>대표 사진(선택)</Title>
+        <Title>대표 사진</Title>
         <Description>공고에 사용할 사진이 있다면 추가해주세요.</Description>
         <PhotoContainer>
           <PhotoList>
