@@ -1,20 +1,20 @@
 import type { UserLocation } from "@/api/UserLocation";
 import styled from "styled-components";
-import Nothing from "@/assets/status/nothing.svg";
+import Nothing from "@/assets/status/nothing.png";
 import NothingActive from "@/assets/status/nothingActive.png";
-import Studying from "@/assets/status/studying.svg";
+import Studying from "@/assets/status/studying.png";
 import StudyingActive from "@/assets/status/studyingActive.png";
-import Working from "@/assets/status/working.svg";
+import Working from "@/assets/status/working.png";
 import WorkingActive from "@/assets/status/workingActive.png";
-import Relaxing from "@/assets/status/relaxing.svg";
+import Relaxing from "@/assets/status/relaxing.png";
 import RelaxingActive from "@/assets/status/relaxingActive.png";
-import Eating from "@/assets/status/eating.svg";
+import Eating from "@/assets/status/eating.png";
 import EatingActive from "@/assets/status/eatingActive.png";
-import Playing from "@/assets/status/playing.svg";
+import Playing from "@/assets/status/playing.png";
 import PlayingActive from "@/assets/status/playingActive.png";
-import Boring from "@/assets/status/boring.svg";
+import Boring from "@/assets/status/boring.png";
 import BoringActive from "@/assets/status/boringActive.png";
-import Hungry from "@/assets/status/hungry.svg";
+import Hungry from "@/assets/status/hungry.png";
 import HungryActive from "@/assets/status/hungryActive.png";
 import { useState } from "react";
 

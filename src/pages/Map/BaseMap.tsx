@@ -7,7 +7,7 @@ import LoadingPage from "@/pages/Map/LoadingPage";
 import type { UserLocation } from "@/api/UserLocation";
 import { getMarkerImage } from "@/constants/markerImages";
 import defaultLion from "@/assets/lion/defaultLion.svg";
-import nothingMarker from "@/assets/marker/nothingMarker.svg";
+import nothingMarker from "@/assets/marker/nothingMarker.png";
 import moveToMyLocationBtn from "@/assets/icons/moveToMyLocation.png";
 import Footer from "@/components/layout/Footer";
 import BottomSheet from "./BottomSheet";
