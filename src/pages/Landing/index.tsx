@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import landingImage from "../../assets/images/landingImage.png";
+import landingImageWider from "../../assets/images/WiderLanding.svg"
 import { db } from "@/firebase/firebase";
 import { loginWithGoogle } from "@/api/user/login";
 
@@ -149,7 +150,7 @@ function Index() {
   return (
     <Root>
       {error && <ErrorBanner role="alert">{error}</ErrorBanner>}
-      <Background src={landingImage} />
+      <Background src={landingImageWider} />
       <OverlayText>
         <ColorSpan
           color={colorStep ? "rgba(255, 234, 0, 1)" : "rgba(255, 255, 255, 1)"}
@@ -209,17 +210,20 @@ const Root = styled.div`
 `;
 
 const Background = styled.img`
+  object-fit: cover;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  // height: 100%;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
+  max-width: 600px;
+  height: 100%;
+  // width: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: center;
+  // align-items: center;
+  // position: absolute;
 
-  @media (min-width: 600px) {
-    bottom: -15%;
-  }
+  // @media (min-width: 600px) {
+  //   bottom: -15%;
+  // }
 `;
 
 const OverlayText = styled.div`
@@ -247,7 +251,7 @@ const ColorSpan = styled.span<ColorSpanProps>`
 
 const BtnSection = styled.div<BtnSectionProps>`
   position: absolute;
-  bottom: 10%;
+  bottom: 7%;
   left: 0;
   width: 100%;
   display: flex;
