@@ -1,9 +1,9 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { getMyClassList, type MyClassListResponse } from "@/api/class/myClassListAPI";
 import { getMyOpenList } from "@/api/class/myOpenListAPI";
-import { getMyReviewList, type MyReviewListResponse } from "@/api/user/myReviewListAPI";
+import { getMyReviewList } from "@/api/user/myReviewListAPI";
 import starOnIcon from "@/assets/icons/starOn.svg";
 import starOffIcon from "@/assets/icons/starOff.svg";
 import pencilIcon from "@/assets/icons/pencil.svg";
@@ -80,7 +80,60 @@ function MyActivities() {
   const [myClassList, setMyClassList] = useState<MyClassListResponse[]>([]);
   const [myOpenList, setMyOpenList] = useState<MyClassListResponse[]>([]);
   const [myReviewList, setMyReviewList] = useState<ReviewHistory[]>([]);
+  const [reviewLookup, setReviewLookup] = useState<Map<number, ReviewHistory>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
+
+  const loadMyReviewList = useCallback(
+    async (options?: { skipLoader?: boolean }) => {
+      if (!options?.skipLoader) {
+        setIsLoading(true);
+      }
+      try {
+        let userId = localStorage.getItem("userId");
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken || !userId) {
+          userId = "2";
+        }
+
+        if (!userId) {
+          console.error("사용자 ID를 찾을 수 없습니다.");
+          setMyReviewList([]);
+          setReviewLookup(new Map());
+          return;
+        }
+
+        const data = await getMyReviewList(Number(userId));
+        const transformedData: ReviewHistory[] = data.map((review) => ({
+          id: review.id,
+          groupId: review.groupId,
+          userId: review.userId,
+          content: review.content,
+          score: review.score,
+          createdAt: review.createdAt,
+          meetingAt: review.createdAt,
+          groupTitle: review.groupTitle,
+          photos: review.photos,
+        }));
+        setMyReviewList(transformedData);
+        const lookup = new Map<number, ReviewHistory>();
+        transformedData.forEach((review) => {
+          if (review.groupId) {
+            lookup.set(review.groupId, review);
+          }
+        });
+        setReviewLookup(lookup);
+      } catch (error) {
+        console.error("Failed to fetch my review list:", error);
+        setMyReviewList([]);
+        setReviewLookup(new Map());
+      } finally {
+        if (!options?.skipLoader) {
+          setIsLoading(false);
+        }
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     const fetchMyClassList = async () => {
@@ -107,54 +160,18 @@ function MyActivities() {
       }
     };
 
-    const fetchMyReviewList = async () => {
-      setIsLoading(true);
-      try {
-        // localStorage에서 userId 가져오기
-        let userId = localStorage.getItem("userId");
-        
-        // test2 토큰 사용 중인지 확인
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken || !userId) {
-          userId = "2"; // test2 계정 사용 중
-        }
-        
-        if (!userId) {
-          console.error("사용자 ID를 찾을 수 없습니다.");
-          setMyReviewList([]);
-          return;
-        }
-
-        const data = await getMyReviewList(Number(userId));
-        // API 응답을 ReviewHistory 형식으로 변환
-        const transformedData: ReviewHistory[] = data.map((review) => ({
-          id: review.id,
-          groupId: review.groupId,
-          userId: review.userId,
-          content: review.content,
-          score: review.score,
-          createdAt: review.createdAt,
-          meetingAt: review.createdAt, // createdAt을 meetingAt으로 사용
-          groupTitle: review.groupTitle,
-          photos: review.photos,
-        }));
-        setMyReviewList(transformedData);
-      } catch (error) {
-        console.error("Failed to fetch my review list:", error);
-        setMyReviewList([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (selectedTab === "신청 내역") {
       fetchMyClassList();
     } else if (selectedTab === "개설 내역") {
       fetchMyOpenList();
     } else if (selectedTab === "모임 후기 관리") {
-      fetchMyReviewList();
+      loadMyReviewList();
     }
-  }, [selectedTab, location.pathname]); // location.pathname을 dependency에 추가하여 페이지 진입 시마다 API 호출
+  }, [selectedTab, location.pathname, loadMyReviewList]); // location.pathname을 dependency에 추가하여 페이지 진입 시마다 API 호출
+
+  useEffect(() => {
+    loadMyReviewList({ skipLoader: true });
+  }, [loadMyReviewList]);
 
   const tabData = useMemo(() => {
     if (selectedTab === "신청 내역") return myClassList;
@@ -192,6 +209,7 @@ function MyActivities() {
               tab={selectedTab}
               data={data}
               background={cardColors[index % cardColors.length]}
+              reviewLookup={reviewLookup}
             />
           ))
         )}
@@ -208,9 +226,10 @@ interface ActivityCardProps {
   tab: TabType;
   data: ActivityData;
   background: string;
+  reviewLookup: Map<number, ReviewHistory>;
 }
 
-function ActivityCard({ tab, data, background }: ActivityCardProps) {
+function ActivityCard({ tab, data, background, reviewLookup }: ActivityCardProps) {
   const navigate = useNavigate();
   
   const cardContent = useMemo(() => {
@@ -250,10 +269,8 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
     return null;
   }, [tab, data]);
 
-  const handleReviewClick = () => {
-    if (cardContent?.id) {
-      navigate("/mypage/review", { state: { groupId: cardContent.id } });
-    }
+  const handleReviewClick = (groupId: number) => {
+    navigate("/mypage/review", { state: { groupId } });
   };
 
   const handleInfoClick = async () => {
@@ -277,7 +294,7 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
   };
 
   const handleEditClick = (reviewId: number) => {
-    navigate("/mypage/review/revise", { state: { reviewId } });
+      navigate("/mypage/review/revise", { state: { reviewId } });
   };
 
   // 리뷰 내역인 경우 새로운 형식으로 표시
@@ -334,6 +351,17 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
 
   // 신청 내역 또는 개설 내역인 경우 새로운 형식으로 표시
   if (!cardContent) return null;
+  const hasReview = cardContent.id ? reviewLookup.has(cardContent.id) : false;
+  const reviewData = cardContent.id ? reviewLookup.get(cardContent.id) : undefined;
+
+  const handleReviewButtonClick = () => {
+    if (!cardContent?.id) return;
+    if (hasReview && reviewData) {
+      handleEditClick(reviewData.id);
+    } else {
+      handleReviewClick(cardContent.id);
+    }
+  };
 
   return (
     <CardLayout backgroundColor={background}>
@@ -376,7 +404,12 @@ function ActivityCard({ tab, data, background }: ActivityCardProps) {
               모임 정보 확인
             </InfoButton>
             {cardContent.state !== "OPEN" && (
-              <ReviewButton onClick={handleReviewClick}>후기 작성하기</ReviewButton>
+              <ReviewButton
+                variant={hasReview ? "edit" : "write"}
+                onClick={handleReviewButtonClick}
+              >
+                {hasReview ? "후기 수정하기" : "후기 작성하기"}
+              </ReviewButton>
             )}
           </ButtonRow>
         </CardBodyContent>
@@ -495,19 +528,6 @@ const MeetingDateText = styled.div`
   line-height: 16px;
 `;
 
-const CardTitle = styled.div`
-  color: #000;
-  font-family: dongleBold;
-  font-size: 26px;
-`;
-
-const CardSubInfo = styled.div`
-  color: #848484;
-  font-family: Pretendard;
-  font-size: 12px;
-  font-weight: 600;
-`;
-
 const CardBody = styled.div`
   padding: 0 20px;
 `;
@@ -565,13 +585,6 @@ const ButtonRow = styled.div<{ isOpen?: boolean }>`
   margin-top: 15px;
 `;
 
-const InfoRow = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  width: 100%;
-`;
-
 const InfoLabel = styled.div`
   color: #404040;
   font-family: Pretendard;
@@ -619,13 +632,14 @@ const InfoButton = styled.button<{ isOpen?: boolean }>`
   text-overflow: ellipsis;
 `;
 
-const ReviewButton = styled.button`
+const ReviewButton = styled.button<{ variant?: "write" | "edit" }>`
   flex: 1;
   min-width: 0;
   height: 24px;
   flex-shrink: 0;
   border-radius: 8px;
-  background: #088C45;
+  background: ${({ variant }) =>
+    variant === "edit" ? "#FFB347" : "#088C45"};
   border: none;
   cursor: pointer;
   font-family: Pretendard;
