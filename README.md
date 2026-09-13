@@ -60,6 +60,7 @@
 <br />
 
 ## 📂 Directory Structure
+```
 src/
  ├── api/                  # 도메인별 API 함수
  │    ├── class/
@@ -89,6 +90,7 @@ src/
  ├── styles/
  ├── types/
  └── utils/
+```
 
 <br />
 
